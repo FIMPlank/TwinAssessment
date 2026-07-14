@@ -610,10 +610,32 @@ document.addEventListener('DOMContentLoaded', async function() {
     }).then(function () { busy = false; });
   }
 
+  /* Discreet, always-visible link to the researcher dashboard (admin area). */
+  var adminLink = null;
+  function buildAdminLink() {
+    adminLink = document.createElement("a");
+    adminLink.id = "__study_admin";
+    adminLink.href = "dashboard.html";
+    adminLink.target = "_blank";
+    adminLink.rel = "noopener";
+    adminLink.setAttribute("data-print-hide", "");
+    adminLink.textContent = "Study dashboard ↗";
+    adminLink.title = "Researcher area — sign-in required";
+    adminLink.style.cssText =
+      "position:fixed;left:16px;bottom:16px;z-index:99997;text-decoration:none;" +
+      "font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;letter-spacing:0.04em;" +
+      "color:#9A9A95;background:rgba(255,255,255,0.92);border:1px solid #E3E1D9;border-radius:20px;" +
+      "padding:7px 13px;box-shadow:0 1px 4px rgba(0,0,0,0.06);transition:color .12s,border-color .12s;";
+    adminLink.addEventListener("mouseenter", function(){ adminLink.style.color = "#17191C"; adminLink.style.borderColor = "#C9C7BF"; });
+    adminLink.addEventListener("mouseleave", function(){ adminLink.style.color = "#9A9A95"; adminLink.style.borderColor = "#E3E1D9"; });
+    document.body.appendChild(adminLink);
+  }
+
   /* Keep the panel attached (the bundler replaces <html> once at mount) and
      only show it once the assessment is complete. */
   function tick() {
     if (!document.body) return;
+    if (!adminLink || !document.body.contains(adminLink)) buildAdminLink();
     if (!el.wrap || !document.body.contains(el.wrap)) buildPanel();
     var st = readState();
     var show = isComplete(st);
