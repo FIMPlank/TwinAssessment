@@ -12,7 +12,7 @@ It operationalizes the **Twin Transformation Capability Maturity Model (TTCMM)**
 > Information Systems Frontiers, 26, 2205–2226.
 > https://doi.org/10.1007/s10796-024-10520-y (Open Access)
 
-**Live site:** https://fimplank.github.io/twinassessment/
+**Live site:** https://fimplank.github.io/TwinAssessment/
 
 Provided in the context of twin transformation research at **Fraunhofer FIT /
 FIM Research Institute for Information Management**.
