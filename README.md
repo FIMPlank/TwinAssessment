@@ -21,12 +21,30 @@ FIM Research Institute for Information Management**.
 
 ## What it does
 
-- Rates six capability dimensions against four maturity stages (0–4).
+- **Quick path (default):** rate each of the six capability dimensions with one
+  maturity-stage pick (0–4).
+- **Deep path (opt-in, per dimension):** drill into a dimension and answer at the
+  **capability level** (Fulfilled / Not fulfilled / N/A). The dimension's stage is
+  then *derived* from the responses and overrides the quick pick, marked
+  "deep-assessed". Both paths feed the same radar, pathway, and gap outputs.
 - Shows an integrated maturity stage, a per-dimension radar profile, the
   organization's pathway, its bottleneck dimension, and prioritized next moves.
 - Optionally lets each organization **submit its results** to a research study.
 - Provides a password-protected **dashboard** for the researcher to view all
   submissions and track organizations over time (longitudinal study).
+
+### Stage-derivation rule (deep path)
+
+A dimension reaches stage *N* when **every applicable capability in stages 1…N is
+Fulfilled**; its derived stage is the highest such *N* (a later fulfilled stage
+never skips an earlier gap). **N/A** capabilities are excluded (they neither block
+nor advance). If not even stage 1 is satisfied, the dimension is *pre-stage-1
+(emerging)*. Stage 1 splits into a **DT** set and an **ST** set, which drive the
+pathway (DT-expert / ST-expert / Newcomer). The canonical model lives in
+[`ttcmm.json`](ttcmm.json) (45 capabilities, reconciled against Breiter et al.
+2024, Table 4); the derivation logic and its tests are in
+[`scripts/`](scripts/) — run `node scripts/ttcmm.test.mjs`. The same logic is
+mirrored inline in the assessment Component.
 
 The six dimensions: **Strategy & Leadership, Culture & Employees, Ecosystem &
 Partnerships, Products & Services, Operations, Technology.**
