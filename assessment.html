@@ -495,6 +495,9 @@ document.addEventListener('DOMContentLoaded', async function() {
   var LS_KEY  = "twinclimb_v1";
   var DIMS    = ["strategy", "culture", "ecosystem", "products", "operations", "technology"];
   var busy = false, lastOkSig = null;
+  var COLLAPSE_KEY = "twinclimb_panel_collapsed";
+  var collapsed = false;
+  try { collapsed = localStorage.getItem(COLLAPSE_KEY) === "1"; } catch (e) {}
 
   function readState() {
     try { return JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch (e) { return {}; }
@@ -527,8 +530,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     wrap.style.cssText =
       "position:fixed;bottom:20px;right:20px;z-index:99998;width:330px;max-width:calc(100vw - 32px);" +
       "background:#fff;border:1px solid #E3E7E5;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.14);" +
-      "font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,sans-serif;color:#17191C;overflow:hidden;";
+      "font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,sans-serif;color:#17191C;overflow:hidden;" +
+      "transition:transform .28s cubic-bezier(.4,0,.2,1),opacity .2s ease;transform:translateX(0);opacity:1;";
     wrap.innerHTML =
+      '<button id="__study_close" type="button" aria-label="Minimize" title="Minimize" style="position:absolute;top:8px;right:8px;width:24px;height:24px;border:none;background:transparent;color:#9A9A95;font-size:17px;line-height:24px;text-align:center;cursor:pointer;padding:0;border-radius:6px;">&times;</button>' +
       '<div style="padding:15px 17px 14px;">' +
         '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:10px;letter-spacing:0.16em;color:#179C7D;text-transform:uppercase;">Longitudinal study</div>' +
         '<div style="font-size:13px;line-height:1.5;color:#41413D;margin:7px 0 12px;">Submit this completed assessment to the research database.</div>' +
@@ -546,11 +551,69 @@ document.addEventListener('DOMContentLoaded', async function() {
     el.email = wrap.querySelector("#__study_email");
     el.submit = wrap.querySelector("#__study_submit");
     el.msg = wrap.querySelector("#__study_msg");
+    el.close = wrap.querySelector("#__study_close");
     el.submit.addEventListener("click", submit);
+    el.close.addEventListener("click", collapse);
+    el.close.addEventListener("mouseenter", function () { el.close.style.background = "#F2F4F3"; el.close.style.color = "#17191C"; });
+    el.close.addEventListener("mouseleave", function () { el.close.style.background = "transparent"; el.close.style.color = "#9A9A95"; });
 
     // prefill company from the assessment's client field, once
     var st = readState();
     if (st.clientName && !el.name.value) el.name.value = st.clientName;
+  }
+
+  var tab = null;
+  function buildTab() {
+    tab = document.createElement("button");
+    tab.id = "__study_tab";
+    tab.type = "button";
+    tab.setAttribute("data-print-hide", "");
+    tab.setAttribute("aria-label", "Show the longitudinal study submission panel");
+    tab.title = "Show the longitudinal study submission panel";
+    tab.textContent = "Study ↑";
+    tab.style.cssText =
+      "position:fixed;bottom:20px;right:20px;z-index:99998;border:1px solid #E3E7E5;border-radius:999px;" +
+      "background:#17191C;color:#fff;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;" +
+      "letter-spacing:0.06em;padding:11px 18px;box-shadow:0 6px 20px rgba(0,0,0,.16);cursor:pointer;" +
+      "transition:transform .28s cubic-bezier(.4,0,.2,1),opacity .2s ease;opacity:0;transform:translateX(150%);pointer-events:none;";
+    tab.addEventListener("mouseenter", function () { tab.style.background = "#2A2D31"; });
+    tab.addEventListener("mouseleave", function () { tab.style.background = "#17191C"; });
+    tab.addEventListener("click", expand);
+    document.body.appendChild(tab);
+  }
+  function applyCollapsed() {
+    if (!el.wrap || !tab) return;
+    if (collapsed) {
+      el.wrap.style.transform = "translateX(150%)";
+      el.wrap.style.opacity = "0";
+      el.wrap.style.pointerEvents = "none";
+      el.wrap.setAttribute("aria-hidden", "true");
+      tab.style.transform = "translateX(0)";
+      tab.style.opacity = "1";
+      tab.style.pointerEvents = "auto";
+      tab.removeAttribute("aria-hidden");
+    } else {
+      el.wrap.style.transform = "translateX(0)";
+      el.wrap.style.opacity = "1";
+      el.wrap.style.pointerEvents = "auto";
+      el.wrap.removeAttribute("aria-hidden");
+      tab.style.transform = "translateX(150%)";
+      tab.style.opacity = "0";
+      tab.style.pointerEvents = "none";
+      tab.setAttribute("aria-hidden", "true");
+    }
+  }
+  function collapse() {
+    collapsed = true;
+    try { localStorage.setItem(COLLAPSE_KEY, "1"); } catch (e) {}
+    applyCollapsed();
+    if (tab) tab.focus();
+  }
+  function expand() {
+    collapsed = false;
+    try { localStorage.setItem(COLLAPSE_KEY, "0"); } catch (e) {}
+    applyCollapsed();
+    if (el.name) el.name.focus();
   }
 
   function setMsg(text, color) {
@@ -668,9 +731,12 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (!langToggle || !document.body.contains(langToggle)) buildLangToggle();
     if (!adminLink || !document.body.contains(adminLink)) buildAdminLink();
     if (!el.wrap || !document.body.contains(el.wrap)) buildPanel();
+    if (!tab || !document.body.contains(tab)) buildTab();
     var st = readState();
     var show = isComplete(st);
     el.wrap.style.display = show ? "block" : "none";
+    tab.style.display = show ? "block" : "none";
+    if (show) applyCollapsed();
     // reset the "Submit again" label if answers changed after a submit
     if (show && lastOkSig && sigFor(st) !== lastOkSig && !busy) {
       el.submit.textContent = "Submit results →";
