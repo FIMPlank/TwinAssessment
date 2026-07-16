@@ -1,26 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%23179C7D%27/%3E%3Cpath d=%27M8 22 L16 11 L24 22%27 stroke=%27white%27 stroke-width=%273%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
-<title>Twin Transformation Maturity Assessment</title>
-<meta name="description" content="Assess your organization's dynamic capabilities for integrating digital and sustainability transformation — 45 capabilities across six dimensions and four maturity stages, based on the TTCMM (Breiter et al., 2024).">
-<link rel="canonical" href="https://fimplank.github.io/twinassessment/">
+<title>Twin Transformation Reifegrad-Assessment</title>
+<meta name="description" content="Bewerten Sie die dynamischen Fähigkeiten Ihrer Organisation für die Verbindung von digitaler und nachhaltiger Transformation — 45 Fähigkeiten über sechs Dimensionen und vier Reifegradstufen, basierend auf dem TTCMM (Breiter et al., 2024).">
+<link rel="canonical" href="https://fimplank.github.io/twinassessment/index.de.html">
 <link rel="alternate" hreflang="en" href="https://fimplank.github.io/twinassessment/">
 <link rel="alternate" hreflang="de" href="https://fimplank.github.io/twinassessment/index.de.html">
 <link rel="alternate" hreflang="x-default" href="https://fimplank.github.io/twinassessment/">
 <!-- Open Graph / Twitter -->
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://fimplank.github.io/twinassessment/">
-<meta property="og:title" content="Twin Transformation Maturity Assessment">
-<meta property="og:description" content="Map your organization's twin transformation climb — where digital and sustainability transformation reinforce each other. A free, research-based self-assessment. No registration required.">
+<meta property="og:locale" content="de_DE">
+<meta property="og:url" content="https://fimplank.github.io/twinassessment/index.de.html">
+<meta property="og:title" content="Twin Transformation Reifegrad-Assessment">
+<meta property="og:description" content="Verorten Sie Ihre Organisation auf dem Weg zur Twin Transformation — wo digitale und nachhaltige Transformation sich gegenseitig verstärken. Ein kostenloses, forschungsbasiertes Self-Assessment. Ohne Registrierung.">
 <meta property="og:image" content="https://fimplank.github.io/twinassessment/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Twin Transformation Maturity Assessment">
-<meta name="twitter:description" content="Map your organization's twin transformation climb — a free, research-based self-assessment. No registration required.">
+<meta name="twitter:title" content="Twin Transformation Reifegrad-Assessment">
+<meta name="twitter:description" content="Verorten Sie Ihre Organisation auf dem Weg zur Twin Transformation — ein kostenloses, forschungsbasiertes Self-Assessment. Ohne Registrierung.">
 <meta name="twitter:image" content="https://fimplank.github.io/twinassessment/og-image.png">
 <style>
   :root{
@@ -58,17 +59,18 @@
 
   section{padding:64px 0;}
   section.tint{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
-  .sec-head{max-width:60ch;}
+  .sec-head{max-width:64ch;}
   .sec-head h2{font-size:clamp(24px,3.4vw,32px);margin:10px 0 0;}
   .sec-head p.lead{font-size:16px;color:var(--sub);margin-top:12px;}
 
   /* hero */
   .hero{padding:66px 0 60px;}
   .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:44px;align-items:center;}
-  .hero h1{font-size:clamp(34px,5.4vw,58px);margin:16px 0 0;max-width:15ch;}
-  .hero p.vp{font-size:clamp(16px,1.9vw,19px);color:var(--sub);margin:20px 0 0;max-width:52ch;}
+  .hero h1{font-size:clamp(30px,5vw,54px);margin:16px 0 0;max-width:16ch;}
+  .hero p.vp{font-size:clamp(16px,1.9vw,19px);color:var(--sub);margin:20px 0 0;max-width:54ch;}
   .hero-cta{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:30px;}
-  .hero-meta{margin-top:20px;font-size:13px;color:var(--mut);display:flex;gap:18px;flex-wrap:wrap;}
+  .hero-note{font-size:12.5px;color:var(--faint);margin-top:14px;}
+  .hero-meta{margin-top:18px;font-size:13px;color:var(--mut);display:flex;gap:18px;flex-wrap:wrap;}
   .hero-meta span{display:inline-flex;align-items:center;gap:7px;}
   .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none;}
   .hero-art{width:100%;height:auto;display:block;}
@@ -78,6 +80,7 @@
   .dim{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px 14px;}
   .dim .sw{width:12px;height:12px;border-radius:3px;flex:none;}
   .dim .nm{font-size:14px;font-weight:500;}
+  .dim .nm small{color:var(--faint);font-weight:400;}
   .stages{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px;}
   .stage{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:15px 15px 16px;position:relative;overflow:hidden;}
   .stage:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent);opacity:calc(0.4 + var(--i)*0.2);}
@@ -110,6 +113,7 @@
   details.abstract summary .chev{transition:transform .18s;display:inline-block;}
   details.abstract[open] summary .chev{transform:rotate(90deg);}
   details.abstract p{font-size:14px;color:var(--sub);line-height:1.65;margin-top:14px;}
+  details.abstract .lang-tag{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.06em;margin-left:6px;}
   .cite{margin-top:22px;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:16px 16px 14px;}
   .cite .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--faint);text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;gap:10px;}
   .cite .txt{font-size:13px;color:var(--sub);line-height:1.6;margin-top:9px;font-family:var(--mono);}
@@ -124,11 +128,18 @@
   footer{background:#12181A;color:#C9CFCC;padding:40px 0 46px;}
   footer .fgrid{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:center;}
   footer .fbrand b{font-family:var(--head);font-weight:700;letter-spacing:.14em;color:#fff;}
-  footer .fbrand div{font-size:12px;color:#8A928F;margin-top:5px;max-width:44ch;line-height:1.5;}
+  footer .fbrand div{font-size:12px;color:#8A928F;margin-top:5px;max-width:48ch;line-height:1.5;}
   footer .flinks{display:flex;gap:20px;flex-wrap:wrap;font-size:13px;}
   footer .flinks a{color:#C9CFCC;text-decoration:none;}
   footer .flinks a:hover{color:#fff;}
-  footer .dash{color:#8A928F;}
+
+  /* language toggle */
+  .nav-right{display:flex;align-items:center;gap:16px;}
+  .lang{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;letter-spacing:.06em;}
+  .lang a{color:var(--faint);text-decoration:none;padding:2px 2px;transition:color .12s;}
+  .lang a:hover{color:var(--ink);}
+  .lang a.active{color:var(--ink);font-weight:600;}
+  .lang .sep{color:var(--line);}
 
   @media (max-width:820px){
     .hero-grid{grid-template-columns:1fr;gap:28px;}
@@ -139,47 +150,24 @@
     .steps{grid-template-columns:1fr 1fr;}
     .about{grid-template-columns:1fr;}
   }
-  /* language toggle + banner */
-  .nav-right{display:flex;align-items:center;gap:16px;}
-  .lang{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;letter-spacing:.06em;}
-  .lang a{color:var(--faint);text-decoration:none;padding:2px 2px;transition:color .12s;}
-  .lang a:hover{color:var(--ink);}
-  .lang a.active{color:var(--ink);font-weight:600;}
-  .lang .sep{color:var(--line);}
-  .langbanner{background:var(--accentSoft);border-bottom:1px solid var(--line);font-size:13.5px;}
-  .langbanner .lb-in{display:flex;align-items:center;gap:14px;padding:10px 24px;max-width:var(--maxw);margin:0 auto;}
-  .langbanner .lb-msg{color:var(--accentDark);}
-  .langbanner a{color:var(--accentDark);font-weight:600;text-decoration:none;white-space:nowrap;}
-  .langbanner a:hover{text-decoration:underline;}
-  .langbanner button{margin-left:auto;background:none;border:none;color:var(--mut);font-size:20px;line-height:1;cursor:pointer;padding:0 4px;}
-  .langbanner button:hover{color:var(--ink);}
   @media (max-width:520px){
     section{padding:48px 0;}
     .dims,.stages,.steps{grid-template-columns:1fr;}
     .nav-cta{display:none;}
     .paper{padding:22px;}
-    .langbanner .lb-in{gap:10px;padding:9px 20px;font-size:12.5px;}
   }
 </style>
 </head>
 <body>
 
-<div id="langBanner" class="langbanner" hidden>
-  <div class="lb-in">
-    <span class="lb-msg">Diese Seite ist auch auf Deutsch verfügbar.</span>
-    <a href="index.de.html" data-setlang="de">→ Zur deutschen Version</a>
-    <button id="lbClose" type="button" aria-label="Hinweis schließen">×</button>
-  </div>
-</div>
-
 <header class="nav">
   <div class="wrap navbar">
-    <a class="brand" href="#top"><b>TWINCLIMB</b><span>Maturity Assessment</span></a>
+    <a class="brand" href="#top"><b>TWINCLIMB</b><span>Reifegrad-Assessment</span></a>
     <div class="nav-right">
       <div class="lang" aria-label="Language / Sprache">
-        <a class="active" aria-current="true">EN</a><span class="sep">|</span><a href="index.de.html" data-setlang="de">DE</a>
+        <a href="index.html" data-setlang="en">EN</a><span class="sep">|</span><a class="active" aria-current="true">DE</a>
       </div>
-      <a class="btn btn-primary nav-cta" href="assessment.html">Start the assessment&nbsp;→</a>
+      <a class="btn btn-primary nav-cta" href="assessment.html">Assessment starten&nbsp;→</a>
     </div>
   </div>
 </header>
@@ -190,22 +178,22 @@
   <div class="wrap hero-grid">
     <div>
       <div class="eyebrow">Twin Transformation Capability Maturity Model</div>
-      <h1>Map your organization's twin&nbsp;transformation climb.</h1>
-      <p class="vp">Assess your organization's dynamic capabilities for integrating digital and sustainability transformation — and see where to climb next.</p>
+      <h1>Bestimmen Sie den Reifegrad Ihrer Twin&nbsp;Transformation.</h1>
+      <p class="vp">Bewerten Sie die dynamischen Fähigkeiten (Dynamic Capabilities) Ihrer Organisation, um digitale und nachhaltige Transformation zu verbinden — und erkennen Sie, wo der nächste Schritt liegt.</p>
       <div class="hero-cta">
-        <a class="btn btn-primary" href="assessment.html">Start the assessment&nbsp;→</a>
-        <a class="link-sm" href="#research">Read the research</a>
+        <a class="btn btn-primary" href="assessment.html">Assessment starten&nbsp;→</a>
+        <a class="link-sm" href="#research">Zur Forschung</a>
       </div>
+      <p class="hero-note">Das Assessment selbst ist derzeit auf Englisch verfügbar.</p>
       <div class="hero-meta">
-        <span><span class="dot"></span>~10–15 minutes</span>
-        <span><span class="dot"></span>No registration</span>
-        <span><span class="dot"></span>Free &amp; research-based</span>
+        <span><span class="dot"></span>~10–15 Minuten</span>
+        <span><span class="dot"></span>Ohne Registrierung</span>
+        <span><span class="dot"></span>Kostenlos &amp; forschungsbasiert</span>
       </div>
     </div>
     <div>
-      <!-- geometric motif: two intertwining paths (digital + sustainability) climbing a 4-stage stair -->
-      <svg class="hero-art" viewBox="0 0 460 380" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Two intertwining transformation paths climbing four maturity stages">
-        <!-- stair -->
+      <!-- Geometrisches Motiv: zwei sich verschränkende Pfade steigen über vier Reifegradstufen -->
+      <svg class="hero-art" viewBox="0 0 460 380" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Zwei sich verschränkende Transformationspfade steigen über vier Reifegradstufen">
         <g>
           <rect x="40"  y="300" width="90" height="40" rx="6" fill="#EEF1EF"/>
           <rect x="140" y="250" width="90" height="90" rx="6" fill="#E7F2EF"/>
@@ -218,10 +206,8 @@
           <text x="285" y="325" text-anchor="middle">3</text>
           <text x="385" y="325" text-anchor="middle">4</text>
         </g>
-        <!-- two intertwining paths -->
         <path d="M50 322 C 120 300, 120 250, 185 240 S 250 205, 285 175 S 360 150, 420 108" stroke="#1F6FB2" stroke-width="3.5" stroke-linecap="round" fill="none"/>
         <path d="M50 336 C 120 330, 130 268, 185 262 S 255 230, 285 196 S 362 168, 420 132" stroke="#179C7D" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-        <!-- summit marker -->
         <circle cx="420" cy="108" r="7" fill="#1F6FB2" stroke="#fff" stroke-width="2.5"/>
         <circle cx="420" cy="132" r="7" fill="#179C7D" stroke="#fff" stroke-width="2.5"/>
         <path d="M420 108 L 420 78" stroke="#17191C" stroke-width="3"/>
@@ -231,70 +217,71 @@
   </div>
 </section>
 
-<!-- ===================== WHAT IS IT ===================== -->
+<!-- ===================== WAS IST ES ===================== -->
 <section class="tint" id="what">
   <div class="wrap">
     <div class="sec-head">
-      <div class="eyebrow">The concept</div>
-      <h2>What is twin transformation maturity?</h2>
-      <p class="lead">Twin transformation is the value-adding interplay of <strong>digital transformation</strong> and <strong>sustainability transformation</strong> — where digital technologies <em>enable</em> sustainability, and sustainability goals <em>guide</em> digital progress.</p>
+      <div class="eyebrow">Das Konzept</div>
+      <h2>Was bedeutet Twin-Transformation-Reifegrad?</h2>
+      <p class="lead">Twin Transformation bezeichnet das wertschöpfende Zusammenspiel von <strong>digitaler Transformation</strong> und <strong>Nachhaltigkeitstransformation</strong> — digitale Technologien <em>ermöglichen</em> Nachhaltigkeit, und Nachhaltigkeitsziele <em>leiten</em> die digitale Entwicklung.</p>
     </div>
-    <p style="max-width:74ch;color:var(--sub);margin-top:16px;font-size:15.5px;">
-      Rather than treating the two as separate agendas, the maturity model looks at how well an organization develops the <strong>dynamic capabilities</strong> to pursue them together. It structures <strong>45 capabilities</strong> along <strong>six capability dimensions</strong> and <strong>four maturity stages</strong>, giving a clear picture of where an organization stands and what to build next.
+    <p style="max-width:78ch;color:var(--sub);margin-top:16px;font-size:15.5px;">
+      Statt beide als getrennte Agenden zu behandeln, betrachtet das <strong>Reifegradmodell</strong>, wie gut eine Organisation die <strong>dynamischen Fähigkeiten (Dynamic Capabilities)</strong> entwickelt, um sie gemeinsam voranzutreiben. Es strukturiert <strong>45 Fähigkeiten</strong> entlang von <strong>sechs Fähigkeitsdimensionen</strong> und <strong>vier Reifegradstufen</strong> und zeigt so klar, wo eine Organisation steht und was als Nächstes aufzubauen ist.
     </p>
 
-    <div class="dims" aria-label="Six capability dimensions">
-      <div class="dim"><span class="sw" style="background:var(--d0)"></span><span class="nm">Strategy &amp; Leadership</span></div>
-      <div class="dim"><span class="sw" style="background:var(--d1)"></span><span class="nm">Culture &amp; Employees</span></div>
-      <div class="dim"><span class="sw" style="background:var(--d2)"></span><span class="nm">Ecosystem &amp; Partnerships</span></div>
-      <div class="dim"><span class="sw" style="background:var(--d3)"></span><span class="nm">Products &amp; Services</span></div>
-      <div class="dim"><span class="sw" style="background:var(--d4)"></span><span class="nm">Operations</span></div>
-      <div class="dim"><span class="sw" style="background:var(--d5)"></span><span class="nm">Technology</span></div>
+    <div class="dims" aria-label="Sechs Fähigkeitsdimensionen">
+      <div class="dim"><span class="sw" style="background:var(--d0)"></span><span class="nm">Strategy &amp; Leadership <small>· Strategie &amp; Führung</small></span></div>
+      <div class="dim"><span class="sw" style="background:var(--d1)"></span><span class="nm">Culture &amp; Employees <small>· Kultur &amp; Mitarbeitende</small></span></div>
+      <div class="dim"><span class="sw" style="background:var(--d2)"></span><span class="nm">Ecosystem &amp; Partnerships <small>· Ökosystem &amp; Partnerschaften</small></span></div>
+      <div class="dim"><span class="sw" style="background:var(--d3)"></span><span class="nm">Products &amp; Services <small>· Produkte &amp; Dienstleistungen</small></span></div>
+      <div class="dim"><span class="sw" style="background:var(--d4)"></span><span class="nm">Operations <small>· Betrieb</small></span></div>
+      <div class="dim"><span class="sw" style="background:var(--d5)"></span><span class="nm">Technology <small>· Technologie</small></span></div>
     </div>
 
-    <div class="stages" aria-label="Four maturity stages">
-      <div class="stage" style="--i:0"><div class="n">STAGE 1</div><div class="t">Awareness</div><div class="d">Aware of the potential of combining digitalization and sustainability; first integrated pilots.</div></div>
-      <div class="stage" style="--i:1"><div class="n">STAGE 2</div><div class="t">Development</div><div class="d">A twin transformation strategy and roadmap; long-term projects piloted and evaluated.</div></div>
-      <div class="stage" style="--i:2"><div class="n">STAGE 3</div><div class="t">Implementation</div><div class="d">The strategy is operationalized and rolled out across the whole organization.</div></div>
-      <div class="stage" style="--i:3"><div class="n">STAGE 4</div><div class="t">True twin transformer</div><div class="d">Twin transformation criteria drive every decision, with continuous self-optimization.</div></div>
+    <div class="stages" aria-label="Vier Reifegradstufen">
+      <div class="stage" style="--i:0"><div class="n">STUFE 1</div><div class="t">Bewusstsein</div><div class="d">Bewusstsein für das Potenzial, Digitalisierung und Nachhaltigkeit zu verbinden; erste integrierte Pilotprojekte.</div></div>
+      <div class="stage" style="--i:1"><div class="n">STUFE 2</div><div class="t">Entwicklung</div><div class="d">Eine Twin-Transformation-Strategie und Roadmap; langfristige Projekte werden pilotiert und evaluiert.</div></div>
+      <div class="stage" style="--i:2"><div class="n">STUFE 3</div><div class="t">Umsetzung</div><div class="d">Die Strategie wird operationalisiert und in der gesamten Organisation ausgerollt.</div></div>
+      <div class="stage" style="--i:3"><div class="n">STUFE 4</div><div class="t">True Twin Transformer</div><div class="d">Twin-Transformation-Kriterien bestimmen jede Entscheidung, mit kontinuierlicher Selbstoptimierung.</div></div>
     </div>
 
-    <h3 style="font-size:18px;margin:34px 0 4px;">Three pathways to becoming a twin transformer</h3>
-    <p style="font-size:14px;color:var(--mut);max-width:70ch;">Organizations start from different points depending on their prior digital and sustainability experience — all three routes converge on the same climb to the summit.</p>
+    <h3 style="font-size:18px;margin:34px 0 4px;">Drei Wege zum Twin Transformer</h3>
+    <p style="font-size:14px;color:var(--mut);max-width:74ch;">Organisationen starten je nach ihrer bisherigen Digital- und Nachhaltigkeitserfahrung von unterschiedlichen Punkten — alle drei Wege münden in denselben Aufstieg zum Gipfel.</p>
     <div class="pathways">
-      <div class="pw"><span class="tag" style="background:#8C8A84;">Newcomer</span><div class="nm">Twin transformation newcomer</div><div class="d">Limited digital and sustainability capabilities — integrate both from the start to save time and resources.</div></div>
-      <div class="pw"><span class="tag" style="background:var(--d1);">DT expert</span><div class="nm">Digital transformation expert</div><div class="d">A strong digital foundation — make digital transformation sustainable by closing the sustainability gap.</div></div>
-      <div class="pw"><span class="tag" style="background:var(--accent);">ST expert</span><div class="nm">Sustainability transformation expert</div><div class="d">A strong sustainability foundation — make sustainability transformation digital by closing the digitalization gap.</div></div>
+      <div class="pw"><span class="tag" style="background:#8C8A84;">Neueinsteiger</span><div class="nm">Twin-Transformation-Neueinsteiger</div><div class="d">Begrenzte digitale und Nachhaltigkeitsfähigkeiten — integrieren Sie beide von Anfang an, um Zeit und Ressourcen zu sparen.</div></div>
+      <div class="pw"><span class="tag" style="background:var(--d1);">DT-Experte</span><div class="nm">Experte für digitale Transformation</div><div class="d">Eine starke digitale Basis — machen Sie die digitale Transformation nachhaltig, indem Sie die Nachhaltigkeitslücke schließen.</div></div>
+      <div class="pw"><span class="tag" style="background:var(--accent);">ST-Experte</span><div class="nm">Experte für Nachhaltigkeitstransformation</div><div class="d">Eine starke Nachhaltigkeitsbasis — machen Sie die Nachhaltigkeitstransformation digital, indem Sie die Digitalisierungslücke schließen.</div></div>
     </div>
   </div>
 </section>
 
-<!-- ===================== HOW IT WORKS ===================== -->
+<!-- ===================== SO FUNKTIONIERT ES ===================== -->
 <section id="how">
   <div class="wrap">
     <div class="sec-head">
-      <div class="eyebrow">The assessment</div>
-      <h2>How it works</h2>
-      <p class="lead">A guided self-assessment — about 10–15 minutes, no registration required.</p>
+      <div class="eyebrow">Das Assessment</div>
+      <h2>So funktioniert das Assessment</h2>
+      <p class="lead">Ein geführtes Self-Assessment — etwa 10–15 Minuten, ohne Registrierung.</p>
     </div>
     <div class="steps">
-      <div class="step"><div class="num">1</div><h3>Rate six dimensions</h3><p>For each capability dimension, select the maturity stage that best reflects your organization today.</p></div>
-      <div class="step"><div class="num">2</div><h3>See your maturity</h3><p>Get an integrated maturity stage and a per-dimension profile on an interactive radar.</p></div>
-      <div class="step"><div class="num">3</div><h3>Find your pathway</h3><p>Understand which of the three routes you're on and where your bottleneck dimension is.</p></div>
-      <div class="step"><div class="num">4</div><h3>Plan next moves</h3><p>Receive prioritized capability gaps to develop next — grounded in the research model.</p></div>
+      <div class="step"><div class="num">1</div><h3>Sechs Dimensionen bewerten</h3><p>Wählen Sie für jede Fähigkeitsdimension die Reifegradstufe, die Ihre Organisation heute am besten beschreibt.</p></div>
+      <div class="step"><div class="num">2</div><h3>Reifegrad sehen</h3><p>Erhalten Sie eine integrierte Reifegradstufe und ein Profil je Dimension im interaktiven Radar.</p></div>
+      <div class="step"><div class="num">3</div><h3>Ihren Weg erkennen</h3><p>Verstehen Sie, auf welchem der drei Wege Sie sind und wo Ihre Engpass-Dimension liegt.</p></div>
+      <div class="step"><div class="num">4</div><h3>Nächste Schritte planen</h3><p>Erhalten Sie priorisierte Fähigkeitslücken, die Sie als Nächstes entwickeln — fundiert im Forschungsmodell.</p></div>
     </div>
     <div style="margin-top:30px;">
-      <a class="btn btn-primary" href="assessment.html">Start the assessment&nbsp;→</a>
+      <a class="btn btn-primary" href="assessment.html">Assessment starten&nbsp;→</a>
     </div>
   </div>
 </section>
 
-<!-- ===================== RESEARCH ===================== -->
+<!-- ===================== FORSCHUNG ===================== -->
 <section class="tint" id="research">
   <div class="wrap">
     <div class="sec-head">
-      <div class="eyebrow">The research behind it</div>
-      <h2>Grounded in peer-reviewed research</h2>
+      <div class="eyebrow">Die Forschung dahinter</div>
+      <h2>Wissenschaftlich fundiert</h2>
+      <p class="lead">Das Assessment basiert auf einer begutachteten Studie (Open Access), die nachfolgend im Original zitiert wird.</p>
     </div>
     <div class="paper" style="margin-top:22px;">
       <div class="j">Information Systems Frontiers · Vol. 26, pp. 2205–2226 (2024) · Open Access</div>
@@ -302,36 +289,36 @@
       <div class="au">Katharina Breiter · Carlotta Crome · Anna Maria Oberländer · Feline Schnaak</div>
       <div class="meta">DOI: 10.1007/s10796-024-10520-y</div>
       <div class="links">
-        <a class="btn btn-ghost" style="padding:10px 18px;font-size:14px;" href="https://doi.org/10.1007/s10796-024-10520-y" target="_blank" rel="noopener">View via DOI ↗</a>
+        <a class="btn btn-ghost" style="padding:10px 18px;font-size:14px;" href="https://doi.org/10.1007/s10796-024-10520-y" target="_blank" rel="noopener">Über DOI öffnen ↗</a>
         <a class="btn btn-ghost" style="padding:10px 18px;font-size:14px;" href="https://link.springer.com/article/10.1007/s10796-024-10520-y" target="_blank" rel="noopener">Springer (Open Access) ↗</a>
       </div>
 
       <details class="abstract">
-        <summary><span class="chev">▸</span> Read abstract</summary>
+        <summary><span class="chev">▸</span> Abstract lesen <span class="lang-tag">(EN)</span></summary>
         <p>Digital transformation and sustainability transformation are at the top of organizations' agendas to remain competitive. While guidance on both transformations exists separately, even more research on integrating digital and sustainability transformation, namely twin transformation, is required. Specifically, deeper knowledge about relevant twin transformation capabilities and progress is needed for effective implementation. To enhance the understanding and provide corresponding guidance, we developed a twin transformation capability maturity model focusing on dynamic capabilities required to realize twin transformation based on a structured literature review and interviews with 13 experts. Further, we demonstrated its use with a technology service provider. Our contribution is twofold: First, accounting for organizations' twin transformation starting points in terms of their digitalization and sustainability experience and expertise, we reveal three pathways to becoming a twin transformer. Second, our work provides an overview of 45 relevant twin transformation capabilities structured along six capability dimensions and four maturity stages. Our work also provides relevant practical implications supporting organizations in assessing their twin transformation maturity building the foundation for targeted capability development.</p>
       </details>
 
       <div class="cite">
-        <div class="lbl"><span>Cite this model (APA)</span><button class="copy" id="copyCite">Copy</button></div>
+        <div class="lbl"><span>Modell zitieren (APA)</span><button class="copy" id="copyCite">Kopieren</button></div>
         <div class="txt" id="citeText">Breiter, K., Crome, C., Oberländer, A. M., &amp; Schnaak, F. (2024). Dynamic capabilities for the twin transformation climb: A capability maturity model. Information Systems Frontiers, 26, 2205–2226. https://doi.org/10.1007/s10796-024-10520-y</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ===================== ABOUT ===================== -->
+<!-- ===================== ÜBER ===================== -->
 <section id="about">
   <div class="wrap about">
     <div>
-      <div class="eyebrow">About</div>
-      <h2 style="font-size:clamp(22px,3vw,28px);margin-top:10px;">Provided by Fraunhofer FIT / FIM Research Institute</h2>
-      <p style="color:var(--sub);margin-top:14px;max-width:60ch;font-size:15px;">
-        This self-assessment is provided in the context of twin transformation research at Fraunhofer FIT and the FIM Research Institute for Information Management, part of the Fraunhofer research campus on twin transformation. It operationalizes the peer-reviewed capability maturity model so organizations can locate their maturity and plan targeted capability development.
+      <div class="eyebrow">Über das Projekt</div>
+      <h2 style="font-size:clamp(22px,3vw,28px);margin-top:10px;">Bereitgestellt von Fraunhofer FIT / FIM Research Institute</h2>
+      <p style="color:var(--sub);margin-top:14px;max-width:62ch;font-size:15px;">
+        Dieses Self-Assessment wird im Rahmen der Twin-Transformation-Forschung am Fraunhofer FIT und am FIM Research Institute for Information Management bereitgestellt — Teil des Fraunhofer-Forschungscampus zur Twin Transformation. Es operationalisiert das begutachtete Reifegradmodell, damit Organisationen ihren Reifegrad verorten und gezielt Fähigkeiten entwickeln können.
       </p>
     </div>
     <div class="note">
-      <strong style="color:var(--ink);">Data note.</strong> No personal data is required to take the assessment. Submitted results are used for research purposes only and stored securely. You can complete the assessment without submitting your results to the study.
-      <div style="font-size:12px;color:var(--faint);margin-top:10px;">Placeholder wording — final legal text to follow.</div>
+      <strong style="color:var(--ink);">Datenhinweis.</strong> Für die Durchführung des Assessments sind keine personenbezogenen Daten erforderlich. Übermittelte Ergebnisse werden ausschließlich zu Forschungszwecken verwendet und sicher gespeichert. Sie können das Assessment abschließen, ohne Ihre Ergebnisse an die Studie zu übermitteln.
+      <div style="font-size:12px;color:var(--faint);margin-top:10px;">Platzhalter-Formulierung — finaler Rechtstext folgt.</div>
     </div>
   </div>
 </section>
@@ -341,26 +328,26 @@
   <div class="wrap fgrid">
     <div class="fbrand">
       <b>TWINCLIMB</b>
-      <div>Twin Transformation Maturity Assessment · based on the TTCMM (Breiter, Crome, Oberländer &amp; Schnaak, 2024). Prototype for research purposes.</div>
+      <div>Twin Transformation Reifegrad-Assessment · basierend auf dem TTCMM (Breiter, Crome, Oberländer &amp; Schnaak, 2024). Prototyp für Forschungszwecke.</div>
     </div>
     <div class="flinks">
-      <a href="assessment.html">Start assessment</a>
+      <a href="assessment.html">Assessment starten</a>
       <a href="impressum.html">Impressum</a>
       <a href="datenschutz.html">Datenschutz</a>
-      <a href="dashboard.html">Study dashboard ↗</a>
+      <a href="dashboard.html">Studien-Dashboard ↗</a>
     </div>
   </div>
 </footer>
 
 <script>
-  // copy citation
+  // Zitat kopieren
   (function(){
     var btn = document.getElementById('copyCite');
     var txt = document.getElementById('citeText');
     if(!btn || !txt) return;
     btn.addEventListener('click', function(){
       var s = txt.textContent.trim();
-      var done = function(){ btn.textContent = 'Copied ✓'; btn.classList.add('done'); setTimeout(function(){ btn.textContent='Copy'; btn.classList.remove('done'); }, 1800); };
+      var done = function(){ btn.textContent = 'Kopiert ✓'; btn.classList.add('done'); setTimeout(function(){ btn.textContent='Kopieren'; btn.classList.remove('done'); }, 1800); };
       if(navigator.clipboard && navigator.clipboard.writeText){
         navigator.clipboard.writeText(s).then(done, function(){ fallback(s, done); });
       } else { fallback(s, done); }
@@ -373,28 +360,12 @@
     }
   })();
 
-  // language preference + German-browser banner
+  // Sprachwahl merken (Toggle)
   (function(){
-    var KEY='twinclimb_lang', DKEY='twinclimb_lang_banner_dismissed';
-    // remember the visitor's choice whenever they use the toggle or banner link
+    var KEY='twinclimb_lang';
     Array.prototype.forEach.call(document.querySelectorAll('[data-setlang]'), function(a){
       a.addEventListener('click', function(){ try{ localStorage.setItem(KEY, a.getAttribute('data-setlang')); }catch(e){} });
     });
-    // show the "auch auf Deutsch" banner only on a first visit from a German browser
-    try{
-      var stored = localStorage.getItem(KEY);
-      var dismissed = localStorage.getItem(DKEY);
-      var langs = [navigator.language].concat(navigator.languages || []);
-      var isDe = langs.some(function(l){ return (l||'').toLowerCase().indexOf('de') === 0; });
-      if(isDe && !stored && !dismissed){
-        var b = document.getElementById('langBanner');
-        if(b){
-          b.hidden = false;
-          var close = document.getElementById('lbClose');
-          if(close) close.addEventListener('click', function(){ b.hidden = true; try{ localStorage.setItem(DKEY,'1'); }catch(e){} });
-        }
-      }
-    }catch(e){}
   })();
 </script>
 </body>
