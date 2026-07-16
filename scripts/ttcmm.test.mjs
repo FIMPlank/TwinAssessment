@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
-import { deriveStage, detectPathway } from './ttcmm_logic.mjs';
-const ttcmm = JSON.parse(readFileSync('../ttcmm.json', 'utf8'));
+import { deriveStage, detectPathway } from './ttcmm.logic.mjs';
+const ttcmm = JSON.parse(readFileSync(new URL('../ttcmm.json', import.meta.url), 'utf8'));
 const byId = Object.fromEntries(ttcmm.dimensions.map(d => [d.id, d]));
 const capsOf = id => byId[id].capabilities.map(c => ({ id: c.id, stage: c.stage, set: c.set }));
 let pass = 0, fail = 0;
