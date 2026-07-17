@@ -11,6 +11,8 @@
       "id": "strategy",
       "name": "Strategy & Leadership",
       "name_de": "Strategie & Führung",
+      "desc": "A digital and sustainability strategy whose principles enable twin transformation — leadership involvement, cross-departmental and cross-organizational collaboration, and information sharing.",
+      "desc_de": "Eine Digital- und Nachhaltigkeitsstrategie, deren Prinzipien Twin Transformation ermöglichen — Einbindung der Führung, abteilungs- und organisationsübergreifende Zusammenarbeit sowie Informationsaustausch.",
       "capabilities": [
         {
           "id": "strategy.s1.dt.0",
@@ -109,6 +111,8 @@
       "id": "culture",
       "name": "Culture & Employees",
       "name_de": "Kultur & Mitarbeitende",
+      "desc": "Collective values and beliefs, attitudes and behaviors — plus employees continually enhancing and applying their operational and management skills and knowledge about twin transformation.",
+      "desc_de": "Gemeinsame Werte und Überzeugungen, Einstellungen und Verhaltensweisen — sowie Mitarbeitende, die ihre operativen und Management-Fähigkeiten und ihr Wissen über Twin Transformation kontinuierlich ausbauen und anwenden.",
       "capabilities": [
         {
           "id": "culture.s1.dt.0",
@@ -165,6 +169,8 @@
       "id": "ecosystem",
       "name": "Ecosystem & Partnerships",
       "name_de": "Ökosystem & Partnerschaften",
+      "desc": "A multilayer network of partners — grown historically or nurtured by management choices — to leverage twin transformation market opportunities.",
+      "desc_de": "Ein mehrschichtiges Netzwerk von Partnern — historisch gewachsen oder durch Managemententscheidungen gefördert — um Marktchancen der Twin Transformation zu nutzen.",
       "capabilities": [
         {
           "id": "ecosystem.s1.dt.0",
@@ -207,6 +213,8 @@
       "id": "products",
       "name": "Products & Services",
       "name_de": "Produkte & Dienstleistungen",
+      "desc": "A new generation of digital and sustainable products or services characterized by servitization — digital services combined with sustainability endeavors.",
+      "desc_de": "Eine neue Generation digitaler und nachhaltiger Produkte oder Dienstleistungen, geprägt durch Servitization — digitale Services verbunden mit Nachhaltigkeitsbestrebungen.",
       "capabilities": [
         {
           "id": "products.s1.dt.0",
@@ -256,6 +264,8 @@
       "id": "operations",
       "name": "Operations",
       "name_de": "Betrieb",
+      "desc": "Value-creation processes, systems thinking and design techniques that enable digital, sustainable value creation and decision-making across the whole organization.",
+      "desc_de": "Wertschöpfungsprozesse, systemisches Denken und Gestaltungsmethoden, die eine digitale, nachhaltige Wertschöpfung und Entscheidungsfindung in der gesamten Organisation ermöglichen.",
       "capabilities": [
         {
           "id": "operations.s1.dt.0",
@@ -305,6 +315,8 @@
       "id": "technology",
       "name": "Technology",
       "name_de": "Technologie",
+      "desc": "Methods and information systems that support the design, execution, monitoring and improvement of digitalization and sustainability activities across organization-spanning initiatives.",
+      "desc_de": "Methoden und Informationssysteme, die die Gestaltung, Durchführung, Überwachung und Verbesserung von Digitalisierungs- und Nachhaltigkeitsaktivitäten über organisationsübergreifende Initiativen hinweg unterstützen.",
       "capabilities": [
         {
           "id": "technology.s1.dt.0",
