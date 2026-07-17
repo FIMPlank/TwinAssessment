@@ -55,12 +55,15 @@ transformer.**
 
 ## Site structure
 
-The site is **static HTML** hosted on GitHub Pages. No build step, no framework.
+The site is **static HTML** hosted on GitHub Pages — every page is served
+as-is, with no server-side code. Most pages have no build step at all;
+the assessment app is the one exception (see [Architecture](#architecture)).
 
 | File | Purpose |
 |------|---------|
 | `index.html` | Landing / start page — the entry point. Hero, explainer, how-it-works, research card, affiliation, footer. |
-| `assessment.html` | The assessment app itself (self-contained single-file prototype). |
+| `assessment.html` / `assessment.de.html` | The assessment app (EN/DE) — **built** from [`app-src/`](app-src/), not hand-edited. |
+| `assets/` | Hashed JS/CSS/font files the build emits for the assessment app. Also generated — don't hand-edit. |
 | `dashboard.html` | Password-protected researcher dashboard (view + export submissions). |
 | `impressum.html` / `datenschutz.html` | Legal placeholder pages (to be completed). |
 | `og-image.png` | Open Graph preview image for shared links. |
@@ -73,10 +76,20 @@ Researcher flow: **`dashboard.html` → sign in → review data**.
 
 ## Architecture
 
-- **Frontend:** static HTML/CSS/JS. The landing, dashboard, and legal pages are
-  hand-written; the assessment is a self-contained bundled prototype. React is
-  **inlined** into the assessment, so the whole site loads from its own origin
-  with **no third-party CDN** (works behind restrictive corporate networks).
+- **Frontend:** static HTML/CSS/JS for the landing, dashboard, and legal
+  pages — hand-written, no build step. The **assessment app** is a proper
+  React source tree in [`app-src/`](app-src/) (Vite + plain JS/JSX, matching
+  the rest of the repo — no TypeScript), built to the static
+  `assessment.html` / `assessment.de.html` you see at the repo root plus
+  their `assets/`. One shared component tree and one
+  [`app-src/src/i18n.js`](app-src/src/i18n.js) string table drive both
+  locales, so there's no more hand-duplicated EN/DE markup to keep in sync.
+  Both the app and its Node test suite import the same canonical
+  [`ttcmm.json`](ttcmm.json) / [`scripts/ttcmm.logic.mjs`](scripts/ttcmm.logic.mjs)
+  — one copy of the capability model, not three. Fonts (IBM Plex Mono/Sans,
+  Space Grotesk) and React are bundled from npm and self-hosted in the
+  build output, so the site still loads entirely from its own origin with
+  **no third-party CDN** (works behind restrictive corporate networks).
 - **Backend:** [Supabase](https://supabase.com) (hosted Postgres + REST API +
   Auth). There is no server to run — the pages talk to Supabase directly.
 - **Design system:** Fraunhofer FIT corporate identity — Fraunhofer green
@@ -180,8 +193,8 @@ the assessment page.
 
 ## Local development
 
-No dependencies or build step. Serve the folder over HTTP so relative links and
-`fetch` behave as on GitHub Pages:
+**Landing / dashboard / legal pages** — no dependencies or build step. Serve
+the folder over HTTP so relative links and `fetch` behave as on GitHub Pages:
 
 ```bash
 python3 -m http.server 8000
@@ -191,13 +204,41 @@ python3 -m http.server 8000
 Opening files directly via `file://` mostly works, but a local server matches
 production more closely.
 
+**Assessment app** (`assessment.html` / `assessment.de.html`) — edit the
+source in [`app-src/`](app-src/), never the built HTML/`assets/` at the repo
+root directly (those are overwritten on every build).
+
+```bash
+cd app-src
+npm install
+npm run dev      # live dev server with hot reload
+npm run build    # writes app-src/dist/{assessment.html,assessment.de.html,assets/}
+```
+
+After `npm run build`, copy the output over the repo-root copies and commit
+both together:
+
+```bash
+cp app-src/dist/assessment.html app-src/dist/assessment.de.html .
+rm -rf assets && cp -r app-src/dist/assets .
+```
+
+The capability model (`ttcmm.json`, `scripts/ttcmm.logic.mjs`) lives at the
+repo root and is imported directly by `app-src/src/ttcmm.js` — edit it once,
+run `node scripts/ttcmm.test.mjs` to check the derivation logic, then rebuild
+the app so the change lands in both locales together.
+
 ---
 
 ## Deployment
 
 GitHub Pages, **Deploy from a branch** → `main` / root. Every push to `main`
 triggers a Pages build; the site updates automatically once it goes green. The
-`.nojekyll` file ensures files are served exactly as committed.
+`.nojekyll` file ensures files are served exactly as committed. The assessment
+app's build output (`assessment.html`, `assessment.de.html`, `assets/`) is
+committed like any other static file — there is no build step on GitHub's
+side, so it must already be built and copied in before pushing (see *Local
+development* above).
 
 ---
 
