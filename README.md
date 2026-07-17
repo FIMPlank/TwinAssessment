@@ -114,6 +114,8 @@ create table public.assessments (
   answers       jsonb not null,
   scores        jsonb,
   overall_stage int,
+  caps          jsonb,  -- per-capability answers from the deep path, keyed by capability id
+  deep          jsonb,  -- dimension ids that were deep-assessed, e.g. ["operations"]
   app_version   text
 );
 
@@ -122,6 +124,17 @@ alter table public.assessments enable row level security;
 -- Anyone may submit; nobody may read with the public key.
 create policy "public can submit assessments"
   on public.assessments for insert to anon with check (true);
+```
+
+If you already had this table before the two-tier (quick + deep) assessment
+shipped, the client now sends `caps`/`deep` on every submission (`app_version`
+`"twinclimb_v2"`) and inserts will fail with a schema-cache error until the
+columns exist. Migrate an existing table with:
+
+```sql
+alter table public.assessments
+  add column if not exists caps jsonb,
+  add column if not exists deep jsonb;
 ```
 
 ### 2. Researcher read access (for the dashboard)
@@ -140,9 +153,12 @@ resulting token.
 
 ### Submission record
 
-Each submission stores the organization name, an optional contact email, the raw
-`answers` (per-dimension stage 0–4), computed `scores` (min/max/avg + per
-dimension), the `overall_stage` (the minimum across dimensions), and a
+Each submission stores the organization name, an optional contact email, the
+effective `answers` (per-dimension stage 0–4, using the deep-derived stage
+where a dimension was refined), computed `scores` (min/max/avg + per
+dimension), the `overall_stage` (the minimum across dimensions), the raw
+`caps` (per-capability Fulfilled/Not fulfilled/N/A, for dimensions assessed at
+the capability level), which dimension ids were `deep`-assessed, and a
 timestamp — everything needed for a longitudinal study.
 
 ---
