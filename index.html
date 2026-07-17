@@ -137,6 +137,22 @@
     .glow{animation:none !important;opacity:1 !important;}
   }
 
+  /* hero mountain: cursor-reactive routes + camp proximity — JS only computes
+     which route/marker is nearest and writes classes/--proximity; every
+     visible change here is a plain CSS transition so it's off entirely
+     when the script below never attaches (reduced-motion / touch / no-hover) */
+  .route-draw{transition:stroke-width .2s ease-out,opacity .2s ease-out,filter .2s ease-out;}
+  .route-draw.route-active{stroke-width:4.3;opacity:1;}
+  .route-draw[data-route="new"].route-active{filter:drop-shadow(0 0 5px var(--route-new));}
+  .route-draw[data-route="dt"].route-active{filter:drop-shadow(0 0 5px var(--route-dt));}
+  .route-draw[data-route="st"].route-active{filter:drop-shadow(0 0 5px var(--route-st));}
+  .camp{transition:filter .2s ease-out;}
+  .camp.glow-active{filter:drop-shadow(0 0 5px var(--camp-color,var(--summit))) drop-shadow(0 0 12px var(--camp-color,var(--summit)));}
+  .camp.settled{animation:campPulse 3.6s ease-in-out infinite;transform:scale(calc(1 + .15*var(--proximity,0)));transition:transform .2s ease-out;}
+  .camp.settled.near{animation-play-state:paused;}
+  @keyframes campPulse{0%,100%{opacity:1;}50%{opacity:.82;}}
+  .camp-chip.settled{animation:none;opacity:calc(.74 + .26*var(--proximity,0));transform:scale(calc(1 + .035*var(--proximity,0)));transition:opacity .2s ease-out,transform .2s ease-out;}
+
   /* dimension chips */
   .sub-h{font-family:var(--head);font-weight:600;font-size:17px;margin:38px 0 14px;}
 
@@ -302,39 +318,39 @@
     <path d="M0,630 C 220,624 440,632 660,626 C 860,621 1040,630 1200,626" stroke="#3A5852" stroke-width="1" fill="none" opacity="0.45"/>
 
     <!-- three routes from the valley floor, converging at Camp 2, then one shared line to the summit -->
-    <path class="route-draw" style="--len:230" d="M612,604 C 618,566 606,516 610,486 C 616,456 645,428 662,410" stroke="var(--route-new)" stroke-width="3.2" fill="none" stroke-linecap="round" opacity="0.92"/>
-    <path class="route-draw" style="--len:320" d="M470,600 C 520,552 560,470 600,442 C 626,424 648,416 662,410" stroke="var(--route-dt)" stroke-width="3.2" fill="none" stroke-linecap="round" opacity="0.92"/>
-    <path class="route-draw" style="--len:230" d="M764,566 C 744,520 704,452 685,432 C 676,423 669,416 662,410" stroke="var(--route-st)" stroke-width="3.2" fill="none" stroke-linecap="round" opacity="0.92"/>
+    <path class="route-draw" data-route="new" style="--len:230" d="M612,604 C 618,566 606,516 610,486 C 616,456 645,428 662,410" stroke="var(--route-new)" stroke-width="3.2" fill="none" stroke-linecap="round" opacity="0.92"/>
+    <path class="route-draw" data-route="dt" style="--len:320" d="M470,600 C 520,552 560,470 600,442 C 626,424 648,416 662,410" stroke="var(--route-dt)" stroke-width="3.2" fill="none" stroke-linecap="round" opacity="0.92"/>
+    <path class="route-draw" data-route="st" style="--len:230" d="M764,566 C 744,520 704,452 685,432 C 676,423 669,416 662,410" stroke="var(--route-st)" stroke-width="3.2" fill="none" stroke-linecap="round" opacity="0.92"/>
     <path class="route-draw route-shared" style="--len:330" d="M662,410 C 694,372 718,342 748,300 C 780,254 808,208 836,168" stroke="url(#sharedRoute)" stroke-width="4.6" fill="none" stroke-linecap="round"/>
 
-    <g class="camp" style="animation-delay:1.3s"><circle cx="612" cy="604" r="5" fill="#fff" filter="url(#soft)"/><circle cx="612" cy="604" r="2.9" fill="var(--route-new)"/></g>
-    <g class="camp" style="animation-delay:1.3s"><circle cx="470" cy="600" r="5" fill="#fff" filter="url(#soft)"/><circle cx="470" cy="600" r="2.9" fill="var(--route-dt)"/></g>
-    <g class="camp" style="animation-delay:1.3s"><circle cx="764" cy="566" r="5" fill="#fff" filter="url(#soft)"/><circle cx="764" cy="566" r="2.9" fill="var(--route-st)"/></g>
+    <g class="camp" data-owner-routes="new" style="animation-delay:1.3s;--camp-color:var(--route-new)"><circle cx="612" cy="604" r="5" fill="#fff" filter="url(#soft)"/><circle cx="612" cy="604" r="2.9" fill="var(--route-new)"/></g>
+    <g class="camp" data-owner-routes="dt" style="animation-delay:1.3s;--camp-color:var(--route-dt)"><circle cx="470" cy="600" r="5" fill="#fff" filter="url(#soft)"/><circle cx="470" cy="600" r="2.9" fill="var(--route-dt)"/></g>
+    <g class="camp" data-owner-routes="st" style="animation-delay:1.3s;--camp-color:var(--route-st)"><circle cx="764" cy="566" r="5" fill="#fff" filter="url(#soft)"/><circle cx="764" cy="566" r="2.9" fill="var(--route-st)"/></g>
 
-    <g class="camp" style="animation-delay:1.6s"><circle cx="610" cy="486" r="6.5" fill="#fff" filter="url(#soft)"/><circle cx="610" cy="486" r="4" fill="var(--route-new)"/></g>
-    <g class="camp" style="animation-delay:1.85s"><circle cx="662" cy="410" r="8.5" fill="#fff" filter="url(#soft)"/><circle cx="662" cy="410" r="5.4" fill="var(--summit)"/><circle cx="662" cy="410" r="2.1" fill="#fff"/></g>
-    <g class="camp" style="animation-delay:2.1s"><circle cx="748" cy="300" r="6.5" fill="#fff" filter="url(#soft)"/><circle cx="748" cy="300" r="4" fill="#149089"/></g>
-    <g class="camp" style="animation-delay:2.35s">
+    <g class="camp" data-camp-id="1" data-owner-routes="new" style="animation-delay:1.6s;--camp-color:var(--route-new)"><circle cx="610" cy="486" r="6.5" fill="#fff" filter="url(#soft)"/><circle cx="610" cy="486" r="4" fill="var(--route-new)"/></g>
+    <g class="camp" data-camp-id="2" data-owner-routes="new dt st" style="animation-delay:1.85s;--camp-color:var(--summit)"><circle cx="662" cy="410" r="8.5" fill="#fff" filter="url(#soft)"/><circle cx="662" cy="410" r="5.4" fill="var(--summit)"/><circle cx="662" cy="410" r="2.1" fill="#fff"/></g>
+    <g class="camp" data-camp-id="3" data-owner-routes="new dt st" style="animation-delay:2.1s;--camp-color:#149089"><circle cx="748" cy="300" r="6.5" fill="#fff" filter="url(#soft)"/><circle cx="748" cy="300" r="4" fill="#149089"/></g>
+    <g class="camp" data-camp-id="4" data-owner-routes="new dt st" style="animation-delay:2.35s;--camp-color:var(--summit)">
       <circle cx="836" cy="168" r="9" fill="#fff" filter="url(#soft)"/><circle cx="836" cy="168" r="5.6" fill="var(--summit)"/>
       <path d="M836,160 L836,133" stroke="#17191C" stroke-width="2.4"/><path d="M836,133 L864,141 L836,150 Z" fill="var(--summit)"/>
     </g>
 
-    <g class="camp-chip" style="animation-delay:1.7s">
+    <g class="camp-chip" data-camp-id="1" style="animation-delay:1.7s">
       <rect x="622" y="470" width="118" height="34" rx="7" fill="#F8FAF9" fill-opacity="0.9" filter="url(#soft)"/>
       <text x="633" y="484" font-family="'IBM Plex Mono',monospace" font-size="9" letter-spacing="1.2" fill="#8C9A94">CAMP 1</text>
       <text x="633" y="498" font-family="'Space Grotesk',sans-serif" font-weight="600" font-size="13" fill="#17191C">Awareness</text>
     </g>
-    <g class="camp-chip" style="animation-delay:1.95s">
+    <g class="camp-chip" data-camp-id="2" style="animation-delay:1.95s">
       <rect x="674" y="378" width="182" height="34" rx="7" fill="#F8FAF9" fill-opacity="0.9" filter="url(#soft)"/>
       <text x="685" y="392" font-family="'IBM Plex Mono',monospace" font-size="9" letter-spacing="1.2" fill="#8C9A94">CAMP 2 · ROUTES MEET</text>
       <text x="685" y="406" font-family="'Space Grotesk',sans-serif" font-weight="600" font-size="13" fill="#17191C">Development</text>
     </g>
-    <g class="camp-chip" style="animation-delay:2.2s">
+    <g class="camp-chip" data-camp-id="3" style="animation-delay:2.2s">
       <rect x="760" y="268" width="150" height="34" rx="7" fill="#F8FAF9" fill-opacity="0.9" filter="url(#soft)"/>
       <text x="771" y="282" font-family="'IBM Plex Mono',monospace" font-size="9" letter-spacing="1.2" fill="#8C9A94">CAMP 3</text>
       <text x="771" y="296" font-family="'Space Grotesk',sans-serif" font-weight="600" font-size="13" fill="#17191C">Implementation</text>
     </g>
-    <g class="camp-chip" style="animation-delay:2.45s">
+    <g class="camp-chip" data-camp-id="4" style="animation-delay:2.45s">
       <rect x="852" y="150" width="196" height="34" rx="7" fill="#F8FAF9" fill-opacity="0.92" filter="url(#soft)"/>
       <text x="863" y="164" font-family="'IBM Plex Mono',monospace" font-size="9" letter-spacing="1.2" fill="#3E9184">SUMMIT</text>
       <text x="863" y="178" font-family="'Space Grotesk',sans-serif" font-weight="600" font-size="13" fill="#10604B">True twin transformer</text>
@@ -599,6 +615,122 @@
       });
     }, { threshold: 0.14, rootMargin: '0px 0px -6% 0px' });
     Array.prototype.forEach.call(document.querySelectorAll('[data-reveal]'), function(el){ io.observe(el); });
+  })();
+
+  // hero: cursor-reactive routes + camp proximity. Fully skipped (no listener
+  // attached) under reduced-motion or on touch/no-hover devices — the SVG
+  // already renders its static baseline in that case, nothing to fall back to.
+  (function(){
+    var hero = document.querySelector('.hero');
+    var svg = hero && hero.querySelector('.hero-svg');
+    if(!hero || !svg) return;
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var canHover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    var isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+    if(reduced || !canHover || isTouch) return;
+
+    var routes = Array.prototype.slice.call(svg.querySelectorAll('.route-draw[data-route]'));
+    var camps = Array.prototype.slice.call(svg.querySelectorAll('.camp'));
+    var chips = Array.prototype.slice.call(svg.querySelectorAll('.camp-chip'));
+
+    // once the load-in reveal animation finishes, hand the element over to
+    // proximity-driven CSS (a plain animation can't be overridden by another
+    // plain rule while it still owns the property, so we swap classes instead)
+    camps.concat(chips).forEach(function(el){
+      el.addEventListener('animationend', function(){ el.classList.add('settled'); }, { once: true });
+    });
+
+    // sample ~24 points per route path (getPointAtLength) as a cheap
+    // approximation of true point-to-curve distance — plenty for a soft
+    // proximity effect, no need for exact nearest-point-on-curve math
+    var routeSamples = routes.map(function(path){
+      var len = path.getTotalLength();
+      var steps = 24;
+      var pts = [];
+      for(var i = 0; i <= steps; i++){ pts.push(path.getPointAtLength(len * i / steps)); }
+      return { path: path, pts: pts, owner: path.getAttribute('data-route') };
+    });
+
+    var campData = camps.map(function(g){
+      var c = g.querySelector('circle');
+      return {
+        el: g,
+        cx: parseFloat(c.getAttribute('cx')),
+        cy: parseFloat(c.getAttribute('cy')),
+        owners: (g.getAttribute('data-owner-routes') || '').split(' ').filter(Boolean)
+      };
+    });
+    var chipData = chips.map(function(g){
+      var id = g.getAttribute('data-camp-id');
+      var camp = campData.filter(function(c){ return c.el.getAttribute('data-camp-id') === id; })[0];
+      return { el: g, camp: camp };
+    });
+
+    var RADIUS = 140; // px, screen space — tune-to-taste soft falloff radius
+    var lastX = 0, lastY = 0, pending = false;
+
+    function update(){
+      pending = false;
+      var ctm = svg.getScreenCTM();
+      if(!ctm) return;
+
+      // transform each sampled SVG-space point to screen space and compare
+      // directly against the raw client coordinates, so the ~140px radius
+      // means the same thing regardless of how the responsive SVG is scaled
+      function toScreen(x, y){
+        var p = svg.createSVGPoint();
+        p.x = x; p.y = y;
+        return p.matrixTransform(ctm);
+      }
+
+      var nearestOwner = null, minDist = Infinity;
+      routeSamples.forEach(function(r){
+        var d = Infinity;
+        r.pts.forEach(function(pt){
+          var s = toScreen(pt.x, pt.y);
+          var dx = s.x - lastX, dy = s.y - lastY;
+          var dist = dx * dx + dy * dy;
+          if(dist < d) d = dist;
+        });
+        if(d < minDist){ minDist = d; nearestOwner = r.owner; }
+      });
+      routeSamples.forEach(function(r){
+        r.path.classList.toggle('route-active', r.owner === nearestOwner);
+      });
+      campData.forEach(function(c){
+        var glow = !!nearestOwner && c.owners.indexOf(nearestOwner) !== -1;
+        c.el.classList.toggle('glow-active', glow);
+      });
+
+      campData.forEach(function(c){
+        var s = toScreen(c.cx, c.cy);
+        var dx = s.x - lastX, dy = s.y - lastY;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        var t = Math.max(0, Math.min(1, 1 - dist / RADIUS));
+        c.el.style.setProperty('--proximity', t.toFixed(3));
+        c.el.classList.toggle('near', t > 0.04);
+      });
+      chipData.forEach(function(cd){
+        if(!cd.camp) return;
+        cd.el.style.setProperty('--proximity', cd.camp.el.style.getPropertyValue('--proximity') || '0');
+      });
+    }
+
+    function onMove(e){
+      lastX = e.clientX; lastY = e.clientY;
+      if(!pending){ pending = true; requestAnimationFrame(update); }
+    }
+    function onLeave(){
+      routeSamples.forEach(function(r){ r.path.classList.remove('route-active'); });
+      campData.forEach(function(c){
+        c.el.classList.remove('glow-active', 'near');
+        c.el.style.setProperty('--proximity', '0');
+      });
+      chipData.forEach(function(cd){ cd.el.style.setProperty('--proximity', '0'); });
+    }
+
+    hero.addEventListener('mousemove', onMove, { passive: true });
+    hero.addEventListener('mouseleave', onLeave, { passive: true });
   })();
 </script>
 </body>
