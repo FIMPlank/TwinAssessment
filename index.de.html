@@ -24,11 +24,27 @@
 <meta name="twitter:description" content="Verorten Sie Ihre Organisation auf dem Weg zur Twin Transformation — ein kostenloses, forschungsbasiertes Self-Assessment. Ohne Registrierung.">
 <meta name="twitter:image" content="https://fimplank.github.io/twinassessment/og-image.png">
 <style>
+  /* Self-hosted fonts (no third-party CDN) — same families the assessment
+     app uses. Latin only: German umlauts/ß live in the Latin-1 range these
+     files already cover. */
+  @font-face{font-family:'Space Grotesk';font-weight:500;font-display:swap;src:url(fonts/space-grotesk-500.woff2) format('woff2');}
+  @font-face{font-family:'Space Grotesk';font-weight:600;font-display:swap;src:url(fonts/space-grotesk-600.woff2) format('woff2');}
+  @font-face{font-family:'Space Grotesk';font-weight:700;font-display:swap;src:url(fonts/space-grotesk-700.woff2) format('woff2');}
+  @font-face{font-family:'IBM Plex Sans';font-weight:400;font-display:swap;src:url(fonts/ibm-plex-sans-400.woff2) format('woff2');}
+  @font-face{font-family:'IBM Plex Sans';font-weight:500;font-display:swap;src:url(fonts/ibm-plex-sans-500.woff2) format('woff2');}
+  @font-face{font-family:'IBM Plex Sans';font-weight:600;font-display:swap;src:url(fonts/ibm-plex-sans-600.woff2) format('woff2');}
+  @font-face{font-family:'IBM Plex Mono';font-weight:400;font-display:swap;src:url(fonts/ibm-plex-mono-400.woff2) format('woff2');}
+  @font-face{font-family:'IBM Plex Mono';font-weight:500;font-display:swap;src:url(fonts/ibm-plex-mono-500.woff2) format('woff2');}
+
   :root{
     --ink:#17191C; --sub:#41413D; --mut:#6B6B66; --faint:#9A9A95;
     --line:#E3E7E5; --line2:#EEF1EF; --surface:#F2F4F3; --card:#FFFFFF;
     --accent:#179C7D; --accentSoft:#E7F2EF; --accentDark:#10604B; --danger:#9A2B2B;
     --d0:#179C7D; --d1:#1F6FB2; --d2:#C0562F; --d3:#7A5CA8; --d4:#B07D00; --d5:#B0417E;
+    /* Twin-Transformation-Routenpalette — die Routen im Berg-Hero speisen
+       sich hieraus: --route-dt (digital) und --route-st (Nachhaltigkeit,
+       = Fraunhofer-Grün --accent, unverändert) laufen in --summit zusammen. */
+    --route-dt:#1C6FB4; --route-st:#179C7D; --route-new:#7C8A94; --summit:#10897C;
     --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
     --sans:'IBM Plex Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
     --head:'Space Grotesk','IBM Plex Sans',system-ui,sans-serif;
@@ -57,51 +73,99 @@
   .brand span{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--faint);text-transform:uppercase;}
   .nav-cta{font-size:14px;padding:10px 18px;}
 
-  section{padding:64px 0;}
-  section.tint{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  section{padding:76px 0;}
+  /* Grain: ein feines SVG-Rauschfeld statt einer flachen digitalen Fläche */
+  section.tint{
+    background-color:var(--surface);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
   .sec-head{max-width:64ch;}
-  .sec-head h2{font-size:clamp(24px,3.4vw,32px);margin:10px 0 0;}
+  .sec-head h2{font-size:clamp(24px,3.4vw,32px);font-weight:700;margin:10px 0 0;}
   .sec-head p.lead{font-size:16px;color:var(--sub);margin-top:12px;}
 
-  /* hero */
-  .hero{padding:66px 0 60px;}
-  .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:44px;align-items:center;}
-  .hero h1{font-size:clamp(30px,5vw,54px);margin:16px 0 0;max-width:16ch;}
-  .hero p.vp{font-size:clamp(16px,1.9vw,19px);color:var(--sub);margin:20px 0 0;max-width:54ch;}
-  .hero-cta{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:30px;}
-  .hero-note{font-size:12.5px;color:var(--faint);margin-top:14px;}
-  .hero-meta{margin-top:18px;font-size:13px;color:var(--mut);display:flex;gap:18px;flex-wrap:wrap;}
-  .hero-meta span{display:inline-flex;align-items:center;gap:7px;}
-  .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none;}
-  .hero-art{width:100%;height:auto;display:block;}
+  /* Elevation: weicher, gestufter Schatten statt Haarlinien-Karten */
+  .lift{background:var(--card);border:1px solid rgba(23,25,28,.05);border-radius:12px;
+    box-shadow:0 1px 2px rgba(23,25,28,.05), 0 6px 20px rgba(23,25,28,.06);
+    transition:transform .16s ease,box-shadow .16s ease;}
+  .lift.interactive:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(23,25,28,.06), 0 14px 32px rgba(23,25,28,.10);}
 
-  /* dimension chips */
-  .dims{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:26px;}
-  .dim{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px 14px;}
-  .dim .sw{width:12px;height:12px;border-radius:3px;flex:none;}
-  .dim .nm{font-size:14px;font-weight:500;}
-  .dim .nm small{color:var(--faint);font-weight:400;}
-  .stages{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px;}
-  .stage{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:15px 15px 16px;position:relative;overflow:hidden;}
-  .stage:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent);opacity:calc(0.4 + var(--i)*0.2);}
-  .stage .n{font-family:var(--mono);font-size:11px;color:var(--faint);}
-  .stage .t{font-family:var(--head);font-weight:600;font-size:15px;margin-top:6px;}
-  .stage .d{font-size:12.5px;color:var(--mut);margin-top:5px;line-height:1.5;}
+  /* Scroll-Reveal: Inhalte sind standardmäßig sichtbar (kein JS / reduzierte
+     Bewegung = keine Animation, kein Inhaltsverlust) */
+  body.reveal-ready [data-reveal]{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s ease;}
+  body.reveal-ready [data-reveal].is-visible{opacity:1;transform:none;}
+
+  /* Hero: der lebendige Berg */
+  .hero{position:relative;overflow:hidden;padding:0;}
+  @media (min-width:821px){ .hero{min-height:600px;} }
+  .hero-svg{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;}
+  .hero-inner{position:relative;z-index:2;padding:64px 0 56px;max-width:560px;}
+  .hero h1{font-size:clamp(32px,5.1vw,56px);margin:18px 0 0;max-width:16ch;}
+  .hero p.vp{font-size:clamp(16px,1.9vw,19px);color:var(--sub);margin:20px 0 0;max-width:48ch;}
+  .hero-cta{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:30px;}
+  .hero-meta{margin-top:22px;font-family:var(--mono);font-size:12.5px;letter-spacing:.02em;color:var(--mut);display:flex;gap:18px;flex-wrap:wrap;}
+  .hero-meta span{display:inline-flex;align-items:center;gap:7px;}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none;}
+  .hero-undernav{display:flex;align-items:baseline;justify-content:space-between;
+    gap:24px;flex-wrap:wrap;padding:22px 0 38px;}
+  .routes-key{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--mono);font-size:11.5px;letter-spacing:.03em;color:var(--mut);}
+  .routes-key span{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;}
+  .routes-key i{width:15px;height:3px;border-radius:2px;display:inline-block;}
+  .routes-key b{color:var(--sub);font-weight:500;margin-right:2px;font-family:var(--sans);}
+  .epigraph{font-family:var(--mono);font-size:12px;letter-spacing:.02em;color:var(--faint);text-align:right;max-width:46ch;}
+  .epigraph em{color:var(--mut);font-style:italic;font-family:var(--sans);}
+
+  /* Berg-Animation: zeichnet sich beim Laden, einmalig orchestriert */
+  .route-draw{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:draw 1.5s ease forwards;}
+  .route-shared{animation-delay:1.15s;}
+  @keyframes draw{to{stroke-dashoffset:0;}}
+  .camp,.camp-chip{opacity:0;animation:rise .6s ease forwards;transform-box:fill-box;transform-origin:center;}
+  @keyframes rise{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:translateY(0);}}
+  .glow{opacity:0;animation:fade 1.4s ease .3s forwards;}
+  @keyframes fade{to{opacity:1;}}
+  @media (prefers-reduced-motion:reduce){
+    .route-draw{animation:none !important;stroke-dashoffset:0 !important;}
+    .camp,.camp-chip{animation:none !important;opacity:1 !important;transform:none !important;}
+    .glow{animation:none !important;opacity:1 !important;}
+  }
+
+  .sub-h{font-family:var(--head);font-weight:600;font-size:17px;margin:38px 0 14px;}
+
+  /* Sechs Dimensionen: Routenmarker-Zeilen statt identischer Karten — jede
+     trägt ein kleines Flaggen-Glyph in ihrer eigenen Dimensionsfarbe */
+  .dims{display:grid;grid-template-columns:1fr 1fr;gap:0 28px;margin-top:6px;border-top:1px solid var(--line);}
+  .dim{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);}
+  .dim .flag{width:17px;height:17px;flex:none;}
+  .dim .nm{font-size:14.5px;font-weight:500;}
+
+  /* Vier Stufen: ein Höhenprofil — Höhenbalken stehen für den Aufstieg */
+  .stages{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:6px;}
+  .stage{padding:18px 16px 18px;}
+  .stage .alt{display:flex;align-items:flex-end;gap:3px;height:26px;margin-bottom:12px;}
+  .stage .alt i{width:6px;border-radius:2px;background:var(--line);display:block;}
+  .stage .alt i:nth-child(1){height:40%;}
+  .stage .alt i:nth-child(2){height:60%;}
+  .stage .alt i:nth-child(3){height:80%;}
+  .stage .alt i:nth-child(4){height:100%;}
+  .stage .alt i.on{background:var(--summit);}
+  .stage .n{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.06em;}
+  .stage .t{font-family:var(--head);font-weight:600;font-size:15.5px;margin-top:6px;}
+  .stage .d{font-size:12.5px;color:var(--mut);margin-top:6px;line-height:1.5;}
+
   .pathways{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px;}
-  .pw{border:1px solid var(--line);border-radius:11px;padding:16px;background:var(--card);}
+  .pw{padding:18px;}
   .pw .tag{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:#fff;padding:3px 9px;border-radius:20px;}
   .pw .nm{font-family:var(--head);font-weight:600;font-size:15px;margin-top:10px;}
   .pw .d{font-size:13px;color:var(--sub);margin-top:7px;line-height:1.55;}
 
-  /* steps */
+  /* Schritte */
   .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:8px;}
-  .step{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px 18px;}
+  .step{padding:22px 18px;}
   .step .num{width:36px;height:36px;border-radius:9px;background:var(--accentSoft);color:var(--accentDark);font-family:var(--head);font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;}
   .step h3{font-size:16px;margin:14px 0 0;}
   .step p{font-size:13.5px;color:var(--mut);margin-top:7px;line-height:1.55;}
 
-  /* research card */
-  .paper{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px;box-shadow:0 1px 3px rgba(0,0,0,.03);}
+  /* Forschungskarte */
+  .paper{padding:32px;border-radius:16px;}
   .paper .j{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;}
   .paper h3{font-size:22px;margin:12px 0 0;max-width:40ch;line-height:1.22;}
   .paper .au{font-size:14.5px;color:var(--sub);margin-top:12px;}
@@ -121,9 +185,9 @@
   .copy:hover{border-color:var(--accent);}
   .copy.done{color:#fff;background:var(--accent);border-color:var(--accent);}
 
-  /* about */
+  /* Über */
   .about{display:grid;grid-template-columns:1.2fr .8fr;gap:34px;align-items:start;}
-  .note{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:18px 20px;font-size:13.5px;color:var(--sub);line-height:1.6;}
+  .note{border-left:3px solid var(--accent);padding:18px 20px;font-size:13.5px;color:var(--sub);line-height:1.6;}
 
   footer{background:#12181A;color:#C9CFCC;padding:40px 0 46px;}
   footer .fgrid{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:center;}
@@ -133,7 +197,21 @@
   footer .flinks a{color:#C9CFCC;text-decoration:none;}
   footer .flinks a:hover{color:#fff;}
 
-  /* language toggle */
+  @media (max-width:820px){
+    .hero{display:flex;flex-direction:column;}
+    .hero-svg{position:relative;inset:auto;order:2;height:300px;margin-top:6px;border-radius:14px;}
+    .hero-svg .camp-chip{display:none;} /* Beschriftungen wären in dieser Höhe unleserlich klein — die echten Namen stehen im Text darunter und im Konzept-Abschnitt */
+    .hero-inner{order:1;padding:44px 0 20px;max-width:100%;}
+    .hero-undernav{flex-direction:column;align-items:flex-start;gap:12px;padding-bottom:36px;}
+    .epigraph{text-align:left;}
+    .dims{grid-template-columns:1fr;}
+    .stages{grid-template-columns:1fr 1fr;}
+    .pathways{grid-template-columns:1fr;}
+    .steps{grid-template-columns:1fr 1fr;}
+    .about{grid-template-columns:1fr;}
+  }
+
+  /* Sprachumschalter */
   .nav-right{display:flex;align-items:center;gap:16px;}
   .lang{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;letter-spacing:.06em;}
   .lang a{color:var(--faint);text-decoration:none;padding:2px 2px;transition:color .12s;}
@@ -141,15 +219,6 @@
   .lang a.active{color:var(--ink);font-weight:600;}
   .lang .sep{color:var(--line);}
 
-  @media (max-width:820px){
-    .hero-grid{grid-template-columns:1fr;gap:28px;}
-    .hero-art{max-width:420px;margin:0 auto;}
-    .dims{grid-template-columns:1fr 1fr;}
-    .stages{grid-template-columns:1fr 1fr;}
-    .pathways{grid-template-columns:1fr;}
-    .steps{grid-template-columns:1fr 1fr;}
-    .about{grid-template-columns:1fr;}
-  }
   @media (max-width:520px){
     section{padding:48px 0;}
     .dims,.stages,.steps{grid-template-columns:1fr;}
@@ -175,11 +244,83 @@
 <!-- ===================== HERO ===================== -->
 <a id="top"></a>
 <section class="hero">
-  <div class="wrap hero-grid">
-    <div>
+  <svg class="hero-svg" viewBox="0 0 1200 640" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg"
+       role="img" aria-label="Illustration eines Bergaufstiegs: Vier Lager führen den Hang hinauf — Bewusstsein, Entwicklung, Umsetzung und der Gipfel, True Twin Transformer. Drei Wege — ein Weg für Experten der digitalen Transformation, ein Weg für Experten der Nachhaltigkeitstransformation und ein Weg für Neueinsteiger — starten im Talgrund und treffen sich bei Lager 2, von dort führt ein gemeinsamer Weg zum Gipfel.">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#E7F1F1"/><stop offset="0.55" stop-color="#F1F6F5"/><stop offset="1" stop-color="#F8FAF9"/>
+      </linearGradient>
+      <radialGradient id="dawn" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0" stop-color="#10897C" stop-opacity="0.28"/><stop offset="0.45" stop-color="#37A79A" stop-opacity="0.12"/><stop offset="1" stop-color="#37A79A" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="ridgeA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D3E2E2"/><stop offset="1" stop-color="#DFEAE8"/></linearGradient>
+      <linearGradient id="ridgeB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A9C6C1"/><stop offset="1" stop-color="#BCD3CD"/></linearGradient>
+      <linearGradient id="massif" x1="0.15" y1="0" x2="0.85" y2="1"><stop offset="0" stop-color="#5E827C"/><stop offset="0.5" stop-color="#4A6C67"/><stop offset="1" stop-color="#3C5A55"/></linearGradient>
+      <linearGradient id="massifLit" x1="0" y1="0" x2="1" y2="0.5"><stop offset="0" stop-color="#8FB0A8" stop-opacity="0"/><stop offset="1" stop-color="#C8E0D6" stop-opacity="0.5"/></linearGradient>
+      <linearGradient id="foreSolid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2B4541"/><stop offset="1" stop-color="#233A36"/></linearGradient>
+      <linearGradient id="sharedRoute" x1="0" y1="1" x2="0.4" y2="0"><stop offset="0" stop-color="#1C6FB4"/><stop offset="0.55" stop-color="#149089"/><stop offset="1" stop-color="#10897C"/></linearGradient>
+      <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#12302B" flood-opacity="0.28"/></filter>
+    </defs>
+
+    <rect x="0" y="0" width="1200" height="640" fill="url(#sky)"/>
+    <ellipse class="glow" cx="835" cy="150" rx="360" ry="300" fill="url(#dawn)"/>
+
+    <path d="M0,392 C 200,384 380,392 520,372 C 690,348 820,300 980,282 C 1082,270 1150,278 1200,272 L1200,640 L0,640 Z" fill="url(#ridgeA)"/>
+    <path d="M0,468 C 180,456 340,452 470,432 C 624,406 720,332 862,252 C 942,207 1012,238 1082,252 C 1132,262 1172,258 1200,256 L1200,640 L0,640 Z" fill="url(#ridgeB)"/>
+
+    <path d="M360,640 C 432,556 476,500 560,440 C 650,386 706,330 762,262 C 800,216 820,176 834,150 C 852,182 880,240 920,306 C 974,394 1046,438 1132,474 C 1164,488 1184,494 1200,500 L1200,640 L360,640 Z" fill="url(#massif)"/>
+    <path d="M834,150 C 852,182 880,240 920,306 C 974,394 1046,438 1132,474 C 1164,488 1184,494 1200,500 L1200,640 L560,640 C 700,560 760,420 834,150 Z" fill="url(#massifLit)"/>
+    <path d="M806,208 C 816,190 826,168 834,150 C 844,172 856,196 866,220 C 856,214 848,224 838,220 C 828,226 818,216 806,208 Z" fill="#EAF3EF" opacity="0.9"/>
+    <path d="M792,236 C 800,232 808,240 816,236 C 812,248 802,250 794,246 Z" fill="#EAF3EF" opacity="0.6"/>
+
+    <path d="M0,616 C 180,610 340,614 500,606 C 660,598 800,566 960,560 C 1060,557 1140,560 1200,560 L1200,640 L0,640 Z" fill="url(#foreSolid)"/>
+    <path d="M0,630 C 220,624 440,632 660,626 C 860,621 1040,630 1200,626" stroke="#3A5852" stroke-width="1" fill="none" opacity="0.45"/>
+
+    <!-- drei Wege vom Talgrund, treffen sich bei Lager 2, dann ein gemeinsamer Weg zum Gipfel -->
+    <path class="route-draw" style="--len:230" d="M612,604 C 618,566 606,516 610,486 C 616,456 645,428 662,410" stroke="var(--route-new)" stroke-width="3.2" fill="none" stroke-linecap="round" opacity="0.92"/>
+    <path class="route-draw" style="--len:320" d="M470,600 C 520,552 560,470 600,442 C 626,424 648,416 662,410" stroke="var(--route-dt)" stroke-width="3.2" fill="none" stroke-linecap="round" opacity="0.92"/>
+    <path class="route-draw" style="--len:230" d="M764,566 C 744,520 704,452 685,432 C 676,423 669,416 662,410" stroke="var(--route-st)" stroke-width="3.2" fill="none" stroke-linecap="round" opacity="0.92"/>
+    <path class="route-draw route-shared" style="--len:330" d="M662,410 C 694,372 718,342 748,300 C 780,254 808,208 836,168" stroke="url(#sharedRoute)" stroke-width="4.6" fill="none" stroke-linecap="round"/>
+
+    <g class="camp" style="animation-delay:1.3s"><circle cx="612" cy="604" r="5" fill="#fff" filter="url(#soft)"/><circle cx="612" cy="604" r="2.9" fill="var(--route-new)"/></g>
+    <g class="camp" style="animation-delay:1.3s"><circle cx="470" cy="600" r="5" fill="#fff" filter="url(#soft)"/><circle cx="470" cy="600" r="2.9" fill="var(--route-dt)"/></g>
+    <g class="camp" style="animation-delay:1.3s"><circle cx="764" cy="566" r="5" fill="#fff" filter="url(#soft)"/><circle cx="764" cy="566" r="2.9" fill="var(--route-st)"/></g>
+
+    <g class="camp" style="animation-delay:1.6s"><circle cx="610" cy="486" r="6.5" fill="#fff" filter="url(#soft)"/><circle cx="610" cy="486" r="4" fill="var(--route-new)"/></g>
+    <g class="camp" style="animation-delay:1.85s"><circle cx="662" cy="410" r="8.5" fill="#fff" filter="url(#soft)"/><circle cx="662" cy="410" r="5.4" fill="var(--summit)"/><circle cx="662" cy="410" r="2.1" fill="#fff"/></g>
+    <g class="camp" style="animation-delay:2.1s"><circle cx="748" cy="300" r="6.5" fill="#fff" filter="url(#soft)"/><circle cx="748" cy="300" r="4" fill="#149089"/></g>
+    <g class="camp" style="animation-delay:2.35s">
+      <circle cx="836" cy="168" r="9" fill="#fff" filter="url(#soft)"/><circle cx="836" cy="168" r="5.6" fill="var(--summit)"/>
+      <path d="M836,160 L836,133" stroke="#17191C" stroke-width="2.4"/><path d="M836,133 L864,141 L836,150 Z" fill="var(--summit)"/>
+    </g>
+
+    <g class="camp-chip" style="animation-delay:1.7s">
+      <rect x="622" y="470" width="118" height="34" rx="7" fill="#F8FAF9" fill-opacity="0.9" filter="url(#soft)"/>
+      <text x="633" y="484" font-family="'IBM Plex Mono',monospace" font-size="9" letter-spacing="1.2" fill="#8C9A94">LAGER 1</text>
+      <text x="633" y="498" font-family="'Space Grotesk',sans-serif" font-weight="600" font-size="13" fill="#17191C">Bewusstsein</text>
+    </g>
+    <g class="camp-chip" style="animation-delay:1.95s">
+      <rect x="674" y="378" width="192" height="34" rx="7" fill="#F8FAF9" fill-opacity="0.9" filter="url(#soft)"/>
+      <text x="685" y="392" font-family="'IBM Plex Mono',monospace" font-size="9" letter-spacing="1.2" fill="#8C9A94">LAGER 2 · WEGE TREFFEN SICH</text>
+      <text x="685" y="406" font-family="'Space Grotesk',sans-serif" font-weight="600" font-size="13" fill="#17191C">Entwicklung</text>
+    </g>
+    <g class="camp-chip" style="animation-delay:2.2s">
+      <rect x="760" y="268" width="150" height="34" rx="7" fill="#F8FAF9" fill-opacity="0.9" filter="url(#soft)"/>
+      <text x="771" y="282" font-family="'IBM Plex Mono',monospace" font-size="9" letter-spacing="1.2" fill="#8C9A94">LAGER 3</text>
+      <text x="771" y="296" font-family="'Space Grotesk',sans-serif" font-weight="600" font-size="13" fill="#17191C">Umsetzung</text>
+    </g>
+    <g class="camp-chip" style="animation-delay:2.45s">
+      <rect x="852" y="150" width="196" height="34" rx="7" fill="#F8FAF9" fill-opacity="0.92" filter="url(#soft)"/>
+      <text x="863" y="164" font-family="'IBM Plex Mono',monospace" font-size="9" letter-spacing="1.2" fill="#3E9184">GIPFEL</text>
+      <text x="863" y="178" font-family="'Space Grotesk',sans-serif" font-weight="600" font-size="13" fill="#10604B">True Twin Transformer</text>
+    </g>
+  </svg>
+
+  <div class="wrap">
+    <div class="hero-inner">
       <div class="eyebrow">Twin Transformation Capability Maturity Model</div>
-      <h1>Bestimmen Sie den Reifegrad Ihrer Twin&nbsp;Transformation.</h1>
-      <p class="vp">Bewerten Sie die dynamischen Fähigkeiten (Dynamic Capabilities) Ihrer Organisation, um digitale und nachhaltige Transformation zu verbinden — und erkennen Sie, wo der nächste Schritt liegt.</p>
+      <h1>Kartieren Sie den Twin-Transformation-Aufstieg eines Unternehmens.</h1>
+      <p class="vp">Digitale Transformation ermöglicht Nachhaltigkeit, Nachhaltigkeit leitet die digitale Entwicklung — bewerten Sie, wo Ihre Organisation steht, und sehen Sie das nächste Lager auf dem Aufstieg.</p>
       <div class="hero-cta">
         <a class="btn btn-primary" href="assessment.de.html">Assessment starten&nbsp;→</a>
         <a class="link-sm" href="#research">Zur Forschung</a>
@@ -190,66 +331,72 @@
         <span><span class="dot"></span>Kostenlos &amp; forschungsbasiert</span>
       </div>
     </div>
-    <div>
-      <!-- Geometrisches Motiv: zwei sich verschränkende Pfade steigen über vier Reifegradstufen -->
-      <svg class="hero-art" viewBox="0 0 460 380" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Zwei sich verschränkende Transformationspfade steigen über vier Reifegradstufen">
-        <g>
-          <rect x="40"  y="300" width="90" height="40" rx="6" fill="#EEF1EF"/>
-          <rect x="140" y="250" width="90" height="90" rx="6" fill="#E7F2EF"/>
-          <rect x="240" y="190" width="90" height="150" rx="6" fill="#D8ECE5"/>
-          <rect x="340" y="120" width="90" height="220" rx="6" fill="#179C7D" opacity="0.16"/>
-        </g>
-        <g font-family="'IBM Plex Mono',monospace" font-size="12" fill="#6B6B66">
-          <text x="85"  y="325" text-anchor="middle">1</text>
-          <text x="185" y="325" text-anchor="middle">2</text>
-          <text x="285" y="325" text-anchor="middle">3</text>
-          <text x="385" y="325" text-anchor="middle">4</text>
-        </g>
-        <path d="M50 322 C 120 300, 120 250, 185 240 S 250 205, 285 175 S 360 150, 420 108" stroke="#1F6FB2" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-        <path d="M50 336 C 120 330, 130 268, 185 262 S 255 230, 285 196 S 362 168, 420 132" stroke="#179C7D" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-        <circle cx="420" cy="108" r="7" fill="#1F6FB2" stroke="#fff" stroke-width="2.5"/>
-        <circle cx="420" cy="132" r="7" fill="#179C7D" stroke="#fff" stroke-width="2.5"/>
-        <path d="M420 108 L 420 78" stroke="#17191C" stroke-width="3"/>
-        <path d="M420 78 L 452 87 L 420 96 Z" fill="#179C7D"/>
-      </svg>
-    </div>
   </div>
 </section>
+
+<div class="wrap hero-undernav">
+  <div class="routes-key">
+    <b>Drei Wege:</b>
+    <span><i style="background:var(--route-dt)"></i>DT-Experte</span>
+    <span><i style="background:var(--route-st)"></i>ST-Experte</span>
+    <span><i style="background:var(--route-new)"></i>Neueinsteiger</span>
+    <span style="color:var(--faint)">— alle treffen sich bei Lager 2</span>
+  </div>
+  <div class="epigraph"><em>„Der Gipfel treibt uns an, doch der Aufstieg selbst ist es, der zählt.“</em> — Conrad Anker</div>
+</div>
 
 <!-- ===================== WAS IST ES ===================== -->
 <section class="tint" id="what">
   <div class="wrap">
-    <div class="sec-head">
+    <div class="sec-head" data-reveal>
       <div class="eyebrow">Das Konzept</div>
       <h2>Was bedeutet Twin-Transformation-Reifegrad?</h2>
       <p class="lead">Twin Transformation bezeichnet das wertschöpfende Zusammenspiel von <strong>digitaler Transformation</strong> und <strong>Nachhaltigkeitstransformation</strong> — digitale Technologien <em>ermöglichen</em> Nachhaltigkeit, und Nachhaltigkeitsziele <em>leiten</em> die digitale Entwicklung.</p>
     </div>
-    <p style="max-width:78ch;color:var(--sub);margin-top:16px;font-size:15.5px;">
+    <p style="max-width:78ch;color:var(--sub);margin-top:16px;font-size:15.5px;" data-reveal>
       Statt beide als getrennte Agenden zu behandeln, betrachtet das <strong>Reifegradmodell</strong>, wie gut eine Organisation die <strong>dynamischen Fähigkeiten (Dynamic Capabilities)</strong> entwickelt, um sie gemeinsam voranzutreiben. Es strukturiert <strong>45 Fähigkeiten</strong> entlang von <strong>sechs Fähigkeitsdimensionen</strong> und <strong>vier Reifegradstufen</strong> und zeigt so klar, wo eine Organisation steht und was als Nächstes aufzubauen ist.
     </p>
 
-    <div class="dims" aria-label="Sechs Fähigkeitsdimensionen">
-      <div class="dim"><span class="sw" style="background:var(--d0)"></span><span class="nm">Strategy &amp; Leadership <small>· Strategie &amp; Führung</small></span></div>
-      <div class="dim"><span class="sw" style="background:var(--d1)"></span><span class="nm">Culture &amp; Employees <small>· Kultur &amp; Mitarbeitende</small></span></div>
-      <div class="dim"><span class="sw" style="background:var(--d2)"></span><span class="nm">Ecosystem &amp; Partnerships <small>· Ökosystem &amp; Partnerschaften</small></span></div>
-      <div class="dim"><span class="sw" style="background:var(--d3)"></span><span class="nm">Products &amp; Services <small>· Produkte &amp; Dienstleistungen</small></span></div>
-      <div class="dim"><span class="sw" style="background:var(--d4)"></span><span class="nm">Operations <small>· Betrieb</small></span></div>
-      <div class="dim"><span class="sw" style="background:var(--d5)"></span><span class="nm">Technology <small>· Technologie</small></span></div>
+    <h3 class="sub-h">Die vier Reifegradstufen — ein Aufstieg</h3>
+    <div class="stages" aria-label="Vier Reifegradstufen" data-reveal>
+      <div class="stage lift interactive">
+        <div class="alt" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
+        <div class="n">STUFE 1</div><div class="t">Bewusstsein</div>
+        <div class="d">Bewusstsein für das Potenzial, Digitalisierung und Nachhaltigkeit zu verbinden; erste integrierte Pilotprojekte.</div>
+      </div>
+      <div class="stage lift interactive">
+        <div class="alt" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i></div>
+        <div class="n">STUFE 2</div><div class="t">Entwicklung</div>
+        <div class="d">Eine Twin-Transformation-Strategie und Roadmap; langfristige Projekte werden pilotiert und evaluiert.</div>
+      </div>
+      <div class="stage lift interactive">
+        <div class="alt" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+        <div class="n">STUFE 3</div><div class="t">Umsetzung</div>
+        <div class="d">Die Strategie wird operationalisiert und in der gesamten Organisation ausgerollt.</div>
+      </div>
+      <div class="stage lift interactive">
+        <div class="alt" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+        <div class="n">STUFE 4</div><div class="t">True Twin Transformer</div>
+        <div class="d">Twin-Transformation-Kriterien bestimmen jede Entscheidung, mit kontinuierlicher Selbstoptimierung.</div>
+      </div>
     </div>
 
-    <div class="stages" aria-label="Vier Reifegradstufen">
-      <div class="stage" style="--i:0"><div class="n">STUFE 1</div><div class="t">Bewusstsein</div><div class="d">Bewusstsein für das Potenzial, Digitalisierung und Nachhaltigkeit zu verbinden; erste integrierte Pilotprojekte.</div></div>
-      <div class="stage" style="--i:1"><div class="n">STUFE 2</div><div class="t">Entwicklung</div><div class="d">Eine Twin-Transformation-Strategie und Roadmap; langfristige Projekte werden pilotiert und evaluiert.</div></div>
-      <div class="stage" style="--i:2"><div class="n">STUFE 3</div><div class="t">Umsetzung</div><div class="d">Die Strategie wird operationalisiert und in der gesamten Organisation ausgerollt.</div></div>
-      <div class="stage" style="--i:3"><div class="n">STUFE 4</div><div class="t">True Twin Transformer</div><div class="d">Twin-Transformation-Kriterien bestimmen jede Entscheidung, mit kontinuierlicher Selbstoptimierung.</div></div>
+    <h3 class="sub-h">Sechs Fähigkeitsdimensionen — worauf Sie bewertet werden</h3>
+    <div class="dims" aria-label="Sechs Fähigkeitsdimensionen" data-reveal>
+      <div class="dim"><svg class="flag" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 18V3" stroke="var(--d0)" stroke-width="1.6" stroke-linecap="round"/><path d="M4 4 L15 6 L4 9 Z" fill="var(--d0)"/></svg><span class="nm">Strategie &amp; Führung</span></div>
+      <div class="dim"><svg class="flag" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 18V3" stroke="var(--d1)" stroke-width="1.6" stroke-linecap="round"/><path d="M4 4 L15 6 L4 9 Z" fill="var(--d1)"/></svg><span class="nm">Kultur &amp; Mitarbeitende</span></div>
+      <div class="dim"><svg class="flag" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 18V3" stroke="var(--d2)" stroke-width="1.6" stroke-linecap="round"/><path d="M4 4 L15 6 L4 9 Z" fill="var(--d2)"/></svg><span class="nm">Ökosystem &amp; Partnerschaften</span></div>
+      <div class="dim"><svg class="flag" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 18V3" stroke="var(--d3)" stroke-width="1.6" stroke-linecap="round"/><path d="M4 4 L15 6 L4 9 Z" fill="var(--d3)"/></svg><span class="nm">Produkte &amp; Dienstleistungen</span></div>
+      <div class="dim"><svg class="flag" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 18V3" stroke="var(--d4)" stroke-width="1.6" stroke-linecap="round"/><path d="M4 4 L15 6 L4 9 Z" fill="var(--d4)"/></svg><span class="nm">Betrieb</span></div>
+      <div class="dim"><svg class="flag" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 18V3" stroke="var(--d5)" stroke-width="1.6" stroke-linecap="round"/><path d="M4 4 L15 6 L4 9 Z" fill="var(--d5)"/></svg><span class="nm">Technologie</span></div>
     </div>
 
-    <h3 style="font-size:18px;margin:34px 0 4px;">Drei Wege zum Twin Transformer</h3>
+    <h3 class="sub-h" style="margin-top:44px;">Drei Wege zum Twin Transformer</h3>
     <p style="font-size:14px;color:var(--mut);max-width:74ch;">Organisationen starten je nach ihrer bisherigen Digital- und Nachhaltigkeitserfahrung von unterschiedlichen Punkten — alle drei Wege münden in denselben Aufstieg zum Gipfel.</p>
-    <div class="pathways">
-      <div class="pw"><span class="tag" style="background:#8C8A84;">Neueinsteiger</span><div class="nm">Twin-Transformation-Neueinsteiger</div><div class="d">Begrenzte digitale und Nachhaltigkeitsfähigkeiten — integrieren Sie beide von Anfang an, um Zeit und Ressourcen zu sparen.</div></div>
-      <div class="pw"><span class="tag" style="background:var(--d1);">DT-Experte</span><div class="nm">Experte für digitale Transformation</div><div class="d">Eine starke digitale Basis — machen Sie die digitale Transformation nachhaltig, indem Sie die Nachhaltigkeitslücke schließen.</div></div>
-      <div class="pw"><span class="tag" style="background:var(--accent);">ST-Experte</span><div class="nm">Experte für Nachhaltigkeitstransformation</div><div class="d">Eine starke Nachhaltigkeitsbasis — machen Sie die Nachhaltigkeitstransformation digital, indem Sie die Digitalisierungslücke schließen.</div></div>
+    <div class="pathways" data-reveal>
+      <div class="pw lift interactive"><span class="tag" style="background:#8C8A84;">Neueinsteiger</span><div class="nm">Twin-Transformation-Neueinsteiger</div><div class="d">Begrenzte digitale und Nachhaltigkeitsfähigkeiten — integrieren Sie beide von Anfang an, um Zeit und Ressourcen zu sparen.</div></div>
+      <div class="pw lift interactive"><span class="tag" style="background:var(--route-dt);">DT-Experte</span><div class="nm">Experte für digitale Transformation</div><div class="d">Eine starke digitale Basis — machen Sie die digitale Transformation nachhaltig, indem Sie die Nachhaltigkeitslücke schließen.</div></div>
+      <div class="pw lift interactive"><span class="tag" style="background:var(--route-st);">ST-Experte</span><div class="nm">Experte für Nachhaltigkeitstransformation</div><div class="d">Eine starke Nachhaltigkeitsbasis — machen Sie die Nachhaltigkeitstransformation digital, indem Sie die Digitalisierungslücke schließen.</div></div>
     </div>
   </div>
 </section>
@@ -257,16 +404,16 @@
 <!-- ===================== SO FUNKTIONIERT ES ===================== -->
 <section id="how">
   <div class="wrap">
-    <div class="sec-head">
+    <div class="sec-head" data-reveal>
       <div class="eyebrow">Das Assessment</div>
       <h2>So funktioniert das Assessment</h2>
       <p class="lead">Ein geführtes Self-Assessment — etwa 10–15 Minuten, ohne Registrierung.</p>
     </div>
-    <div class="steps">
-      <div class="step"><div class="num">1</div><h3>Sechs Dimensionen bewerten</h3><p>Wählen Sie für jede Fähigkeitsdimension die Reifegradstufe, die Ihre Organisation heute am besten beschreibt.</p></div>
-      <div class="step"><div class="num">2</div><h3>Reifegrad sehen</h3><p>Erhalten Sie eine integrierte Reifegradstufe und ein Profil je Dimension im interaktiven Radar.</p></div>
-      <div class="step"><div class="num">3</div><h3>Ihren Weg erkennen</h3><p>Verstehen Sie, auf welchem der drei Wege Sie sind und wo Ihre Engpass-Dimension liegt.</p></div>
-      <div class="step"><div class="num">4</div><h3>Nächste Schritte planen</h3><p>Erhalten Sie priorisierte Fähigkeitslücken, die Sie als Nächstes entwickeln — fundiert im Forschungsmodell.</p></div>
+    <div class="steps" data-reveal>
+      <div class="step lift interactive"><div class="num">1</div><h3>Sechs Dimensionen bewerten</h3><p>Wählen Sie für jede Fähigkeitsdimension die Reifegradstufe, die Ihre Organisation heute am besten beschreibt.</p></div>
+      <div class="step lift interactive"><div class="num">2</div><h3>Reifegrad sehen</h3><p>Erhalten Sie eine integrierte Reifegradstufe und ein Profil je Dimension im interaktiven Radar.</p></div>
+      <div class="step lift interactive"><div class="num">3</div><h3>Ihren Weg erkennen</h3><p>Verstehen Sie, auf welchem der drei Wege Sie sind und wo Ihre Engpass-Dimension liegt.</p></div>
+      <div class="step lift interactive"><div class="num">4</div><h3>Nächste Schritte planen</h3><p>Erhalten Sie priorisierte Fähigkeitslücken, die Sie als Nächstes entwickeln — fundiert im Forschungsmodell.</p></div>
     </div>
     <div style="margin-top:30px;">
       <a class="btn btn-primary" href="assessment.de.html">Assessment starten&nbsp;→</a>
@@ -277,12 +424,12 @@
 <!-- ===================== FORSCHUNG ===================== -->
 <section class="tint" id="research">
   <div class="wrap">
-    <div class="sec-head">
+    <div class="sec-head" data-reveal>
       <div class="eyebrow">Die Forschung dahinter</div>
       <h2>Wissenschaftlich fundiert</h2>
       <p class="lead">Das Assessment basiert auf einer begutachteten Studie (Open Access), die nachfolgend im Original zitiert wird.</p>
     </div>
-    <div class="paper" style="margin-top:22px;">
+    <div class="paper lift" style="margin-top:22px;" data-reveal>
       <div class="j">Information Systems Frontiers · Vol. 26, pp. 2205–2226 (2024) · Open Access</div>
       <h3>Dynamic Capabilities for the Twin Transformation Climb: A Capability Maturity Model</h3>
       <div class="au">Katharina Breiter · Carlotta Crome · Anna Maria Oberländer · Feline Schnaak</div>
@@ -308,14 +455,14 @@
 <!-- ===================== ÜBER ===================== -->
 <section id="about">
   <div class="wrap about">
-    <div>
+    <div data-reveal>
       <div class="eyebrow">Über das Projekt</div>
       <h2 style="font-size:clamp(22px,3vw,28px);margin-top:10px;">Bereitgestellt von Fraunhofer FIT / FIM Research Institute</h2>
       <p style="color:var(--sub);margin-top:14px;max-width:62ch;font-size:15px;">
         Dieses Self-Assessment wird im Rahmen der Twin-Transformation-Forschung am Fraunhofer FIT und am FIM Research Institute for Information Management bereitgestellt — Teil des Fraunhofer-Forschungscampus zur Twin Transformation. Es operationalisiert das begutachtete Reifegradmodell, damit Organisationen ihren Reifegrad verorten und gezielt Fähigkeiten entwickeln können.
       </p>
     </div>
-    <div class="note">
+    <div class="note lift" data-reveal>
       <strong style="color:var(--ink);">Datenhinweis.</strong> Für die Durchführung des Assessments sind keine personenbezogenen Daten erforderlich. Übermittelte Ergebnisse werden ausschließlich zu Forschungszwecken verwendet und sicher gespeichert. Sie können das Assessment abschließen, ohne Ihre Ergebnisse an die Studie zu übermitteln.
       <div style="font-size:12px;color:var(--faint);margin-top:10px;">Platzhalter-Formulierung — finaler Rechtstext folgt.</div>
     </div>
@@ -365,6 +512,23 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-setlang]'), function(a){
       a.addEventListener('click', function(){ try{ localStorage.setItem(KEY, a.getAttribute('data-setlang')); }catch(e){} });
     });
+  })();
+
+  // Scroll-Reveals — reine Erweiterung. Inhalte sind per CSS standardmäßig
+  // sichtbar; wir verstecken sie erst und blenden sie dann ein, nachdem wir
+  // bestätigt haben, dass IntersectionObserver existiert und keine
+  // reduzierte Bewegung gewünscht ist — ohne JS oder mit reduzierter
+  // Bewegung geht also nie Inhalt verloren.
+  (function(){
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduce || !('IntersectionObserver' in window)) return;
+    document.body.classList.add('reveal-ready');
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ e.target.classList.add('is-visible'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.14, rootMargin: '0px 0px -6% 0px' });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-reveal]'), function(el){ io.observe(el); });
   })();
 </script>
 </body>
