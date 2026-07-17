@@ -95,18 +95,29 @@
   body.reveal-ready [data-reveal].is-visible{opacity:1;transform:none;}
 
   /* Hero: der lebendige Berg */
-  .hero{position:relative;overflow:hidden;padding:0;}
+  .hero{position:relative;overflow:hidden;padding:0;
+    /* entspricht exakt dem #sky-Gradient im SVG, damit ein horizontaler
+       Letterbox-Rand (durch preserveAspectRatio="meet" auf breiten
+       Bildschirmen) unsichtbar bleibt statt eine harte Kante zu zeigen */
+    background:linear-gradient(180deg,#E7F1F1 0%,#F1F6F5 55%,#F8FAF9 100%);}
   @media (min-width:821px){ .hero{min-height:600px;} }
   .hero-svg{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;}
-  .hero-inner{position:relative;z-index:2;padding:64px 0 56px;max-width:560px;}
+  .hero-inner{position:relative;z-index:2;padding:64px 0 40px;max-width:560px;}
   .hero h1{font-size:clamp(32px,5.1vw,56px);margin:18px 0 0;max-width:16ch;}
   .hero p.vp{font-size:clamp(16px,1.9vw,19px);color:var(--sub);margin:20px 0 0;max-width:48ch;}
   .hero-cta{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:30px;}
-  .hero-meta{margin-top:22px;font-family:var(--mono);font-size:12.5px;letter-spacing:.02em;color:var(--mut);display:flex;gap:18px;flex-wrap:wrap;}
-  .hero-meta span{display:inline-flex;align-items:center;gap:7px;}
+  /* "Zur Forschung" schwebt bei jeder Breite über der Berg-Grafik, deshalb
+     bekommt es wie die Lager-Beschriftungen eine eigene helle Fläche */
+  .hero-cta .link-sm{background:rgba(255,255,255,.9);padding:8px 14px;border-radius:20px;border-bottom:none;box-shadow:0 1px 2px rgba(0,0,0,.05);}
+  .hero-cta .link-sm:hover{background:#fff;}
   .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none;}
-  .hero-undernav{display:flex;align-items:baseline;justify-content:space-between;
-    gap:24px;flex-wrap:wrap;padding:22px 0 38px;}
+  /* Statuszeile, Routen-Legende und Zitat liegen unterhalb des Heros auf dem
+     normalen Seitenhintergrund — nie über der SVG-Grafik — und bleiben so
+     immer lesbar */
+  .hero-undernav{display:flex;flex-direction:column;gap:14px;padding:22px 0 38px;}
+  .hero-meta{font-family:var(--mono);font-size:12.5px;letter-spacing:.02em;color:var(--mut);display:flex;gap:18px;flex-wrap:wrap;}
+  .hero-meta span{display:inline-flex;align-items:center;gap:7px;}
+  .undernav-row{display:flex;align-items:baseline;justify-content:space-between;gap:24px;flex-wrap:wrap;}
   .routes-key{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--mono);font-size:11.5px;letter-spacing:.03em;color:var(--mut);}
   .routes-key span{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;}
   .routes-key i{width:15px;height:3px;border-radius:2px;display:inline-block;}
@@ -202,7 +213,8 @@
     .hero-svg{position:relative;inset:auto;order:2;height:300px;margin-top:6px;border-radius:14px;}
     .hero-svg .camp-chip{display:none;} /* Beschriftungen wären in dieser Höhe unleserlich klein — die echten Namen stehen im Text darunter und im Konzept-Abschnitt */
     .hero-inner{order:1;padding:44px 0 20px;max-width:100%;}
-    .hero-undernav{flex-direction:column;align-items:flex-start;gap:12px;padding-bottom:36px;}
+    .hero-undernav{padding-bottom:36px;}
+    .undernav-row{flex-direction:column;align-items:flex-start;gap:12px;}
     .epigraph{text-align:left;}
     .dims{grid-template-columns:1fr;}
     .stages{grid-template-columns:1fr 1fr;}
@@ -244,7 +256,7 @@
 <!-- ===================== HERO ===================== -->
 <a id="top"></a>
 <section class="hero">
-  <svg class="hero-svg" viewBox="0 0 1200 640" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg"
+  <svg class="hero-svg" viewBox="0 0 1200 640" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg"
        role="img" aria-label="Illustration eines Bergaufstiegs: Vier Lager führen den Hang hinauf — Bewusstsein, Entwicklung, Umsetzung und der Gipfel, True Twin Transformer. Drei Wege — ein Weg für Experten der digitalen Transformation, ein Weg für Experten der Nachhaltigkeitstransformation und ein Weg für Neueinsteiger — starten im Talgrund und treffen sich bei Lager 2, von dort führt ein gemeinsamer Weg zum Gipfel.">
     <defs>
       <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
@@ -325,25 +337,41 @@
         <a class="btn btn-primary" href="assessment.de.html">Assessment starten&nbsp;→</a>
         <a class="link-sm" href="#research">Zur Forschung</a>
       </div>
-      <div class="hero-meta">
-        <span><span class="dot"></span>~10–15 Minuten</span>
-        <span><span class="dot"></span>Ohne Registrierung</span>
-        <span><span class="dot"></span>Kostenlos &amp; forschungsbasiert</span>
-      </div>
     </div>
   </div>
 </section>
 
 <div class="wrap hero-undernav">
-  <div class="routes-key">
-    <b>Drei Wege:</b>
-    <span><i style="background:var(--route-dt)"></i>DT-Experte</span>
-    <span><i style="background:var(--route-st)"></i>ST-Experte</span>
-    <span><i style="background:var(--route-new)"></i>Neueinsteiger</span>
-    <span style="color:var(--faint)">— alle treffen sich bei Lager 2</span>
+  <div class="hero-meta">
+    <span><span class="dot"></span>~10–15 Minuten</span>
+    <span><span class="dot"></span>Ohne Registrierung</span>
+    <span><span class="dot"></span>Kostenlos &amp; forschungsbasiert</span>
   </div>
-  <div class="epigraph"><em>„Der Gipfel treibt uns an, doch der Aufstieg selbst ist es, der zählt.“</em> — Conrad Anker</div>
+  <div class="undernav-row">
+    <div class="routes-key">
+      <b>Drei Wege:</b>
+      <span><i style="background:var(--route-dt)"></i>DT-Experte</span>
+      <span><i style="background:var(--route-st)"></i>ST-Experte</span>
+      <span><i style="background:var(--route-new)"></i>Neueinsteiger</span>
+      <span style="color:var(--faint)">— alle treffen sich bei Lager 2</span>
+    </div>
+    <div class="epigraph"><em>„Der Gipfel treibt uns an, doch der Aufstieg selbst ist es, der zählt.“</em> — Conrad Anker</div>
+  </div>
 </div>
+
+<!-- ===================== GETRAGEN VON FFTT ===================== -->
+<section style="padding:36px 0 8px;">
+  <div class="wrap">
+    <div class="lift" style="padding:26px 30px;" data-reveal>
+      <div class="eyebrow">Getragen von</div>
+      <h3 style="font-family:var(--head);font-weight:600;font-size:19px;margin-top:8px;">Dem Fraunhofer-Forschungscampus Twin Transformation</h3>
+      <p style="font-size:14.5px;color:var(--sub);margin-top:10px;max-width:78ch;line-height:1.6;">
+        Der Fraunhofer-Forschungscampus Twin Transformation (FFTT) — Fraunhofer FIT und Fraunhofer IPA, gefördert durch die Oberfrankenstiftung — baut eine Twin-Transformation-Community auf und betreibt drei Twin Labs (Digitale &amp; Nachhaltige Produktion, Digitale &amp; Nachhaltige Organisation, Digitale &amp; Nachhaltige Wertschöpfungsnetze), die dieses Reifegradmodell in praktische Unterstützung für Organisationen auf dem Aufstieg übersetzen.
+      </p>
+      <a class="link-sm" href="https://www.twin-transformation.fraunhofer.de/" target="_blank" rel="noopener" style="display:inline-block;margin-top:14px;">Zum Forschungscampus&nbsp;↗</a>
+    </div>
+  </div>
+</section>
 
 <!-- ===================== WAS IST ES ===================== -->
 <section class="tint" id="what">
@@ -466,6 +494,21 @@
       <strong style="color:var(--ink);">Datenhinweis.</strong> Für die Durchführung des Assessments sind keine personenbezogenen Daten erforderlich. Übermittelte Ergebnisse werden ausschließlich zu Forschungszwecken verwendet und sicher gespeichert. Sie können das Assessment abschließen, ohne Ihre Ergebnisse an die Studie zu übermitteln.
       <div style="font-size:12px;color:var(--faint);margin-top:10px;">Platzhalter-Formulierung — finaler Rechtstext folgt.</div>
     </div>
+  </div>
+</section>
+
+<!-- ===================== BERATUNGS-CTA ===================== -->
+<section class="tint" id="consulting">
+  <div class="wrap">
+    <div class="sec-head" data-reveal>
+      <div class="eyebrow">Nächster Schritt</div>
+      <h2>Ergebnis erhalten, dann kostenlose Erstberatung sichern.</h2>
+      <p class="lead">Nach Abschluss des Self-Assessments können Organisationen ein kostenloses Erstgespräch mit dem Fraunhofer-Forschungscampus Twin Transformation anfragen, um ihre Engpass-Dimension und nächste Schritte zu besprechen — ohne Kosten, ohne Verpflichtung.</p>
+    </div>
+    <div style="margin-top:26px;">
+      <a class="btn btn-primary" href="mailto:twin-transformation@fit.fraunhofer.de?subject=Anfrage%20kostenlose%20Erstberatung">Kostenlose Erstberatung anfragen&nbsp;→</a>
+    </div>
+    <div style="font-size:12px;color:var(--faint);margin-top:14px;">Platzhalter-Kontakt — finale Adresse noch zu bestätigen: twin-transformation@fit.fraunhofer.de</div>
   </div>
 </section>
 

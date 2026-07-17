@@ -93,18 +93,29 @@
   body.reveal-ready [data-reveal].is-visible{opacity:1;transform:none;}
 
   /* hero: the living mountain */
-  .hero{position:relative;overflow:hidden;padding:0;}
+  .hero{position:relative;overflow:hidden;padding:0;
+    /* matches the SVG's #sky gradient exactly, so on wide screens where
+       preserveAspectRatio="meet" letterboxes the art horizontally (rather
+       than crop it vertically), the margin is invisible, not a hard edge */
+    background:linear-gradient(180deg,#E7F1F1 0%,#F1F6F5 55%,#F8FAF9 100%);}
   @media (min-width:821px){ .hero{min-height:600px;} }
   .hero-svg{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;}
-  .hero-inner{position:relative;z-index:2;padding:64px 0 56px;max-width:548px;}
+  .hero-inner{position:relative;z-index:2;padding:64px 0 40px;max-width:548px;}
   .hero h1{font-size:clamp(34px,5.4vw,58px);margin:18px 0 0;max-width:15ch;}
   .hero p.vp{font-size:clamp(16px,1.9vw,19px);color:var(--sub);margin:20px 0 0;max-width:46ch;}
   .hero-cta{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:30px;}
-  .hero-meta{margin-top:22px;font-family:var(--mono);font-size:12.5px;letter-spacing:.02em;color:var(--mut);display:flex;gap:18px;flex-wrap:wrap;}
-  .hero-meta span{display:inline-flex;align-items:center;gap:7px;}
+  /* "Read the research" floats over mountain art at every breakpoint, so it
+     gets its own solid backing — the same trick the camp labels use — rather
+     than relying on contrast with whatever happens to be behind it */
+  .hero-cta .link-sm{background:rgba(255,255,255,.9);padding:8px 14px;border-radius:20px;border-bottom:none;box-shadow:0 1px 2px rgba(0,0,0,.05);}
+  .hero-cta .link-sm:hover{background:#fff;}
   .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none;}
-  .hero-undernav{display:flex;align-items:baseline;justify-content:space-between;
-    gap:24px;flex-wrap:wrap;padding:22px 0 38px;}
+  /* the stat bar + routes key + epigraph live below the hero on the plain
+     page background — never over the SVG art — so they're always legible */
+  .hero-undernav{display:flex;flex-direction:column;gap:14px;padding:22px 0 38px;}
+  .hero-meta{font-family:var(--mono);font-size:12.5px;letter-spacing:.02em;color:var(--mut);display:flex;gap:18px;flex-wrap:wrap;}
+  .hero-meta span{display:inline-flex;align-items:center;gap:7px;}
+  .undernav-row{display:flex;align-items:baseline;justify-content:space-between;gap:24px;flex-wrap:wrap;}
   .routes-key{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--mono);font-size:11.5px;letter-spacing:.03em;color:var(--mut);}
   .routes-key span{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;}
   .routes-key i{width:15px;height:3px;border-radius:2px;display:inline-block;}
@@ -201,7 +212,8 @@
     .hero-svg{position:relative;inset:auto;order:2;height:300px;margin-top:6px;border-radius:14px;}
     .hero-svg .camp-chip{display:none;} /* labels shrink illegibly at this height; the real names live in the text below and the concept section */
     .hero-inner{order:1;padding:44px 0 20px;max-width:100%;}
-    .hero-undernav{flex-direction:column;align-items:flex-start;gap:12px;padding-bottom:36px;}
+    .hero-undernav{padding-bottom:36px;}
+    .undernav-row{flex-direction:column;align-items:flex-start;gap:12px;}
     .epigraph{text-align:left;}
     .dims{grid-template-columns:1fr;}
     .stages{grid-template-columns:1fr 1fr;}
@@ -257,7 +269,7 @@
 <!-- ===================== HERO ===================== -->
 <a id="top"></a>
 <section class="hero">
-  <svg class="hero-svg" viewBox="0 0 1200 640" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg"
+  <svg class="hero-svg" viewBox="0 0 1200 640" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg"
        role="img" aria-label="Illustration of a mountain climb: four camps ascend the slope — Awareness, Development, Implementation, and the summit, True twin transformer. Three routes — a digital-transformation expert route, a sustainability-transformation expert route, and a newcomer route — start from the valley floor and converge at Camp 2, then share one path to the summit.">
     <defs>
       <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
@@ -338,25 +350,41 @@
         <a class="btn btn-primary" href="assessment.html">Start the assessment&nbsp;→</a>
         <a class="link-sm" href="#research">Read the research</a>
       </div>
-      <div class="hero-meta">
-        <span><span class="dot"></span>~10–15 minutes</span>
-        <span><span class="dot"></span>No registration</span>
-        <span><span class="dot"></span>Free &amp; research-based</span>
-      </div>
     </div>
   </div>
 </section>
 
 <div class="wrap hero-undernav">
-  <div class="routes-key">
-    <b>Three routes:</b>
-    <span><i style="background:var(--route-dt)"></i>DT expert</span>
-    <span><i style="background:var(--route-st)"></i>ST expert</span>
-    <span><i style="background:var(--route-new)"></i>Newcomer</span>
-    <span style="color:var(--faint)">— all converge at Camp 2</span>
+  <div class="hero-meta">
+    <span><span class="dot"></span>~10–15 minutes</span>
+    <span><span class="dot"></span>No registration</span>
+    <span><span class="dot"></span>Free &amp; research-based</span>
   </div>
-  <div class="epigraph"><em>"The summit is what drives us, but the climb itself is what matters."</em> — Conrad Anker</div>
+  <div class="undernav-row">
+    <div class="routes-key">
+      <b>Three routes:</b>
+      <span><i style="background:var(--route-dt)"></i>DT expert</span>
+      <span><i style="background:var(--route-st)"></i>ST expert</span>
+      <span><i style="background:var(--route-new)"></i>Newcomer</span>
+      <span style="color:var(--faint)">— all converge at Camp 2</span>
+    </div>
+    <div class="epigraph"><em>"The summit is what drives us, but the climb itself is what matters."</em> — Conrad Anker</div>
+  </div>
 </div>
+
+<!-- ===================== BACKED BY FFTT ===================== -->
+<section style="padding:36px 0 8px;">
+  <div class="wrap">
+    <div class="lift" style="padding:26px 30px;" data-reveal>
+      <div class="eyebrow">Backed by</div>
+      <h3 style="font-family:var(--head);font-weight:600;font-size:19px;margin-top:8px;">The Fraunhofer Forschungscampus Twin Transformation</h3>
+      <p style="font-size:14.5px;color:var(--sub);margin-top:10px;max-width:78ch;line-height:1.6;">
+        The Fraunhofer Forschungscampus Twin Transformation (FFTT) — Fraunhofer FIT and Fraunhofer IPA, funded by the Oberfrankenstiftung — is building a Twin Transformation community and operates three Twin Labs (Digital &amp; Sustainable Production, Digital &amp; Sustainable Organization, Digital &amp; Sustainable Value Networks) that turn this maturity model into practical support for organizations on the climb.
+      </p>
+      <a class="link-sm" href="https://www.twin-transformation.fraunhofer.de/" target="_blank" rel="noopener" style="display:inline-block;margin-top:14px;">Visit the Forschungscampus&nbsp;↗</a>
+    </div>
+  </div>
+</section>
 
 <!-- ===================== WHAT IS IT ===================== -->
 <section class="tint" id="what">
@@ -478,6 +506,21 @@
       <strong style="color:var(--ink);">Data note.</strong> No personal data is required to take the assessment. Submitted results are used for research purposes only and stored securely. You can complete the assessment without submitting your results to the study.
       <div style="font-size:12px;color:var(--faint);margin-top:10px;">Placeholder wording — final legal text to follow.</div>
     </div>
+  </div>
+</section>
+
+<!-- ===================== CONSULTING CTA ===================== -->
+<section class="tint" id="consulting">
+  <div class="wrap">
+    <div class="sec-head" data-reveal>
+      <div class="eyebrow">Next step</div>
+      <h2>Get your result, then get a free consulting session.</h2>
+      <p class="lead">After finishing the self-assessment, organizations can request a free first conversation with the Fraunhofer Forschungscampus Twin Transformation to discuss their bottleneck dimension and next steps — no cost, no obligation.</p>
+    </div>
+    <div style="margin-top:26px;">
+      <a class="btn btn-primary" href="mailto:twin-transformation@fit.fraunhofer.de?subject=Request%20for%20a%20free%20consulting%20session">Request a free consulting session&nbsp;→</a>
+    </div>
+    <div style="font-size:12px;color:var(--faint);margin-top:14px;">Placeholder contact — final address to be confirmed: twin-transformation@fit.fraunhofer.de</div>
   </div>
 </section>
 
