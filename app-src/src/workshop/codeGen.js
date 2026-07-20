@@ -6,3 +6,9 @@ export function generateCode(len = 6) {
   for (let i = 0; i < len; i++) out += ALPHABET[Math.floor(Math.random() * ALPHABET.length)]
   return out
 }
+
+export function generatePin(len = 4) {
+  let out = ''
+  for (let i = 0; i < len; i++) out += Math.floor(Math.random() * 10)
+  return out
+}

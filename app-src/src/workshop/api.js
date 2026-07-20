@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient'
-import { generateCode } from './codeGen'
+import { generateCode, generatePin } from './codeGen'
 
 // Thin data layer over the four workshop_* tables. Every write is a plain
 // Postgres insert/update through the anon key — the join code is the access
@@ -11,7 +11,7 @@ export async function createSession(facilitatorName, lang) {
     const code = generateCode()
     const { data, error } = await supabase
       .from('workshop_sessions')
-      .insert({ code, facilitator_name: facilitatorName, lang })
+      .insert({ code, facilitator_name: facilitatorName, lang, facilitator_pin: generatePin() })
       .select()
       .single()
     if (!error) return data

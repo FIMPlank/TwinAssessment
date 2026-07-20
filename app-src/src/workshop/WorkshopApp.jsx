@@ -45,7 +45,10 @@ export default function WorkshopApp({ lang }) {
   function onCreatedSession(session) {
     setFacilitatorSessionId(session.id)
     setQueryParam('facilitate', session.id)
-    try { localStorage.setItem('twinclimb_ws_last_facilitated', JSON.stringify({ id: session.id, code: session.code })) } catch (e) {}
+    try {
+      localStorage.setItem('twinclimb_ws_last_facilitated', JSON.stringify({ id: session.id, code: session.code }))
+      localStorage.setItem(`twinclimb_ws_fac_verified_${session.id}`, '1')
+    } catch (e) {}
   }
 
   function onJoined(p, sessionId) {

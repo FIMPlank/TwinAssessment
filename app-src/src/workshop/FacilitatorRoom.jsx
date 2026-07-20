@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { DIMENSIONS, dimName } from '../ttcmm'
 import { useWorkshopSession } from './useWorkshopSession'
 import { usePrefersReducedMotion } from './hooks'
@@ -11,14 +11,56 @@ import SummaryReport from './components/SummaryReport'
 
 const C = { ink: '#17191C', sub: '#6B6B66', mut: '#9A9A95', line: '#E3E7E5' }
 const PHASES = ['prework', 'opening', 'calibration', 'deepdive', 'prioritization', 'summary']
+const PHASE_BUDGET_MIN = { prework: null, opening: 10, calibration: 15, deepdive: 40, prioritization: 25, summary: null }
+
+function PhaseTimer({ strings, phase }) {
+  const [seconds, setSeconds] = useState(0)
+  useEffect(() => {
+    setSeconds(0)
+    const id = setInterval(() => setSeconds((s) => s + 1), 1000)
+    return () => clearInterval(id)
+  }, [phase])
+  const budget = PHASE_BUDGET_MIN[phase]
+  if (budget == null) return null
+  const mm = String(Math.floor(seconds / 60)).padStart(2, '0')
+  const ss = String(seconds % 60).padStart(2, '0')
+  return <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, color: seconds > budget * 60 ? '#9A2B2B' : C.mut, marginTop: 4 }}>{strings.wsPhaseElapsed(`${mm}:${ss}`, budget)}</div>
+}
 
 export default function FacilitatorRoom({ strings, lang, sessionId }) {
   const { session, participants, responses, moves, loading, error } = useWorkshopSession(sessionId)
   const reducedMotion = usePrefersReducedMotion()
   const [copied, setCopied] = useState(false)
+  const verifiedKey = `twinclimb_ws_fac_verified_${sessionId}`
+  const [verified, setVerified] = useState(() => { try { return localStorage.getItem(verifiedKey) === '1' } catch (e) { return false } })
+  const [pin, setPin] = useState('')
+  const [pinError, setPinError] = useState(false)
 
   if (loading) return <p style={{ padding: 40, color: C.mut }}>…</p>
   if (error || !session) return <p style={{ padding: 40, color: '#9A2B2B' }}>{strings.wsNoSession}</p>
+
+  if (!verified) {
+    const submitPin = (e) => {
+      e.preventDefault()
+      if (pin === session.facilitator_pin) {
+        try { localStorage.setItem(verifiedKey, '1') } catch (err) {}
+        setVerified(true)
+      } else {
+        setPinError(true)
+      }
+    }
+    return (
+      <form onSubmit={submitPin} style={{ maxWidth: 360, margin: '80px auto', padding: '0 24px', textAlign: 'center' }}>
+        <p style={{ fontSize: 14.5, color: C.sub, marginBottom: 14 }}>{strings.wsPinPrompt}</p>
+        <input value={pin} onChange={(e) => { setPin(e.target.value); setPinError(false) }} placeholder={strings.wsPinPlaceholder} autoFocus
+          style={{ width: '100%', boxSizing: 'border-box', padding: '13px 14px', borderRadius: 8, border: `1.5px solid ${C.line}`, fontSize: 18, textAlign: 'center', letterSpacing: '0.2em', fontFamily: 'inherit' }} />
+        {pinError && <p style={{ color: '#9A2B2B', fontSize: 13, marginTop: 10 }}>{strings.wsPinWrong}</p>}
+        <button type="submit" style={{ marginTop: 14, width: '100%', padding: '13px 22px', border: 'none', borderRadius: 7, background: C.ink, color: '#fff', fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: 14 }}>
+          {strings.wsPinSubmit}
+        </button>
+      </form>
+    )
+  }
 
   const phaseIdx = PHASES.indexOf(session.phase)
   const phaseLabel = { prework: strings.wsPhasePrework, opening: strings.wsPhaseOpening, calibration: strings.wsPhaseCalibration, deepdive: strings.wsPhaseDeepdive, prioritization: strings.wsPhasePrioritization, summary: strings.wsPhaseSummary }
@@ -53,11 +95,13 @@ export default function FacilitatorRoom({ strings, lang, sessionId }) {
             </button>
             <span style={{ fontSize: 12.5, color: C.mut }}>{strings.wsParticipantsJoined(participants.length)}</span>
           </div>
+          <div style={{ fontSize: 11.5, color: C.mut, marginTop: 6 }}>{strings.wsPinDisplay(session.facilitator_pin)}</div>
         </div>
         <div style={{ textAlign: 'right' }}>
           <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, letterSpacing: '0.1em', color: C.mut, textTransform: 'uppercase' }}>
             {phaseLabel[session.phase]} · {phaseIdx + 1}/{PHASES.length}
           </div>
+          <PhaseTimer strings={strings} phase={session.phase} />
           <div style={{ display: 'flex', gap: 8, marginTop: 10, justifyContent: 'flex-end' }}>
             <button onClick={() => goPhase(-1)} disabled={phaseIdx <= 0} style={{ padding: '9px 14px', border: `1px solid #C6CBC8`, borderRadius: 7, background: '#fff', fontSize: 13, fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, opacity: phaseIdx <= 0 ? 0.4 : 1 }}>
               {strings.wsPreviousPhase}

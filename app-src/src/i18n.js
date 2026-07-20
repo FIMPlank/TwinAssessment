@@ -252,6 +252,15 @@ const en = {
   wsResearchOptInLabel: 'Allow this session to be considered for future aggregated research (no data is pooled automatically; this only flags the session for a later opt-in review)',
   wsNoSession: "This session doesn't exist or hasn't loaded yet.",
   wsStageAbbrev: (n) => `S${n}`,
+
+  wsPinDisplay: (pin) => `Facilitator PIN: ${pin} — you'll need this to reopen the control room.`,
+  wsPinPrompt: 'Enter the facilitator PIN to open the control room.',
+  wsPinPlaceholder: 'PIN',
+  wsPinSubmit: 'Unlock →',
+  wsPinWrong: 'Wrong PIN.',
+  wsJoiningLockedTitle: 'Joining is closed',
+  wsJoiningLockedBody: 'The facilitator has moved past pre-work — this session is no longer accepting new participants.',
+  wsPhaseElapsed: (mmss, budget) => `${mmss} elapsed · ~${budget} min planned`,
   wsNotStartedAbbrev: '—',
 }
 
@@ -464,6 +473,15 @@ const de = {
   wsResearchOptInLabel: 'Diese Session für eine spätere aggregierte Forschungsnutzung markieren (es werden dadurch keine Daten automatisch zusammengeführt — nur eine Markierung für eine spätere Opt-in-Prüfung)',
   wsNoSession: 'Diese Session existiert nicht oder wurde noch nicht geladen.',
   wsStageAbbrev: (n) => `S${n}`,
+
+  wsPinDisplay: (pin) => `Moderations-PIN: ${pin} — Sie benötigen diesen, um den Kontrollraum erneut zu öffnen.`,
+  wsPinPrompt: 'Geben Sie den Moderations-PIN ein, um den Kontrollraum zu öffnen.',
+  wsPinPlaceholder: 'PIN',
+  wsPinSubmit: 'Freischalten →',
+  wsPinWrong: 'Falscher PIN.',
+  wsJoiningLockedTitle: 'Beitritt geschlossen',
+  wsJoiningLockedBody: 'Die Moderation hat die Vorarbeit bereits abgeschlossen — diese Session nimmt keine neuen Teilnehmenden mehr auf.',
+  wsPhaseElapsed: (mmss, budget) => `${mmss} vergangen · ~${budget} Min. geplant`,
   wsNotStartedAbbrev: '—',
 }
 

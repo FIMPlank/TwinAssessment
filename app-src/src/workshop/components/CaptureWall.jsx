@@ -6,10 +6,14 @@ const C = { ink: '#17191C', sub: '#6B6B66', mut: '#9A9A95', line: '#E3E7E5' }
 
 function PromptColumn({ label, sessionId, dimensionId, capabilityId, promptType, participant, responses, participantIndex, reducedMotion }) {
   const mine = participant ? responses.find((r) => r.participant_id === participant.id) : null
-  const others = responses.filter((r) => !participant || r.participant_id !== participant.id)
+  const others = responses.filter((r) => !participant || r.participant_id !== participant.id).filter((r) => r.text.trim())
   const [text, setText] = useState(mine?.text || '')
   const responseIdRef = useRef(mine?.id || null)
   const debounceRef = useRef(null)
+  // ping newly-arrived bubbles (not the initial batch already on screen)
+  const seenRef = useRef(new Set(others.map((r) => r.id)))
+  const newIds = others.filter((r) => !seenRef.current.has(r.id)).map((r) => r.id)
+  others.forEach((r) => seenRef.current.add(r.id))
 
   useEffect(() => {
     if (mine && !responseIdRef.current) responseIdRef.current = mine.id
@@ -44,12 +48,12 @@ function PromptColumn({ label, sessionId, dimensionId, capabilityId, promptType,
         />
       )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginTop: participant ? 9 : 0 }}>
-        {others.filter((r) => r.text.trim()).map((r) => (
+        {others.map((r) => (
           <div
             key={r.id}
             style={{
               border: `1px solid ${C.line}`, borderRadius: 8, background: '#fff', padding: '8px 10px',
-              animation: reducedMotion ? 'none' : 'wsBubbleIn .25s ease-out',
+              animation: reducedMotion ? 'none' : newIds.includes(r.id) ? 'wsBubbleIn .25s ease-out, wsPing 1.4s ease-out' : 'none',
             }}
           >
             <div style={{ fontSize: 10.5, fontFamily: "'IBM Plex Mono',monospace", color: participantColor(participantIndex(r.participant_id)), marginBottom: 3 }}>
@@ -72,7 +76,7 @@ export default function CaptureWall({ strings, sessionId, dimensionId, capabilit
   return (
     <div style={{ border: `1px solid ${C.line}`, borderRadius: 12, background: '#FAFBFA', padding: 18, marginBottom: 16 }}>
       <div style={{ fontSize: 14.5, fontWeight: 600, fontFamily: "'Space Grotesk',sans-serif", marginBottom: 4 }}>{capabilityLabel}</div>
-      <style>{'@keyframes wsBubbleIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}'}</style>
+      <style>{'@keyframes wsBubbleIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}@keyframes wsPing{0%{background:#FFF3D6}100%{background:#fff}}'}</style>
       <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginTop: 14 }}>
         <PromptColumn label={strings.wsPromptBlocker} sessionId={sessionId} dimensionId={dimensionId} capabilityId={capabilityId} promptType="blocker" participant={participant} responses={byPrompt('blocker')} participantIndex={participantIndex} reducedMotion={reducedMotion} />
         <PromptColumn label={strings.wsPromptOwner} sessionId={sessionId} dimensionId={dimensionId} capabilityId={capabilityId} promptType="owner" participant={participant} responses={byPrompt('owner')} participantIndex={participantIndex} reducedMotion={reducedMotion} />

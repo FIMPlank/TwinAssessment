@@ -33,8 +33,14 @@ export default function ParticipantJoin({ strings, lang, code, onJoined }) {
 
       {session === undefined && <p style={{ color: C.mut, marginTop: 20 }}>…</p>}
       {session === null && <p style={{ color: '#9A2B2B', marginTop: 20 }}>{strings.wsJoinInvalidCode}</p>}
+      {session && session.phase !== 'prework' && (
+        <div style={{ marginTop: 20 }}>
+          <p style={{ fontWeight: 600, fontSize: 15 }}>{strings.wsJoiningLockedTitle}</p>
+          <p style={{ color: C.sub, fontSize: 13.5, marginTop: 8 }}>{strings.wsJoiningLockedBody}</p>
+        </div>
+      )}
 
-      {session && (
+      {session && session.phase === 'prework' && (
         <form onSubmit={handleJoin} style={{ marginTop: 24 }}>
           <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, letterSpacing: '0.1em', color: C.mut, marginBottom: 16 }}>{strings.wsJoinCodeLabel}: {session.code}</div>
           <label style={{ display: 'block', fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, letterSpacing: '0.1em', color: C.mut, textTransform: 'uppercase', marginBottom: 8 }}>
