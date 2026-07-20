@@ -13,14 +13,14 @@ const C = { ink: '#17191C', sub: '#6B6B66', mut: '#9A9A95', line: '#E3E7E5' }
 const PHASES = ['prework', 'opening', 'calibration', 'deepdive', 'prioritization', 'summary']
 const PHASE_BUDGET_MIN = { prework: null, opening: 10, calibration: 15, deepdive: 40, prioritization: 25, summary: null }
 
-function PhaseTimer({ strings, phase }) {
+function PhaseTimer({ strings, phase, phaseMinutes }) {
   const [seconds, setSeconds] = useState(0)
   useEffect(() => {
     setSeconds(0)
     const id = setInterval(() => setSeconds((s) => s + 1), 1000)
     return () => clearInterval(id)
   }, [phase])
-  const budget = PHASE_BUDGET_MIN[phase]
+  const budget = (phaseMinutes && phaseMinutes[phase]) ?? PHASE_BUDGET_MIN[phase]
   if (budget == null) return null
   const mm = String(Math.floor(seconds / 60)).padStart(2, '0')
   const ss = String(seconds % 60).padStart(2, '0')
@@ -89,6 +89,7 @@ export default function FacilitatorRoom({ strings, lang, sessionId }) {
         <div>
           <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, letterSpacing: '0.14em', color: C.mut, textTransform: 'uppercase' }}>{strings.wsJoinCodeLabel}</div>
           <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 30, letterSpacing: '0.08em', marginTop: 4 }}>{session.code}</div>
+          {session.company_name && <div style={{ fontSize: 13.5, fontWeight: 600, marginTop: 2 }}>{session.company_name}</div>}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
             <button onClick={copyLink} style={{ padding: '7px 13px', border: `1px solid #C6CBC8`, borderRadius: 6, background: '#fff', fontSize: 12.5, fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600 }}>
               {copied ? strings.wsCopyLinkDone : strings.wsCopyLink}
@@ -101,7 +102,7 @@ export default function FacilitatorRoom({ strings, lang, sessionId }) {
           <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, letterSpacing: '0.1em', color: C.mut, textTransform: 'uppercase' }}>
             {phaseLabel[session.phase]} · {phaseIdx + 1}/{PHASES.length}
           </div>
-          <PhaseTimer strings={strings} phase={session.phase} />
+          <PhaseTimer strings={strings} phase={session.phase} phaseMinutes={session.phase_minutes} />
           <div style={{ display: 'flex', gap: 8, marginTop: 10, justifyContent: 'flex-end' }}>
             <button onClick={() => goPhase(-1)} disabled={phaseIdx <= 0} style={{ padding: '9px 14px', border: `1px solid #C6CBC8`, borderRadius: 7, background: '#fff', fontSize: 13, fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, opacity: phaseIdx <= 0 ? 0.4 : 1 }}>
               {strings.wsPreviousPhase}
@@ -112,6 +113,12 @@ export default function FacilitatorRoom({ strings, lang, sessionId }) {
           </div>
         </div>
       </div>
+
+      {session.context_note && (
+        <div data-print-hide="" style={{ marginTop: 16, padding: '10px 14px', background: '#FFF8E8', border: '1px solid #EFE0B0', borderRadius: 8, fontSize: 13, color: '#6B5A2A', whiteSpace: 'pre-wrap' }}>
+          {session.context_note}
+        </div>
+      )}
 
       <div style={{ marginTop: 26 }}>
         {session.phase === 'prework' && (

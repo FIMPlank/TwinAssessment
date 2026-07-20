@@ -25,7 +25,7 @@ export default function SummaryReport({ strings, lang, dims, session, participan
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', padding: '10px 0 80px' }}>
       <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, letterSpacing: '0.18em', color: C.mut, textTransform: 'uppercase' }}>
-        {strings.wsSummaryTitle}
+        {strings.wsSummaryTitle}{session.company_name ? ` · ${session.company_name}` : ''}
       </div>
       <p style={{ fontSize: 14.5, color: C.sub, margin: '10px 0 0', maxWidth: '70ch' }}>{strings.wsSummaryIntro}</p>
 

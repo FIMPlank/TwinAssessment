@@ -2,9 +2,13 @@ import { useState } from 'react'
 import { createSession } from './api'
 
 const C = { ink: '#17191C', sub: '#6B6B66', mut: '#9A9A95', line: '#E3E7E5' }
+const DEFAULT_MINUTES = { opening: 10, calibration: 15, deepdive: 40, prioritization: 25 }
 
 export default function FacilitatorHome({ strings, lang, onCreated }) {
   const [name, setName] = useState('')
+  const [companyName, setCompanyName] = useState('')
+  const [contextNote, setContextNote] = useState('')
+  const [minutes, setMinutes] = useState(DEFAULT_MINUTES)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
@@ -14,13 +18,16 @@ export default function FacilitatorHome({ strings, lang, onCreated }) {
     setBusy(true)
     setError('')
     try {
-      const session = await createSession(name.trim(), lang)
+      const session = await createSession(name.trim(), lang, { companyName: companyName.trim(), contextNote: contextNote.trim(), phaseMinutes: minutes })
       onCreated(session)
     } catch (err) {
       setError(String(err.message || err))
       setBusy(false)
     }
   }
+
+  const inputStyle = { width: '100%', boxSizing: 'border-box', padding: '13px 14px', borderRadius: 8, border: `1.5px solid ${C.line}`, fontSize: 15, fontFamily: 'inherit' }
+  const labelStyle = { display: 'block', fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, letterSpacing: '0.1em', color: C.mut, textTransform: 'uppercase', marginBottom: 8, marginTop: 18 }
 
   return (
     <div style={{ maxWidth: 640, margin: '0 auto', padding: '64px 32px 120px' }}>
@@ -35,13 +42,29 @@ export default function FacilitatorHome({ strings, lang, onCreated }) {
       </p>
 
       <form onSubmit={handleCreate} style={{ marginTop: 32, border: `1px solid ${C.line}`, borderRadius: 14, background: '#fff', padding: 26 }}>
-        <label style={{ display: 'block', fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, letterSpacing: '0.1em', color: C.mut, textTransform: 'uppercase', marginBottom: 8 }}>
-          {strings.wsFacilitatorNameLabel}
-        </label>
-        <input
-          value={name} onChange={(e) => setName(e.target.value)} placeholder={strings.wsFacilitatorNamePlaceholder} autoFocus
-          style={{ width: '100%', boxSizing: 'border-box', padding: '13px 14px', borderRadius: 8, border: `1.5px solid ${C.line}`, fontSize: 15, fontFamily: 'inherit' }}
-        />
+        <label style={{ ...labelStyle, marginTop: 0 }}>{strings.wsFacilitatorNameLabel}</label>
+        <input value={name} onChange={(e) => setName(e.target.value)} placeholder={strings.wsFacilitatorNamePlaceholder} autoFocus style={inputStyle} />
+
+        <label style={labelStyle}>{strings.wsCompanyNameLabel}</label>
+        <input value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder={strings.wsCompanyNamePlaceholder} style={inputStyle} />
+
+        <label style={labelStyle}>{strings.wsContextNoteLabel}</label>
+        <textarea value={contextNote} onChange={(e) => setContextNote(e.target.value)} placeholder={strings.wsContextNotePlaceholder} rows={2} style={{ ...inputStyle, resize: 'vertical' }} />
+
+        <label style={labelStyle}>{strings.wsPhaseMinutesLabel}</label>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          {['opening', 'calibration', 'deepdive', 'prioritization'].map((phase) => (
+            <div key={phase} style={{ flex: '1 1 100px' }}>
+              <div style={{ fontSize: 11.5, color: C.sub, marginBottom: 4 }}>{strings[`wsPhase${phase[0].toUpperCase()}${phase.slice(1)}`]}</div>
+              <input
+                type="number" min={1} max={180} value={minutes[phase]}
+                onChange={(e) => setMinutes((m) => ({ ...m, [phase]: Math.max(1, Number(e.target.value) || 1) }))}
+                style={{ ...inputStyle, padding: '9px 10px' }}
+              />
+            </div>
+          ))}
+        </div>
+
         {error && <p style={{ color: '#9A2B2B', fontSize: 13, marginTop: 10 }}>{error}</p>}
         <button type="submit" disabled={busy || !name.trim()} style={{ marginTop: 18, padding: '13px 26px', border: 'none', borderRadius: 7, background: busy ? '#9A9A95' : C.ink, color: '#fff', fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: 14, cursor: busy ? 'default' : 'pointer' }}>
           {busy ? strings.wsCreating : strings.wsCreateSession}

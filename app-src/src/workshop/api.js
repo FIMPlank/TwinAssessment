@@ -6,12 +6,17 @@ import { generateCode, generatePin } from './codeGen'
 // boundary (see supabase/migrations/20260720_workshop_mode.sql), there is no
 // participant login and no separate facilitator credential.
 
-export async function createSession(facilitatorName, lang) {
+export async function createSession(facilitatorName, lang, opts = {}) {
+  const { companyName, contextNote, phaseMinutes } = opts
   for (let attempt = 0; attempt < 5; attempt++) {
     const code = generateCode()
+    const row = { code, facilitator_name: facilitatorName, lang, facilitator_pin: generatePin() }
+    if (companyName) row.company_name = companyName
+    if (contextNote) row.context_note = contextNote
+    if (phaseMinutes) row.phase_minutes = phaseMinutes
     const { data, error } = await supabase
       .from('workshop_sessions')
-      .insert({ code, facilitator_name: facilitatorName, lang, facilitator_pin: generatePin() })
+      .insert(row)
       .select()
       .single()
     if (!error) return data
