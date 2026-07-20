@@ -11,6 +11,8 @@ import SpreadChart from './components/SpreadChart'
 import DeepDiveView from './components/DeepDiveView'
 import MoveBoard from './components/MoveBoard'
 import SummaryReport from './components/SummaryReport'
+import ParticipantRollCall from './components/ParticipantRollCall'
+import AsyncCheckRoom from './AsyncCheckRoom'
 
 const PHASES = ['prework', 'opening', 'calibration', 'deepdive', 'prioritization', 'summary']
 
@@ -59,6 +61,10 @@ export default function FacilitatorRoom({ strings, lang, sessionId }) {
     )
   }
 
+  if (session.mode === 'async') {
+    return <AsyncCheckRoom strings={strings} lang={lang} sessionId={sessionId} session={session} participants={participants} responses={responses} moves={moves} />
+  }
+
   const phaseIdx = PHASES.indexOf(session.phase)
   const joinUrl = `${window.location.origin}${window.location.pathname.replace(/workshop(\.de)?\.html$/, `workshop${lang === 'de' ? '.de' : ''}.html`)}?code=${session.code}`
 
@@ -76,7 +82,6 @@ export default function FacilitatorRoom({ strings, lang, sessionId }) {
   function setCalibDim(idx) { updateSession(sessionId, { active_dimension_id: DIMENSIONS[idx].id }) }
 
   const totalMinutes = Object.values(session.phase_minutes || {}).reduce((a, b) => a + Number(b || 0), 0)
-  const doneCount = participants.filter((p) => p.answers && Object.keys(p.answers).length === DIMENSIONS.length).length
 
   return (
     <div>
@@ -113,18 +118,7 @@ export default function FacilitatorRoom({ strings, lang, sessionId }) {
             {totalMinutes > 0 && <p style={{ fontFamily: 'var(--ws-font-mono)', fontSize: 12.5, color: 'var(--ws-text-muted)', marginTop: 14 }}>{strings.wsPlannedDuration(totalMinutes)}</p>}
 
             <div style={{ ...cardStyle, marginTop: 24, padding: 22 }}>
-              <div style={{ ...stageLabelStyle, marginBottom: 14 }}>{strings.wsParticipantsLabel} · {doneCount}/{participants.length || 0}</div>
-              {participants.length === 0 && <p style={{ fontSize: 14, color: 'var(--ws-text-muted)', fontStyle: 'italic' }}>{strings.wsParticipantsJoined(0)}</p>}
-              {participants.map((p) => {
-                const done = p.answers && Object.keys(p.answers).length === DIMENSIONS.length
-                return (
-                  <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderTop: '1px solid var(--ws-border-soft)' }}>
-                    <span aria-hidden="true" style={{ width: 20, height: 20, borderRadius: 6, background: done ? 'var(--ws-brand)' : '#fff', border: `1.5px solid ${done ? 'var(--ws-brand)' : 'var(--ws-border-soft)'}`, color: '#fff', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{done ? '✓' : ''}</span>
-                    <span style={{ fontSize: 14.5 }}>{p.name}</span>
-                    <span style={{ fontSize: 12, color: 'var(--ws-text-muted)' }}>{done ? strings.wsPreworkComplete : strings.wsPreworkPending}</span>
-                  </div>
-                )
-              })}
+              <ParticipantRollCall strings={strings} participants={participants} dimCount={DIMENSIONS.length} />
             </div>
           </div>
         )}

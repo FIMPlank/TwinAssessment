@@ -42,6 +42,14 @@ export default function ParticipantRoom({ strings, lang, participant: initialPar
     )
   }
 
+  if (session.mode === 'async') {
+    return (
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '26px 20px 80px' }}>
+        <SummaryReport strings={strings} lang={lang} dims={DIMENSIONS} session={session} participants={participants} responses={[]} moves={[]} isFacilitator={false} mode="async" />
+      </div>
+    )
+  }
+
   return (
     <div>
       <WorkshopProgress strings={strings} phase={session.phase} />

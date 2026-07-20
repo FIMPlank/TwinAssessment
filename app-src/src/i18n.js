@@ -163,8 +163,13 @@ const en = {
 
   // workshop mode
   wsBrand: 'TWINCLIMB WORKSHOP',
+  wsModeGroupLabel: 'Workshop mode',
+  wsModeLive: 'Live session',
+  wsModeAsync: 'Async team check',
   wsHomeTitle: 'Facilitate a live workshop',
   wsHomeIntro: 'A 90-minute, facilitated session for a whole team — reusing the same TTCMM model, but built for a room, not one respondent. Divergence between participants is the signal.',
+  wsAsyncHomeTitle: 'Run an async team check',
+  wsAsyncHomeIntro: 'Invite people to self-assess on their own time over the coming days — no meeting to schedule. Once everyone is in, generate the same divergence report a live workshop would produce.',
   wsFacilitatorNameLabel: 'Your name',
   wsFacilitatorNamePlaceholder: 'e.g. Jamie Rivers',
   wsCompanyNameLabel: 'Company / client (optional)',
@@ -211,6 +216,7 @@ const en = {
   wsPreviousDimension: 'Previous dimension',
   wsNextDimension: 'Next dimension',
   wsCreateSession: 'Create session →',
+  wsAsyncCreateSession: 'Create async check →',
   wsCreating: 'Creating…',
   wsJoinCodeLabel: 'Join code',
   wsJoinLinkLabel: 'Or share this link',
@@ -219,6 +225,11 @@ const en = {
   wsParticipantsJoined: (n) => `${n} joined`,
   wsHaveCodeAlready: 'Already have a join code?',
   wsGoJoin: 'Join a session →',
+
+  wsAsyncBadge: 'Async',
+  wsAsyncRoomTitle: 'Waiting on the room',
+  wsAsyncRoomIntro: 'Share the code or link with everyone who should weigh in. Each person self-assesses on their own time — generate the report once enough people are in.',
+  wsAsyncGenerateReport: 'Generate report →',
 
   wsJoinTitle: 'Join the workshop',
   wsJoinCodePlaceholder: 'Join code',
@@ -428,8 +439,13 @@ const de = {
 
   // Workshop-Modus
   wsBrand: 'TWINCLIMB WORKSHOP',
+  wsModeGroupLabel: 'Workshop-Modus',
+  wsModeLive: 'Live-Session',
+  wsModeAsync: 'Asynchroner Team-Check',
   wsHomeTitle: 'Einen Live-Workshop moderieren',
   wsHomeIntro: 'Eine 90-minütige, moderierte Session für ein ganzes Team — mit demselben TTCMM-Modell, aber gebaut für einen Raum, nicht für eine einzelne Antwort. Die Abweichung zwischen den Teilnehmenden ist das Signal.',
+  wsAsyncHomeTitle: 'Einen asynchronen Team-Check starten',
+  wsAsyncHomeIntro: 'Laden Sie Personen ein, sich in den kommenden Tagen selbst einzuschätzen — ganz ohne Termin. Sobald alle dabei sind, erzeugen Sie denselben Abweichungsbericht wie bei einem Live-Workshop.',
   wsFacilitatorNameLabel: 'Ihr Name',
   wsFacilitatorNamePlaceholder: 'z. B. Jamie Rivers',
   wsCompanyNameLabel: 'Unternehmen / Kunde (optional)',
@@ -476,6 +492,7 @@ const de = {
   wsPreviousDimension: 'Vorherige Dimension',
   wsNextDimension: 'Nächste Dimension',
   wsCreateSession: 'Session erstellen →',
+  wsAsyncCreateSession: 'Async-Check erstellen →',
   wsCreating: 'Wird erstellt…',
   wsJoinCodeLabel: 'Beitritts-Code',
   wsJoinLinkLabel: 'Oder diesen Link teilen',
@@ -484,6 +501,11 @@ const de = {
   wsParticipantsJoined: (n) => `${n} beigetreten`,
   wsHaveCodeAlready: 'Schon einen Beitritts-Code?',
   wsGoJoin: 'Einer Session beitreten →',
+
+  wsAsyncBadge: 'Async',
+  wsAsyncRoomTitle: 'Warten auf die Gruppe',
+  wsAsyncRoomIntro: 'Teilen Sie den Code oder Link mit allen, die mitwirken sollen. Jede Person schätzt sich selbst ein, wann es passt — erzeugen Sie den Bericht, sobald genug Personen dabei sind.',
+  wsAsyncGenerateReport: 'Bericht erzeugen →',
 
   wsJoinTitle: 'Dem Workshop beitreten',
   wsJoinCodePlaceholder: 'Beitritts-Code',

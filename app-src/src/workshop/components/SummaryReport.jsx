@@ -1,6 +1,7 @@
 import { dimName, capText } from '../../ttcmm'
 import OverlayRadar, { participantColor } from './OverlayRadar'
 import MoveBoard from './MoveBoard'
+import WorkshopInsight from './WorkshopInsight'
 
 function referenceStage(dim, participants) {
   const vals = participants.map((p) => p.answers?.[dim.id]).filter((v) => v !== undefined && v !== null)
@@ -24,7 +25,7 @@ function SummitGlyph() {
   )
 }
 
-export default function SummaryReport({ strings, lang, dims, session, participants, responses, moves, isFacilitator, onPrint }) {
+export default function SummaryReport({ strings, lang, dims, session, participants, responses, moves, isFacilitator, onPrint, mode = 'live' }) {
   const nameById = {}
   participants.forEach((p) => { nameById[p.id] = p.name })
   const selectedIds = session.deep_dive_dimension_ids || []
@@ -55,44 +56,54 @@ export default function SummaryReport({ strings, lang, dims, session, participan
         <OverlayRadar strings={strings} lang={lang} dims={dims} participants={participants} emptyLabel={strings.wsNoPreworkYet} />
       </div>
 
-      <div style={{ marginTop: 24 }}>
-        <h3 style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 600, fontSize: 17, margin: '0 0 12px' }}>{strings.wsSummaryCaptured}</h3>
-        {selectedIds.length === 0 && <p style={{ fontSize: 13.5, color: 'var(--ws-text-muted)', fontStyle: 'italic' }}>{strings.wsPickDimensions}</p>}
-        {selectedIds.map((dimId) => {
-          const dim = dims.find((d) => d.id === dimId)
-          if (!dim) return null
-          const ref = referenceStage(dim, participants)
-          const nextStage = Math.min(ref + 1, 4)
-          const caps = ref < 4 ? dim.capabilities.filter((c) => c.stage === nextStage) : []
-          return (
-            <div key={dimId} data-print-break="" style={{ marginBottom: 18 }}>
-              <div style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 600, fontSize: 15, marginBottom: 8 }}>{dimName(dim, lang)}</div>
-              {caps.map((cap) => {
-                const forCap = responses.filter((r) => r.capability_id === cap.id && r.text.trim())
-                if (forCap.length === 0) return null
-                return (
-                  <div key={cap.id} style={{ border: '1px solid var(--ws-border-soft)', borderRadius: 'var(--ws-radius-sm)', background: 'var(--ws-bg-soft)', padding: 14, marginBottom: 10 }}>
-                    <div style={{ fontSize: 13.5, fontWeight: 500, marginBottom: 8 }}>{capText(cap, lang)}</div>
-                    {forCap.map((r) => (
-                      <div key={r.id} style={{ fontSize: 12.5, lineHeight: 1.5, margin: '4px 0' }}>
-                        <span style={{ color: participantColor(participants.findIndex((p) => p.id === r.participant_id)), fontFamily: 'var(--ws-font-mono)', fontSize: 10.5 }}>
-                          {nameById[r.participant_id] || '?'} · {r.prompt_type}
-                        </span>{' '}
-                        <span style={{ color: 'var(--ws-text-primary)' }}>{r.text}</span>
-                      </div>
-                    ))}
-                  </div>
-                )
-              })}
-            </div>
-          )
-        })}
-      </div>
+      {mode === 'async' && !solo && (
+        <div style={{ marginTop: 24 }}>
+          <WorkshopInsight strings={strings} lang={lang} dims={dims} participants={participants} />
+        </div>
+      )}
 
-      <div data-print-break="" style={{ marginTop: 24 }}>
-        <h3 style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 600, fontSize: 17, margin: '0 0 12px' }}>{strings.wsSummaryMoves}</h3>
-        {moves.length === 0 ? <p style={{ fontSize: 13.5, color: 'var(--ws-text-muted)', fontStyle: 'italic' }}>{strings.wsSummaryNoMoves}</p> : <MoveBoard strings={strings} moves={moves} editable={false} />}
-      </div>
+      {mode !== 'async' && (
+        <div style={{ marginTop: 24 }}>
+          <h3 style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 600, fontSize: 17, margin: '0 0 12px' }}>{strings.wsSummaryCaptured}</h3>
+          {selectedIds.length === 0 && <p style={{ fontSize: 13.5, color: 'var(--ws-text-muted)', fontStyle: 'italic' }}>{strings.wsPickDimensions}</p>}
+          {selectedIds.map((dimId) => {
+            const dim = dims.find((d) => d.id === dimId)
+            if (!dim) return null
+            const ref = referenceStage(dim, participants)
+            const nextStage = Math.min(ref + 1, 4)
+            const caps = ref < 4 ? dim.capabilities.filter((c) => c.stage === nextStage) : []
+            return (
+              <div key={dimId} data-print-break="" style={{ marginBottom: 18 }}>
+                <div style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 600, fontSize: 15, marginBottom: 8 }}>{dimName(dim, lang)}</div>
+                {caps.map((cap) => {
+                  const forCap = responses.filter((r) => r.capability_id === cap.id && r.text.trim())
+                  if (forCap.length === 0) return null
+                  return (
+                    <div key={cap.id} style={{ border: '1px solid var(--ws-border-soft)', borderRadius: 'var(--ws-radius-sm)', background: 'var(--ws-bg-soft)', padding: 14, marginBottom: 10 }}>
+                      <div style={{ fontSize: 13.5, fontWeight: 500, marginBottom: 8 }}>{capText(cap, lang)}</div>
+                      {forCap.map((r) => (
+                        <div key={r.id} style={{ fontSize: 12.5, lineHeight: 1.5, margin: '4px 0' }}>
+                          <span style={{ color: participantColor(participants.findIndex((p) => p.id === r.participant_id)), fontFamily: 'var(--ws-font-mono)', fontSize: 10.5 }}>
+                            {nameById[r.participant_id] || '?'} · {r.prompt_type}
+                          </span>{' '}
+                          <span style={{ color: 'var(--ws-text-primary)' }}>{r.text}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )
+                })}
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {mode !== 'async' && (
+        <div data-print-break="" style={{ marginTop: 24 }}>
+          <h3 style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 600, fontSize: 17, margin: '0 0 12px' }}>{strings.wsSummaryMoves}</h3>
+          {moves.length === 0 ? <p style={{ fontSize: 13.5, color: 'var(--ws-text-muted)', fontStyle: 'italic' }}>{strings.wsSummaryNoMoves}</p> : <MoveBoard strings={strings} moves={moves} editable={false} />}
+        </div>
+      )}
 
       <p style={{ marginTop: 22, fontFamily: 'var(--ws-font-mono)', fontSize: 12.5, color: 'var(--ws-text-muted)' }}>
         {strings.wsSummaryRecheck(recheckDate(session.created_at, lang))}

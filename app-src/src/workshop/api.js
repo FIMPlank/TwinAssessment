@@ -7,13 +7,14 @@ import { generateCode, generatePin } from './codeGen'
 // participant login and no separate facilitator credential.
 
 export async function createSession(facilitatorName, lang, opts = {}) {
-  const { companyName, contextNote, phaseMinutes } = opts
+  const { companyName, contextNote, phaseMinutes, mode } = opts
   for (let attempt = 0; attempt < 5; attempt++) {
     const code = generateCode()
     const row = { code, facilitator_name: facilitatorName, lang, facilitator_pin: generatePin() }
     if (companyName) row.company_name = companyName
     if (contextNote) row.context_note = contextNote
     if (phaseMinutes) row.phase_minutes = phaseMinutes
+    if (mode) row.mode = mode
     const { data, error } = await supabase
       .from('workshop_sessions')
       .insert(row)
