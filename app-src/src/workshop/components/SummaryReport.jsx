@@ -20,6 +20,7 @@ export default function SummaryReport({ strings, lang, dims, session, participan
   const nameById = {}
   participants.forEach((p, i) => { nameById[p.id] = p.name })
   const selectedIds = session.deep_dive_dimension_ids || []
+  const solo = participants.length <= 1
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', padding: '10px 0 80px' }}>
@@ -29,7 +30,7 @@ export default function SummaryReport({ strings, lang, dims, session, participan
       <p style={{ fontSize: 14.5, color: C.sub, margin: '10px 0 0', maxWidth: '70ch' }}>{strings.wsSummaryIntro}</p>
 
       <div data-print-break="" style={{ border: `1px solid ${C.line}`, borderRadius: 14, background: '#fff', padding: 22, marginTop: 22 }}>
-        <h3 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: 17, margin: '0 0 12px' }}>{strings.wsSummaryDivergence}</h3>
+        <h3 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: 17, margin: '0 0 12px' }}>{solo ? strings.wsSummaryDivergenceSolo : strings.wsSummaryDivergence}</h3>
         <OverlayRadar strings={strings} lang={lang} dims={dims} participants={participants} emptyLabel={strings.wsNoPreworkYet} />
       </div>
 

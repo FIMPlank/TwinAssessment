@@ -26,6 +26,7 @@ export default function ParticipantRoom({ strings, lang, code, participant: init
 
   const phaseLabel = { prework: strings.wsPhasePrework, opening: strings.wsPhaseOpening, calibration: strings.wsPhaseCalibration, deepdive: strings.wsPhaseDeepdive, prioritization: strings.wsPhasePrioritization, summary: strings.wsPhaseSummary }
   const calibDim = DIMENSIONS.find((d) => d.id === session.active_dimension_id) || DIMENSIONS[0]
+  const solo = participants.length <= 1
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', padding: '20px 0 90px' }}>
@@ -41,8 +42,8 @@ export default function ParticipantRoom({ strings, lang, code, participant: init
 
         {session.phase === 'opening' && (
           <div style={{ padding: '0 24px' }}>
-            <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 22, margin: '0 0 6px' }}>{strings.wsOpeningTitle}</h2>
-            <p style={{ fontSize: 13.5, color: C.sub, marginBottom: 18 }}>{strings.wsOpeningIntro}</p>
+            <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 22, margin: '0 0 6px' }}>{solo ? strings.wsOpeningTitleSolo : strings.wsOpeningTitle}</h2>
+            <p style={{ fontSize: 13.5, color: C.sub, marginBottom: 18 }}>{solo ? strings.wsOpeningIntroSolo : strings.wsOpeningIntro}</p>
             <OverlayRadar strings={strings} lang={lang} dims={DIMENSIONS} participants={participants} emptyLabel={strings.wsNoPreworkYet} />
           </div>
         )}
@@ -50,7 +51,7 @@ export default function ParticipantRoom({ strings, lang, code, participant: init
         {session.phase === 'calibration' && (
           <div style={{ padding: '0 24px' }}>
             <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 22, margin: '0 0 6px' }}>{strings.wsCalibrationTitle}</h2>
-            <p style={{ fontSize: 13.5, color: C.sub }}>{strings.wsCalibrationIntro}</p>
+            <p style={{ fontSize: 13.5, color: C.sub }}>{solo ? strings.wsCalibrationIntroSolo : strings.wsCalibrationIntro}</p>
             <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: 17, marginTop: 14, textAlign: 'center' }}>{dimName(calibDim, lang)}</div>
             <SpreadChart strings={strings} dimension={calibDim} participants={participants} />
           </div>
@@ -59,7 +60,7 @@ export default function ParticipantRoom({ strings, lang, code, participant: init
         {session.phase === 'deepdive' && (
           <div style={{ padding: '0 24px' }}>
             <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 22, margin: '0 0 6px' }}>{strings.wsDeepdiveTitle}</h2>
-            <p style={{ fontSize: 13.5, color: C.sub, marginBottom: 18 }}>{strings.wsDeepdiveIntro}</p>
+            <p style={{ fontSize: 13.5, color: C.sub, marginBottom: 18 }}>{solo ? strings.wsDeepdiveIntroSolo : strings.wsDeepdiveIntro}</p>
             <DeepDiveView
               strings={strings} lang={lang} dims={DIMENSIONS} session={session} participants={participants} responses={responses}
               participant={mergedParticipant} sessionId={participant.sessionId} isFacilitator={false} reducedMotion={reducedMotion}

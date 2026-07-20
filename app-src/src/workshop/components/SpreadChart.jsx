@@ -38,7 +38,7 @@ export default function SpreadChart({ strings, dimension, participants, color })
         })}
       </div>
       <div style={{ marginTop: 26, fontFamily: "'IBM Plex Mono',monospace", fontSize: 12, color: C.sub }}>
-        {strings.wsSpreadLabel}: {vals.length ? `${min}–${max}` : '—'} · {strings.wsParticipantCount(withAnswers.length)}
+        {vals.length === 0 ? `${strings.wsSpreadLabel}: —` : withAnswers.length === 1 ? `${strings.wsScoreLabel}: ${min}` : `${strings.wsSpreadLabel}: ${min}–${max}`} · {strings.wsParticipantCount(withAnswers.length)}
       </div>
     </div>
   )

@@ -35,6 +35,7 @@ export default function FacilitatorRoom({ strings, lang, sessionId }) {
 
   const calibIdx = Math.max(0, DIMENSIONS.findIndex((d) => d.id === session.active_dimension_id))
   const calibDim = DIMENSIONS[calibIdx] || DIMENSIONS[0]
+  const solo = participants.length <= 1
 
   function setCalibDim(idx) {
     updateSession(sessionId, { active_dimension_id: DIMENSIONS[idx].id })
@@ -88,8 +89,8 @@ export default function FacilitatorRoom({ strings, lang, sessionId }) {
 
         {session.phase === 'opening' && (
           <div>
-            <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 24, margin: '0 0 6px' }}>{strings.wsOpeningTitle}</h2>
-            <p style={{ fontSize: 14, color: C.sub, maxWidth: '64ch', marginBottom: 20 }}>{strings.wsOpeningIntro}</p>
+            <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 24, margin: '0 0 6px' }}>{solo ? strings.wsOpeningTitleSolo : strings.wsOpeningTitle}</h2>
+            <p style={{ fontSize: 14, color: C.sub, maxWidth: '64ch', marginBottom: 20 }}>{solo ? strings.wsOpeningIntroSolo : strings.wsOpeningIntro}</p>
             <OverlayRadar strings={strings} lang={lang} dims={DIMENSIONS} participants={participants} emptyLabel={strings.wsNoPreworkYet} />
           </div>
         )}
@@ -97,7 +98,7 @@ export default function FacilitatorRoom({ strings, lang, sessionId }) {
         {session.phase === 'calibration' && (
           <div>
             <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 24, margin: '0 0 6px' }}>{strings.wsCalibrationTitle}</h2>
-            <p style={{ fontSize: 14, color: C.sub, maxWidth: '64ch' }}>{strings.wsCalibrationIntro}</p>
+            <p style={{ fontSize: 14, color: C.sub, maxWidth: '64ch' }}>{solo ? strings.wsCalibrationIntroSolo : strings.wsCalibrationIntro}</p>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 18 }}>
               <button onClick={() => setCalibDim(Math.max(0, calibIdx - 1))} disabled={calibIdx <= 0} style={{ padding: '9px 14px', border: `1px solid #C6CBC8`, borderRadius: 7, background: '#fff', fontSize: 13, opacity: calibIdx <= 0 ? 0.4 : 1 }}>←</button>
               <div style={{ textAlign: 'center' }}>
@@ -113,7 +114,7 @@ export default function FacilitatorRoom({ strings, lang, sessionId }) {
         {session.phase === 'deepdive' && (
           <div>
             <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 24, margin: '0 0 6px' }}>{strings.wsDeepdiveTitle}</h2>
-            <p style={{ fontSize: 14, color: C.sub, maxWidth: '64ch', marginBottom: 20 }}>{strings.wsDeepdiveIntro}</p>
+            <p style={{ fontSize: 14, color: C.sub, maxWidth: '64ch', marginBottom: 20 }}>{solo ? strings.wsDeepdiveIntroSolo : strings.wsDeepdiveIntro}</p>
             <DeepDiveView
               strings={strings} lang={lang} dims={DIMENSIONS} session={session} participants={participants} responses={responses}
               sessionId={sessionId} isFacilitator reducedMotion={reducedMotion}
