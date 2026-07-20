@@ -2,9 +2,10 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'node:path'
 
-// TwinClimb assessment app. Builds to two static entry points that share one
-// component tree (src/App.jsx) and one i18n string table (src/i18n.js) —
-// no more hand-duplicated EN/DE bundles. `base: './'` keeps asset URLs
+// TwinClimb assessment app. Builds to four static entry points sharing one
+// i18n string table (src/i18n.js) and the canonical TTCMM data/logic: the
+// self-assessment (src/App.jsx) and the live workshop mode
+// (src/workshop/WorkshopApp.jsx), each EN/DE. `base: './'` keeps asset URLs
 // relative so the build can be copied straight into the repo root, which
 // GitHub Pages serves from a subpath (fimplank.github.io/TwinAssessment/).
 export default defineConfig({
@@ -17,6 +18,8 @@ export default defineConfig({
       input: {
         assessment: resolve(__dirname, 'assessment.html'),
         'assessment.de': resolve(__dirname, 'assessment.de.html'),
+        workshop: resolve(__dirname, 'workshop.html'),
+        'workshop.de': resolve(__dirname, 'workshop.de.html'),
       },
     },
   },

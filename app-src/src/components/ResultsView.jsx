@@ -1,28 +1,10 @@
 import { PALETTE, dimName, capText } from '../ttcmm'
 import { SHORT_LABEL, STAGE_TITLE, STAGE_DESC, DIM_SHORT_NAME } from '../i18n'
 import { hexToRgba } from '../utils'
+import { radarGeometry } from '../radar'
 
 const ACCENT = '#179C7D'
 const C = { dt: '#1F6FB2', st: '#179C7D' }
-
-function radarGeometry(vals, n) {
-  const cx = 220, cy = 200, R = 132, mx = 4
-  const ang = (i) => ((-90 + i * 60) * Math.PI) / 180
-  const pt = (r, i) => [cx + r * Math.cos(ang(i)), cy + r * Math.sin(ang(i))]
-  const rings = [1, 2, 3, 4].map((k) => ({
-    points: Array.from({ length: n }, (_, i) => pt((k / mx) * R, i).map((v) => v.toFixed(1)).join(',')).join(' '),
-  }))
-  const axes = Array.from({ length: n }, (_, i) => {
-    const [x, y] = pt(R, i)
-    return { x1: cx, y1: cy, x2: x.toFixed(1), y2: y.toFixed(1) }
-  })
-  const points = vals.map((v, i) => pt((v / mx) * R, i).map((n2) => n2.toFixed(1)).join(',')).join(' ')
-  const verts = vals.map((v, i) => {
-    const [x, y] = pt((v / mx) * R, i)
-    return { x: x.toFixed(1), y: y.toFixed(1), color: PALETTE[i] }
-  })
-  return { rings, axes, points, verts, pt, cx, R }
-}
 
 export default function ResultsView({ strings, lang, dims, vals, isDeepList, capsByCapId, pathway, onEditAnswers, onPrint, onRestart }) {
   const SHORT = SHORT_LABEL[lang]
@@ -176,7 +158,7 @@ export default function ResultsView({ strings, lang, dims, vals, isDeepList, cap
             {radar.rings.map((r, i) => <polygon key={i} points={r.points} fill="none" stroke="#E6E9E7" strokeWidth="1" />)}
             {radar.axes.map((a, i) => <line key={i} x1={a.x1} y1={a.y1} x2={a.x2} y2={a.y2} stroke="#DCE0DD" strokeWidth="1" />)}
             <polygon points={radar.points} fill={radarFill} stroke={radarStroke} strokeWidth="2" strokeLinejoin="round" />
-            {radar.verts.map((v, i) => <circle key={i} cx={v.x} cy={v.y} r="4.6" fill={v.color} stroke="#fff" strokeWidth="1.5" />)}
+            {radar.verts.map((v, i) => <circle key={i} cx={v.x} cy={v.y} r="4.6" fill={PALETTE[i]} stroke="#fff" strokeWidth="1.5" />)}
             {labels.map((l, i) => (
               <text key={i} x={l.x} y={l.y} textAnchor={l.anchor} dominantBaseline="middle" fontFamily="IBM Plex Mono" fontSize="11" fill="#6B6B66">{l.name}</text>
             ))}
