@@ -6,6 +6,12 @@
     "3": "Twin transformation implementation",
     "4": "True twin transformer"
   },
+  "stageLabels_de": {
+    "1": "Bewusstsein für die Verbindung von Digitalisierung und Nachhaltigkeit",
+    "2": "Twin-Transformation-Entwicklung",
+    "3": "Twin-Transformation-Umsetzung",
+    "4": "True Twin Transformer"
+  },
   "dimensions": [
     {
       "id": "strategy",
