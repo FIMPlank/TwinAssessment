@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { STRINGS } from '../i18n'
+import WorkshopShell from './components/WorkshopShell'
 import FacilitatorHome from './FacilitatorHome'
 import FacilitatorRoom from './FacilitatorRoom'
 import ParticipantJoin from './ParticipantJoin'
@@ -21,8 +22,6 @@ function setQueryParam(name, value) {
   else url.searchParams.delete(name)
   window.history.replaceState({}, '', url)
 }
-
-const C = { ink: '#17191C', line: '#E3E7E5' }
 
 export default function WorkshopApp({ lang }) {
   const strings = STRINGS[lang]
@@ -68,19 +67,9 @@ export default function WorkshopApp({ lang }) {
     body = <FacilitatorHome strings={strings} lang={lang} onCreated={onCreatedSession} />
   }
 
-  const otherLangHref = (lang === 'de' ? 'workshop.html' : 'workshop.de.html') + window.location.search
-
   return (
-    <div style={{ minHeight: '100vh', background: '#F2F4F3', color: C.ink, fontFamily: "'IBM Plex Sans',sans-serif", WebkitFontSmoothing: 'antialiased' }}>
-      <div data-print-hide="" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${C.line}`, background: '#fff' }}>
-        <a href={lang === 'de' ? 'workshop.de.html' : 'workshop.html'} style={{ display: 'flex', alignItems: 'baseline', gap: 12, textDecoration: 'none', color: C.ink }}>
-          <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 18, letterSpacing: '0.1em' }}>{strings.wsBrand}</span>
-        </a>
-        <a href={otherLangHref} style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 12, letterSpacing: '0.06em', color: '#9A9A95', textDecoration: 'none' }}>
-          {lang === 'de' ? 'EN' : 'DE'}
-        </a>
-      </div>
+    <WorkshopShell strings={strings} lang={lang}>
       {body}
-    </div>
+    </WorkshopShell>
   )
 }

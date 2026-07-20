@@ -31,3 +31,84 @@ button { font-family: inherit; cursor: pointer; }
   [data-print-hide] { display: none !important; }
   [data-print-break] { break-inside: avoid; }
 }
+
+/* ===================================================================
+   Workshop Studio design tokens — scoped to .ws-root only, so none of
+   this reaches the self-assessment app (which never uses classNames,
+   only inline styles, so there is nothing to collide with anyway).
+   =================================================================== */
+.ws-root {
+  --ws-bg-deep: #0d1714;
+  --ws-bg-elevated: #13231e;
+  --ws-bg-soft: #eef1eb;
+  --ws-surface: #f8f8f4;
+  --ws-surface-dark: #172923;
+  --ws-text-primary: #10201a;
+  --ws-text-on-dark: #f4f7f2;
+  --ws-text-muted: #66736d;
+  --ws-text-muted-on-dark: #9db3a9;
+  --ws-brand: #179c7d;
+  --ws-brand-bright: #35c59d;
+  --ws-brand-deep: #0e6654;
+  --ws-border-soft: rgba(16, 32, 26, 0.1);
+  --ws-border-on-dark: rgba(244, 247, 242, 0.14);
+  --ws-radius-lg: 26px;
+  --ws-radius-md: 18px;
+  --ws-radius-sm: 10px;
+  --ws-shadow-soft: 0 1px 2px rgba(13, 23, 20, 0.06), 0 12px 32px rgba(13, 23, 20, 0.08);
+  --ws-shadow-deep: 0 20px 60px rgba(0, 0, 0, 0.35);
+  --ws-font-head: 'Space Grotesk', sans-serif;
+  --ws-font-body: 'IBM Plex Sans', sans-serif;
+  --ws-font-mono: 'IBM Plex Mono', monospace;
+
+  background: var(--ws-bg-soft);
+  color: var(--ws-text-primary);
+  font-family: var(--ws-font-body);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+.ws-root *:focus-visible {
+  outline: 2.5px solid var(--ws-brand-bright);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.ws-root button { font-family: inherit; }
+
+@keyframes ws-rise-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes ws-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.ws-animate-in { animation: ws-rise-in 280ms ease-out both; }
+.ws-animate-fade { animation: ws-fade-in 240ms ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ws-root .ws-animate-in,
+  .ws-root .ws-animate-fade { animation: none !important; }
+  .ws-root * { transition-duration: .001ms !important; }
+}
+
+.ws-sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+.ws-progress-compact { display: none; }
+@media (max-width: 760px) {
+  .ws-progress-rail { display: none !important; }
+  .ws-progress-compact { display: flex !important; }
+}
+
+.ws-hero-contours {
+  position: absolute; inset: 0; z-index: 0; opacity: 0.5; pointer-events: none;
+}
+.ws-hero-glow {
+  position: absolute; z-index: 0; pointer-events: none;
+  width: 60vw; max-width: 780px; height: 60vw; max-height: 780px;
+  background: radial-gradient(circle, rgba(53,197,157,0.22) 0%, rgba(53,197,157,0) 70%);
+}
