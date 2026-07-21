@@ -65,7 +65,11 @@ const CAPABILITY_CATALOG = [
 
 const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY')
 const MODEL = 'claude-sonnet-5'
-const MAX_TEXT_CHARS = 150_000 // roughly bounds prompt cost/latency for one call
+// ~4 chars/token, so 600k chars is ~150k input tokens — comfortably inside
+// the model's 200k-token context alongside the capability list, system
+// prompt, and the model's own output. Covers the vast majority of real
+// reports (even 200-300 pages) without truncation.
+const MAX_TEXT_CHARS = 600_000
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',

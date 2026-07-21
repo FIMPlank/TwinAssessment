@@ -3,7 +3,7 @@ import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker
 
-const MAX_PAGES = 60 // bounds extraction time + the text sent to the model
+const MAX_PAGES = 500 // guards against a pathologically huge file; real reports never hit this
 
 // Client-side only — the file itself never leaves the browser, only the
 // extracted text is sent (to the Edge Function, then the model).
