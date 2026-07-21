@@ -2,7 +2,7 @@ import { PALETTE, dimName, capText, DIMENSIONS } from '../../ttcmm'
 
 const OPT_VALUES = ['yes', 'no', 'na']
 
-export default function CapabilityReview({ strings, lang, caps, evidence, onSetCap }) {
+export default function CapabilityReview({ strings, lang, caps, evidence, onSetCap, readOnly = false }) {
   return (
     <div>
       {DIMENSIONS.map((dim, di) => (
@@ -31,25 +31,37 @@ export default function CapabilityReview({ strings, lang, caps, evidence, onSetC
                       </div>
                     )}
                   </div>
-                  <div role="radiogroup" aria-label={capText(cap, lang)} style={{ display: 'flex', gap: 6, flexWrap: 'wrap', flex: 'none' }}>
-                    {OPT_VALUES.map((v) => {
-                      const on = cur === v
-                      const color = v === 'yes' ? 'var(--ws-brand)' : v === 'no' ? '#B3432F' : 'var(--ws-text-muted)'
-                      return (
-                        <label
-                          key={v}
-                          style={{
-                            display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 10px', borderRadius: 7, cursor: 'pointer', fontSize: 12,
-                            border: `1.5px solid ${on ? color : 'var(--ws-border-soft)'}`, color: on ? color : 'var(--ws-text-muted)',
-                            background: on ? `${color}1a` : '#fff', fontWeight: on ? 600 : 400,
-                          }}
-                        >
-                          <input type="radio" name={`rc-cap-${cap.id}`} checked={on} onChange={() => onSetCap(cap.id, v)} style={{ margin: 0, cursor: 'pointer' }} />
-                          {v === 'yes' ? strings.capYes : v === 'no' ? strings.capNo : strings.capNa}
-                        </label>
-                      )
-                    })}
-                  </div>
+                  {readOnly ? (
+                    <span
+                      style={{
+                        flex: 'none', display: 'inline-flex', alignItems: 'center', padding: '5px 11px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                        color: cur === 'yes' ? 'var(--rc-brand-deep)' : cur === 'no' ? 'var(--rc-negative)' : 'var(--rc-text-muted)',
+                        background: cur === 'yes' ? 'var(--rc-brand-tint)' : cur === 'no' ? 'rgba(162,59,43,0.1)' : 'var(--rc-surface-muted)',
+                      }}
+                    >
+                      {cur === 'yes' ? strings.capYes : cur === 'no' ? strings.capNo : strings.capNa}
+                    </span>
+                  ) : (
+                    <div role="radiogroup" aria-label={capText(cap, lang)} style={{ display: 'flex', gap: 6, flexWrap: 'wrap', flex: 'none' }}>
+                      {OPT_VALUES.map((v) => {
+                        const on = cur === v
+                        const color = v === 'yes' ? 'var(--ws-brand)' : v === 'no' ? '#B3432F' : 'var(--ws-text-muted)'
+                        return (
+                          <label
+                            key={v}
+                            style={{
+                              display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 10px', borderRadius: 7, cursor: 'pointer', fontSize: 12,
+                              border: `1.5px solid ${on ? color : 'var(--ws-border-soft)'}`, color: on ? color : 'var(--ws-text-muted)',
+                              background: on ? `${color}1a` : '#fff', fontWeight: on ? 600 : 400,
+                            }}
+                          >
+                            <input type="radio" name={`rc-cap-${cap.id}`} checked={on} onChange={() => onSetCap(cap.id, v)} style={{ margin: 0, cursor: 'pointer' }} />
+                            {v === 'yes' ? strings.capYes : v === 'no' ? strings.capNo : strings.capNa}
+                          </label>
+                        )
+                      })}
+                    </div>
+                  )}
                 </div>
               )
             })}

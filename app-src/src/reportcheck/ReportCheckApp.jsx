@@ -4,18 +4,21 @@ import { STRINGS } from '../i18n'
 import { extractPdfText } from './pdfText'
 import { assessReport, saveReportCheck, fetchReportCheck } from './api'
 import ReportCheckHeader from './components/ReportCheckHeader'
-import WipBanner from './components/WipBanner'
+import EarlyAccessNotice from './components/EarlyAccessNotice'
+import PdfDropzone from './components/PdfDropzone'
 import CapabilityReview from './components/CapabilityReview'
-import ResultsView from '../components/ResultsView'
+import ReportResultsView from './components/ReportResultsView'
 
 const DOC_TYPES = ['sustainability', 'digital', 'roadmap', 'general']
 
-// upload -> extracting -> analyzing -> review -> results
+// upload (select file) -> extracting -> analyzing -> review (edit AI draft) -> results
 export default function ReportCheckApp({ lang }) {
   const strings = STRINGS[lang]
   const [step, setStep] = useState('upload')
   const [companyName, setCompanyName] = useState('')
   const [docType, setDocType] = useState('general')
+  const [pendingFile, setPendingFile] = useState(null)
+  const [fileError, setFileError] = useState('')
   const [fileName, setFileName] = useState('')
   const [caps, setCaps] = useState({})
   const [evidence, setEvidence] = useState({})
@@ -42,13 +45,24 @@ export default function ReportCheckApp({ lang }) {
       .catch((e) => { setError(String(e.message || e)); setStep('upload') })
   }, [code]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  async function handleFile(file) {
-    if (!file) return
+  function handleFileSelected(file, isPdf) {
+    if (!isPdf) { setFileError(strings.rcInvalidFileType); return }
+    setFileError('')
+    setPendingFile(file)
+  }
+
+  function handleRemoveFile() {
+    setPendingFile(null)
+    setFileError('')
+  }
+
+  async function runAnalysis() {
+    if (!pendingFile) return
     setError('')
-    setFileName(file.name)
+    setFileName(pendingFile.name)
     setStep('extracting')
     try {
-      const { text } = await extractPdfText(file)
+      const { text } = await extractPdfText(pendingFile)
       setStep('analyzing')
       const result = await assessReport(text, lang, docType)
       setCaps(result.caps || {})
@@ -85,6 +99,8 @@ export default function ReportCheckApp({ lang }) {
     setStep('upload')
     setCaps({})
     setEvidence({})
+    setPendingFile(null)
+    setFileError('')
     setFileName('')
     setDocType('general')
     setSavedRecord(null)
@@ -102,39 +118,40 @@ export default function ReportCheckApp({ lang }) {
   })
   const pathway = pathwayFor(caps, {})
 
+  const labelStyle = {
+    display: 'block', fontFamily: 'var(--ws-font-mono)', fontSize: 11, letterSpacing: '0.1em', color: 'var(--rc-text-muted)',
+    textTransform: 'uppercase', marginBottom: 8,
+  }
+
   return (
-    <div className="ws-root">
+    <div className="ws-root rc-root">
       <ReportCheckHeader strings={strings} lang={lang} />
 
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '36px 20px 90px' }}>
-        {step !== 'results' && <WipBanner strings={strings} />}
+        <EarlyAccessNotice strings={strings} />
 
         {(step === 'upload' || step === 'loading') && (
-          <div style={{ textAlign: 'center' }}>
-            <h1 style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 700, fontSize: 'clamp(26px,4vw,34px)', margin: '0 0 12px' }}>{strings.rcHeroTitle}</h1>
-            <p style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ws-text-muted)', maxWidth: '62ch', margin: '0 auto 28px' }}>{strings.rcHeroIntro}</p>
+          <div className="rc-animate-in" style={{ textAlign: 'center' }}>
+            <h1 style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 700, fontSize: 'clamp(28px,4vw,38px)', letterSpacing: '-0.01em', margin: '0 0 12px', color: 'var(--rc-text-primary)' }}>{strings.rcHeroTitle}</h1>
+            <p style={{ fontSize: 15.5, lineHeight: 1.6, color: 'var(--rc-text-muted)', maxWidth: '62ch', margin: '0 auto 28px' }}>{strings.rcHeroIntro}</p>
 
-            <div style={{ background: 'var(--ws-surface)', borderRadius: 'var(--ws-radius-lg)', padding: 28, boxShadow: 'var(--ws-shadow-soft)', textAlign: 'left', maxWidth: 480, margin: '0 auto' }}>
-              <label style={{ display: 'block', fontFamily: 'var(--ws-font-mono)', fontSize: 11, letterSpacing: '0.1em', color: 'var(--ws-text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>
-                {strings.rcCompanyNameLabel}
-              </label>
+            <div style={{ background: 'var(--rc-surface)', border: '1px solid var(--rc-border)', borderRadius: 'var(--rc-radius-lg)', padding: 28, boxShadow: 'var(--rc-shadow-soft)', textAlign: 'left', maxWidth: 520, margin: '0 auto' }}>
+              <label style={{ ...labelStyle, marginTop: 0 }}>{strings.rcCompanyNameLabel}</label>
               <input
                 value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder={strings.rcCompanyNamePlaceholder}
-                style={{ width: '100%', boxSizing: 'border-box', padding: '12px 14px', borderRadius: 'var(--ws-radius-sm)', border: '1.5px solid var(--ws-border-soft)', fontSize: 15, fontFamily: 'inherit', marginBottom: 18 }}
+                style={{ width: '100%', boxSizing: 'border-box', padding: '12px 14px', borderRadius: 'var(--rc-radius-sm)', border: '1.5px solid var(--rc-border)', fontSize: 15, fontFamily: 'inherit', marginBottom: 18 }}
               />
 
-              <label style={{ display: 'block', fontFamily: 'var(--ws-font-mono)', fontSize: 11, letterSpacing: '0.1em', color: 'var(--ws-text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>
-                {strings.rcDocTypeLabel}
-              </label>
-              <div role="radiogroup" aria-label={strings.rcDocTypeLabel} style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 18 }}>
+              <label style={labelStyle}>{strings.rcDocTypeLabel}</label>
+              <div role="radiogroup" aria-label={strings.rcDocTypeLabel} style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
                 {DOC_TYPES.map((t) => (
                   <label
                     key={t}
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 20, cursor: 'pointer', fontSize: 12.5,
-                      border: `1.5px solid ${docType === t ? 'var(--ws-brand)' : 'var(--ws-border-soft)'}`,
-                      color: docType === t ? 'var(--ws-brand-deep)' : 'var(--ws-text-muted)', fontWeight: docType === t ? 600 : 400,
-                      background: docType === t ? 'rgba(23,156,125,0.1)' : '#fff',
+                      border: `1.5px solid ${docType === t ? 'var(--rc-brand)' : 'var(--rc-border)'}`,
+                      color: docType === t ? 'var(--rc-brand-deep)' : 'var(--rc-text-muted)', fontWeight: docType === t ? 600 : 400,
+                      background: docType === t ? 'var(--rc-brand-tint)' : 'var(--rc-surface)',
                     }}
                   >
                     <input type="radio" name="rc-doc-type" checked={docType === t} onChange={() => setDocType(t)} style={{ margin: 0, cursor: 'pointer' }} />
@@ -143,48 +160,55 @@ export default function ReportCheckApp({ lang }) {
                 ))}
               </div>
 
-              <label style={{ display: 'block', fontFamily: 'var(--ws-font-mono)', fontSize: 11, letterSpacing: '0.1em', color: 'var(--ws-text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>
-                {strings.rcUploadLabel}
-              </label>
-              <input
-                type="file" accept="application/pdf" disabled={step === 'loading'}
-                onChange={(e) => handleFile(e.target.files?.[0])}
-                style={{ width: '100%', fontSize: 13.5 }}
+              <label style={labelStyle}>{strings.rcUploadLabel}</label>
+              <PdfDropzone
+                strings={strings} file={pendingFile} onFileSelected={handleFileSelected} onRemove={handleRemoveFile}
+                error={fileError} disabled={step === 'loading'}
               />
-              <p style={{ fontSize: 12, color: 'var(--ws-text-muted)', marginTop: 10 }}>{strings.rcUploadHint}</p>
 
-              {error && <p style={{ color: '#B3432F', fontSize: 13, marginTop: 14 }}>{error}</p>}
+              {error && <p role="alert" style={{ color: 'var(--rc-negative)', fontSize: 13, marginTop: 14 }}>{error}</p>}
+
+              <button
+                onClick={runAnalysis} disabled={!pendingFile || step === 'loading'}
+                style={{
+                  marginTop: 20, width: '100%', padding: '14px 22px', border: 'none', borderRadius: 'var(--rc-radius-sm)',
+                  background: pendingFile ? 'var(--rc-brand)' : 'var(--rc-surface-muted)', color: pendingFile ? '#fff' : 'var(--rc-text-muted)',
+                  fontFamily: 'var(--ws-font-head)', fontWeight: 600, fontSize: 15, cursor: pendingFile ? 'pointer' : 'not-allowed', transition: 'background 140ms',
+                }}
+              >
+                {strings.rcAnalyzeStart}
+              </button>
             </div>
           </div>
         )}
 
         {(step === 'extracting' || step === 'analyzing') && (
-          <div style={{ textAlign: 'center', padding: '60px 0' }}>
-            <p style={{ fontSize: 15, color: 'var(--ws-text-muted)' }}>
+          <div className="rc-animate-in" style={{ textAlign: 'center', padding: '60px 0' }}>
+            <p style={{ fontSize: 15, color: 'var(--rc-text-muted)' }}>
               {step === 'extracting' ? strings.rcExtracting : strings.rcAnalyzing}
             </p>
           </div>
         )}
 
         {step === 'review' && (
-          <div>
-            <h2 style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 700, fontSize: 'clamp(22px,3.4vw,28px)', margin: '0 0 8px' }}>{strings.rcReviewTitle}</h2>
-            <p style={{ fontSize: 14.5, lineHeight: 1.6, color: 'var(--ws-text-muted)', maxWidth: '70ch', margin: '0 0 8px' }}>{strings.rcReviewIntro}</p>
-            {fileName && <p style={{ fontSize: 12.5, color: 'var(--ws-text-muted)', margin: '0 0 4px' }}>{strings.rcSourceLabel}: {fileName}</p>}
-            {truncated && <p style={{ fontSize: 12.5, color: '#B3432F', margin: '0 0 20px' }}>{strings.rcTruncatedNote}</p>}
+          <div className="rc-animate-in">
+            <h2 style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 700, fontSize: 'clamp(22px,3.4vw,28px)', margin: '0 0 8px', color: 'var(--rc-text-primary)' }}>{strings.rcReviewTitle}</h2>
+            <p style={{ fontSize: 14.5, lineHeight: 1.6, color: 'var(--rc-text-muted)', maxWidth: '70ch', margin: '0 0 8px' }}>{strings.rcReviewIntro}</p>
+            {fileName && <p style={{ fontSize: 12.5, color: 'var(--rc-text-muted)', margin: '0 0 4px' }}>{strings.rcSourceLabel}: {fileName}</p>}
+            {truncated && <p style={{ fontSize: 12.5, color: 'var(--rc-negative)', margin: '0 0 20px' }}>{strings.rcTruncatedNote}</p>}
 
             <CapabilityReview strings={strings} lang={lang} caps={caps} evidence={evidence} onSetCap={setCap} />
 
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 8 }}>
               <button
                 onClick={() => setStep('results')}
-                style={{ padding: '13px 26px', border: 'none', borderRadius: 'var(--ws-radius-sm)', background: 'var(--ws-brand)', color: '#fff', fontFamily: 'var(--ws-font-head)', fontWeight: 600, fontSize: 14.5 }}
+                style={{ padding: '13px 26px', border: 'none', borderRadius: 'var(--rc-radius-sm)', background: 'var(--rc-brand)', color: '#fff', fontFamily: 'var(--ws-font-head)', fontWeight: 600, fontSize: 14.5 }}
               >
                 {strings.rcConfirmButton}
               </button>
               <button
                 onClick={restart}
-                style={{ padding: '13px 22px', border: '1px solid var(--ws-border-soft)', borderRadius: 'var(--ws-radius-sm)', background: '#fff', color: 'var(--ws-text-primary)', fontFamily: 'var(--ws-font-head)', fontWeight: 600, fontSize: 14 }}
+                style={{ padding: '13px 22px', border: '1px solid var(--rc-border)', borderRadius: 'var(--rc-radius-sm)', background: '#fff', color: 'var(--rc-text-primary)', fontFamily: 'var(--ws-font-head)', fontWeight: 600, fontSize: 14 }}
               >
                 {strings.rcStartOver}
               </button>
@@ -193,34 +217,12 @@ export default function ReportCheckApp({ lang }) {
         )}
 
         {step === 'results' && (
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 4 }}>
-              <span style={{ fontFamily: 'var(--ws-font-mono)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#6B5A2A', background: '#FFF7E6', border: '1px solid #EFDDA0', borderRadius: 20, padding: '5px 12px' }}>
-                {strings.rcDraftBadge}
-              </span>
-              {companyName && <span style={{ fontSize: 13.5, fontWeight: 600 }}>{companyName}</span>}
-            </div>
-
-            {!savedRecord && (
-              <div style={{ margin: '16px 0 8px', padding: '14px 16px', border: '1px solid var(--ws-border-soft)', borderRadius: 'var(--ws-radius-sm)', background: 'var(--ws-surface)', display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-                <p style={{ fontSize: 13, color: 'var(--ws-text-muted)', margin: 0, flex: '1 1 260px' }}>{strings.rcSavePrompt}</p>
-                <button
-                  onClick={handleSave} disabled={saving}
-                  style={{ padding: '10px 18px', border: 'none', borderRadius: 'var(--ws-radius-sm)', background: 'var(--ws-brand)', color: '#fff', fontFamily: 'var(--ws-font-head)', fontWeight: 600, fontSize: 13.5 }}
-                >
-                  {saving ? strings.rcSaving : strings.rcSaveLink}
-                </button>
-              </div>
-            )}
-            {savedRecord && (
-              <p style={{ fontSize: 12.5, color: 'var(--ws-text-muted)', margin: '16px 0' }}>
-                {strings.rcLinkSaved}: <code>{window.location.origin}{window.location.pathname}?code={savedRecord.code}</code>
-              </p>
-            )}
-
-            <ResultsView
+          <div className="rc-animate-in">
+            <ReportResultsView
               strings={strings} lang={lang} dims={DIMENSIONS} vals={DIMENSIONS.map((d) => effByDim[d.id])}
-              isDeepList={deepList} capsByCapId={caps} pathway={pathway}
+              isDeepList={deepList} capsByCapId={caps} evidence={evidence} pathway={pathway}
+              companyName={companyName} aiModel={aiModel} truncated={truncated}
+              savedRecord={savedRecord} saving={saving} onSave={handleSave}
               onEditAnswers={() => setStep('review')} onPrint={() => window.print()} onRestart={restart}
             />
           </div>

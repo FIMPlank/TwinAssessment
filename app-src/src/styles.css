@@ -112,3 +112,76 @@ button { font-family: inherit; cursor: pointer; }
   width: 60vw; max-width: 780px; height: 60vw; max-height: 780px;
   background: radial-gradient(circle, rgba(53,197,157,0.22) 0%, rgba(53,197,157,0) 70%);
 }
+
+/* ===================================================================
+   Report Check design tokens — scoped to .rc-root, layered on top of
+   (not replacing) .ws-root so the review step's existing var(--ws-*)
+   styling keeps working unchanged. Modeled on the self-assessment's
+   own calm, light palette (see ResultsView.jsx) rather than the
+   Workshop Studio's dark hero system — this page reads as a research
+   report, not a live event.
+   =================================================================== */
+.rc-root {
+  --rc-bg: #f7f7f4;
+  --rc-surface: #ffffff;
+  --rc-surface-muted: #f1f3f0;
+  --rc-text-primary: #14231d;
+  --rc-text-muted: #5b6b63;
+  --rc-text-on-dark: #f5f7f4;
+  --rc-text-muted-on-dark: #a9bdb3;
+  --rc-brand: #179c7d;
+  --rc-brand-deep: #0e6654;
+  --rc-brand-bright: #35c59d;
+  --rc-brand-tint: rgba(23, 156, 125, 0.1);
+  --rc-border: rgba(20, 35, 29, 0.12);
+  --rc-border-on-dark: rgba(245, 247, 244, 0.14);
+  --rc-negative: #a23b2b;
+  --rc-radius-lg: 16px;
+  --rc-radius-md: 14px;
+  --rc-radius-sm: 12px;
+  --rc-shadow-soft: 0 1px 2px rgba(20, 35, 29, 0.05), 0 8px 24px rgba(20, 35, 29, 0.06);
+  --rc-shadow-deep: 0 16px 48px rgba(20, 35, 29, 0.16);
+  --rc-space-1: 4px;
+  --rc-space-2: 8px;
+  --rc-space-3: 12px;
+  --rc-space-4: 16px;
+  --rc-space-5: 24px;
+  --rc-space-6: 32px;
+  --rc-space-7: 48px;
+
+  background: var(--rc-bg);
+}
+
+.rc-root *:focus-visible {
+  outline: 2.5px solid var(--rc-brand-deep);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@keyframes rc-fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.rc-animate-in { animation: rc-fade-up 220ms ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rc-root .rc-animate-in { animation: none !important; }
+  .rc-root * { transition-duration: .001ms !important; }
+}
+
+.rc-dropzone { transition: border-color 140ms ease, background 140ms ease; }
+.rc-dropzone.rc-drag-active {
+  border-color: var(--rc-brand) !important;
+  background: var(--rc-brand-tint) !important;
+}
+
+.rc-details > summary { cursor: pointer; }
+.rc-details > summary::-webkit-details-marker { display: none; }
+
+@media (max-width: 640px) {
+  .rc-hero-motif { display: none; }
+}
+
+@media (min-width: 860px) {
+  .rc-profile-grid { grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr) !important; align-items: center; }
+}
