@@ -1,1 +1,0 @@
-import{b as e,r as t,y as n}from"./radar-FgULuMl_.js";import{t as r}from"./App-D0WDntUJ.js";var i=e(),a=n(),o=t();(0,a.createRoot)(document.getElementById(`root`)).render((0,o.jsx)(i.StrictMode,{children:(0,o.jsx)(r,{lang:`en`})}));

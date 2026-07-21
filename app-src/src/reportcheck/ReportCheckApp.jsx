@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { DIMENSIONS, deriveForDim, pathwayFor } from '../ttcmm'
 import { STRINGS } from '../i18n'
-import { extractPdfText } from './pdfText'
+import { extractDocumentText } from './documentText'
 import { assessReport, saveReportCheck, fetchReportCheck } from './api'
 import ReportCheckHeader from './components/ReportCheckHeader'
 import EarlyAccessNotice from './components/EarlyAccessNotice'
-import PdfDropzone from './components/PdfDropzone'
+import DocumentDropzone from './components/DocumentDropzone'
 import CapabilityReview from './components/CapabilityReview'
 import ReportResultsView from './components/ReportResultsView'
 
@@ -45,8 +45,8 @@ export default function ReportCheckApp({ lang }) {
       .catch((e) => { setError(String(e.message || e)); setStep('upload') })
   }, [code]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  function handleFileSelected(file, isPdf) {
-    if (!isPdf) { setFileError(strings.rcInvalidFileType); return }
+  function handleFileSelected(file, isSupported) {
+    if (!isSupported) { setFileError(strings.rcInvalidFileType); return }
     setFileError('')
     setPendingFile(file)
   }
@@ -62,7 +62,7 @@ export default function ReportCheckApp({ lang }) {
     setFileName(pendingFile.name)
     setStep('extracting')
     try {
-      const { text } = await extractPdfText(pendingFile)
+      const { text } = await extractDocumentText(pendingFile)
       setStep('analyzing')
       const result = await assessReport(text, lang, docType)
       setCaps(result.caps || {})
@@ -161,7 +161,7 @@ export default function ReportCheckApp({ lang }) {
               </div>
 
               <label style={labelStyle}>{strings.rcUploadLabel}</label>
-              <PdfDropzone
+              <DocumentDropzone
                 strings={strings} file={pendingFile} onFileSelected={handleFileSelected} onRemove={handleRemoveFile}
                 error={fileError} disabled={step === 'loading'}
               />

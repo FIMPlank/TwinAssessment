@@ -176,7 +176,7 @@ Deno.serve(async (req) => {
   try {
     const { text, lang, docType } = await req.json()
     if (!text || typeof text !== 'string' || text.trim().length < 200) {
-      return json({ error: 'No usable text was extracted from that file — is it a text-based PDF?' }, 400)
+      return json({ error: 'No usable text was extracted from that file — is it a text-based PDF, Word document, or text file?' }, 400)
     }
     const truncated = text.length > MAX_TEXT_CHARS
     const reportText = truncated ? text.slice(0, MAX_TEXT_CHARS) : text

@@ -1,4 +1,7 @@
 import { useRef, useState } from 'react'
+import { isSupportedDocument } from '../documentText'
+
+const ACCEPT = '.pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain'
 
 function formatBytes(bytes) {
   if (bytes < 1024) return `${bytes} B`
@@ -25,18 +28,17 @@ function CheckIcon() {
   )
 }
 
-// Drag-and-drop PDF upload card. File selection is a distinct step from
-// starting analysis — this component only ever reports "here is a valid
-// file" or "here is a validation problem"; ReportCheckApp decides when to
-// actually process it.
-export default function PdfDropzone({ strings, file, onFileSelected, onRemove, error, disabled }) {
+// Drag-and-drop document upload card (PDF, Word .docx, or plain text). File
+// selection is a distinct step from starting analysis — this component only
+// ever reports "here is a valid file" or "here is a validation problem";
+// ReportCheckApp decides when to actually process it.
+export default function DocumentDropzone({ strings, file, onFileSelected, onRemove, error, disabled }) {
   const [dragActive, setDragActive] = useState(false)
   const inputRef = useRef(null)
 
   function validateAndEmit(f) {
     if (!f) return
-    const isPdf = f.type === 'application/pdf' || /\.pdf$/i.test(f.name)
-    onFileSelected(f, isPdf)
+    onFileSelected(f, isSupportedDocument(f))
   }
 
   function handleDrop(e) {
@@ -93,7 +95,7 @@ export default function PdfDropzone({ strings, file, onFileSelected, onRemove, e
             ✕
           </button>
         </div>
-        <input ref={inputRef} type="file" accept="application/pdf" onChange={(e) => validateAndEmit(e.target.files?.[0])} style={{ display: 'none' }} />
+        <input ref={inputRef} type="file" accept={ACCEPT} onChange={(e) => validateAndEmit(e.target.files?.[0])} style={{ display: 'none' }} />
       </div>
     )
   }
@@ -125,7 +127,7 @@ export default function PdfDropzone({ strings, file, onFileSelected, onRemove, e
           </span>
         </div>
       </div>
-      <input ref={inputRef} type="file" accept="application/pdf" onChange={(e) => validateAndEmit(e.target.files?.[0])} style={{ display: 'none' }} />
+      <input ref={inputRef} type="file" accept={ACCEPT} onChange={(e) => validateAndEmit(e.target.files?.[0])} style={{ display: 'none' }} />
       {error && <p role="alert" style={{ color: 'var(--rc-negative)', fontSize: 13, marginTop: 10 }}>{error}</p>}
     </div>
   )
