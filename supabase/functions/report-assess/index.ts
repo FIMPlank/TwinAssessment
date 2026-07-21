@@ -77,20 +77,33 @@ function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } })
 }
 
-const SYSTEM_PROMPT = `You are assessing an uploaded organizational report (sustainability report, digital strategy document, annual report, etc.) against a fixed Twin Transformation Capability Maturity Model (TTCMM) checklist.
+// Absence of evidence counts as "no" (not "na") — a report simply not
+// mentioning a capability must not vacuously advance a stage; see
+// deriveStage in scripts/ttcmm.logic.mjs, which excludes "na" items from
+// the completeness check. "na" would silently overestimate maturity here.
+const DOC_TYPE_HINTS: Record<string, string> = {
+  sustainability: 'This document is a sustainability report. Expect strong evidence for environmental/social capabilities, and little to none for purely digital/technology capabilities. Do not infer digital capabilities from sustainability commitments alone — judge those "no" unless separately evidenced.',
+  digital: 'This document is a digitalization / IT strategy report. Expect strong evidence for digital/technology capabilities, and little to none for sustainability-specific capabilities. Do not infer sustainability capabilities from digital-transformation language alone — judge those "no" unless separately evidenced.',
+  roadmap: 'This document is a strategic roadmap or general corporate report covering multiple areas. Judge each capability strictly on its own merits, without assuming either digital or sustainability strength from the document type.',
+  general: '',
+}
 
+function buildSystemPrompt(docType: string) {
+  const hint = DOC_TYPE_HINTS[docType] || ''
+  return `You are assessing an uploaded organizational report (sustainability report, digital strategy document, annual report, etc.) against a fixed Twin Transformation Capability Maturity Model (TTCMM) checklist.
+${hint ? `\n${hint}\n` : ''}
 For every capability id in the checklist, decide:
 - "yes" — the report gives clear, specific evidence this capability is in place.
-- "no" — the report is specific enough to say this capability is explicitly absent or contradicted.
-- "na" — the report does not say enough either way to judge (this should be the most common answer; do not guess).
+- "no" — the report does not give clear, specific evidence this capability is in place. This includes capabilities the report simply never mentions — silence is "no", not an exemption. Do not skip a capability just because the report is quiet about it.
 
-Be conservative: only say "yes" or "no" when the report text actually supports it. Marketing language ("we are committed to sustainability") without concrete evidence of the specific capability should usually be "na", not "yes".
+Be conservative: only say "yes" when the report text actually and specifically supports it. Marketing language ("we are committed to sustainability") without concrete evidence of the specific capability is "no".
 
-For every "yes" or "no", include a short verbatim quote (<=200 characters) from the report as evidence. For "na", leave the quote empty.
+For every "yes", include a short verbatim quote (<=200 characters) from the report as evidence. For "no", include a quote only if the report explicitly contradicts the capability; otherwise leave the quote empty.
 
 You must call the submit_assessment tool exactly once with a judgment for every single capability id in the checklist — do not skip any.`
+}
 
-async function callClaude(reportText: string, lang: string) {
+async function callClaude(reportText: string, lang: string, docType: string) {
   const capabilityList = CAPABILITY_CATALOG
     .map((c) => `${c.id} [dimension: ${c.dimension}, stage ${c.stage}]: ${c.text}`)
     .join('\n')
@@ -107,7 +120,7 @@ async function callClaude(reportText: string, lang: string) {
             type: 'object',
             properties: {
               id: { type: 'string' },
-              v: { type: 'string', enum: ['yes', 'no', 'na'] },
+              v: { type: 'string', enum: ['yes', 'no'] },
               quote: { type: 'string' },
             },
             required: ['id', 'v', 'quote'],
@@ -128,7 +141,7 @@ async function callClaude(reportText: string, lang: string) {
     body: JSON.stringify({
       model: MODEL,
       max_tokens: 8000,
-      system: SYSTEM_PROMPT,
+      system: buildSystemPrompt(docType),
       tools: [tool],
       tool_choice: { type: 'tool', name: 'submit_assessment' },
       messages: [
@@ -157,21 +170,22 @@ Deno.serve(async (req) => {
   if (!ANTHROPIC_API_KEY) return json({ error: 'ANTHROPIC_API_KEY is not configured on this function.' }, 500)
 
   try {
-    const { text, lang } = await req.json()
+    const { text, lang, docType } = await req.json()
     if (!text || typeof text !== 'string' || text.trim().length < 200) {
       return json({ error: 'No usable text was extracted from that file — is it a text-based PDF?' }, 400)
     }
     const truncated = text.length > MAX_TEXT_CHARS
     const reportText = truncated ? text.slice(0, MAX_TEXT_CHARS) : text
+    const resolvedDocType = DOC_TYPE_HINTS[docType] !== undefined ? docType : 'general'
 
-    const judgments = await callClaude(reportText, lang === 'de' ? 'de' : 'en')
+    const judgments = await callClaude(reportText, lang === 'de' ? 'de' : 'en', resolvedDocType)
 
     const caps: Record<string, string> = {}
     const evidence: Record<string, string> = {}
     const knownIds = new Set(CAPABILITY_CATALOG.map((c) => c.id))
     for (const j of judgments) {
       if (!knownIds.has(j.id)) continue
-      caps[j.id] = ['yes', 'no', 'na'].includes(j.v) ? j.v : 'na'
+      caps[j.id] = j.v === 'yes' ? 'yes' : 'no'
       if (j.quote) evidence[j.id] = j.quote
     }
 

@@ -8,11 +8,14 @@ import WipBanner from './components/WipBanner'
 import CapabilityReview from './components/CapabilityReview'
 import ResultsView from '../components/ResultsView'
 
+const DOC_TYPES = ['sustainability', 'digital', 'roadmap', 'general']
+
 // upload -> extracting -> analyzing -> review -> results
 export default function ReportCheckApp({ lang }) {
   const strings = STRINGS[lang]
   const [step, setStep] = useState('upload')
   const [companyName, setCompanyName] = useState('')
+  const [docType, setDocType] = useState('general')
   const [fileName, setFileName] = useState('')
   const [caps, setCaps] = useState({})
   const [evidence, setEvidence] = useState({})
@@ -47,7 +50,7 @@ export default function ReportCheckApp({ lang }) {
     try {
       const { text } = await extractPdfText(file)
       setStep('analyzing')
-      const result = await assessReport(text, lang)
+      const result = await assessReport(text, lang, docType)
       setCaps(result.caps || {})
       setEvidence(result.evidence || {})
       setAiModel(result.model || '')
@@ -66,7 +69,7 @@ export default function ReportCheckApp({ lang }) {
   async function handleSave() {
     setSaving(true)
     try {
-      const row = await saveReportCheck({ lang, companyName, sourceFilename: fileName, caps, evidence, aiModel })
+      const row = await saveReportCheck({ lang, companyName, sourceFilename: fileName, docType, caps, evidence, aiModel })
       setSavedRecord(row)
       const url = new URL(window.location.href)
       url.searchParams.set('code', row.code)
@@ -83,6 +86,7 @@ export default function ReportCheckApp({ lang }) {
     setCaps({})
     setEvidence({})
     setFileName('')
+    setDocType('general')
     setSavedRecord(null)
     const url = new URL(window.location.href)
     url.searchParams.delete('code')
@@ -118,6 +122,26 @@ export default function ReportCheckApp({ lang }) {
                 value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder={strings.rcCompanyNamePlaceholder}
                 style={{ width: '100%', boxSizing: 'border-box', padding: '12px 14px', borderRadius: 'var(--ws-radius-sm)', border: '1.5px solid var(--ws-border-soft)', fontSize: 15, fontFamily: 'inherit', marginBottom: 18 }}
               />
+
+              <label style={{ display: 'block', fontFamily: 'var(--ws-font-mono)', fontSize: 11, letterSpacing: '0.1em', color: 'var(--ws-text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>
+                {strings.rcDocTypeLabel}
+              </label>
+              <div role="radiogroup" aria-label={strings.rcDocTypeLabel} style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 18 }}>
+                {DOC_TYPES.map((t) => (
+                  <label
+                    key={t}
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 20, cursor: 'pointer', fontSize: 12.5,
+                      border: `1.5px solid ${docType === t ? 'var(--ws-brand)' : 'var(--ws-border-soft)'}`,
+                      color: docType === t ? 'var(--ws-brand-deep)' : 'var(--ws-text-muted)', fontWeight: docType === t ? 600 : 400,
+                      background: docType === t ? 'rgba(23,156,125,0.1)' : '#fff',
+                    }}
+                  >
+                    <input type="radio" name="rc-doc-type" checked={docType === t} onChange={() => setDocType(t)} style={{ margin: 0, cursor: 'pointer' }} />
+                    {strings[`rcDocType${t[0].toUpperCase()}${t.slice(1)}`]}
+                  </label>
+                ))}
+              </div>
 
               <label style={{ display: 'block', fontFamily: 'var(--ws-font-mono)', fontSize: 11, letterSpacing: '0.1em', color: 'var(--ws-text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>
                 {strings.rcUploadLabel}
