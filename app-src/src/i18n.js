@@ -317,6 +317,30 @@ const en = {
   wsJoiningLockedBody: 'The facilitator has moved past pre-work — this session is no longer accepting new participants.',
   wsPhaseElapsed: (mmss, budget) => `${mmss} elapsed · ~${budget} min planned`,
   wsNotStartedAbbrev: '—',
+
+  // AI report check (beta)
+  rcBrand: 'AI REPORT CHECK · BETA',
+  rcWipNotice: 'Experimental feature: an AI drafts a TTCMM assessment from your uploaded report. Nothing is final — review and adjust every capability before trusting the result.',
+  rcHeroTitle: 'Draft your assessment from a report',
+  rcHeroIntro: 'Upload a sustainability, digital-strategy, or annual report and an AI will draft a starting TTCMM assessment from it — with a quoted citation for every judgment — for you to review and correct before it counts.',
+  rcCompanyNameLabel: 'Company / client (optional)',
+  rcCompanyNamePlaceholder: 'e.g. Northwind Logistics',
+  rcUploadLabel: 'Report (PDF)',
+  rcUploadHint: 'Text-based PDF only (not a scanned image). The file stays in your browser — only extracted text is sent for analysis.',
+  rcExtracting: 'Reading the PDF…',
+  rcAnalyzing: 'Drafting the assessment — this can take up to a minute…',
+  rcInvalidCode: "That report check doesn't exist or hasn't loaded yet.",
+  rcReviewTitle: 'Review the AI draft',
+  rcReviewIntro: 'Each capability shows the AI\'s judgment and, where available, the quoted evidence it found. Correct anything that looks wrong — only what you confirm here shapes the result.',
+  rcSourceLabel: 'Source',
+  rcTruncatedNote: 'The report was long — only the first part was analyzed.',
+  rcConfirmButton: 'See draft results →',
+  rcStartOver: 'Start over',
+  rcDraftBadge: 'AI draft · reviewed by you',
+  rcSavePrompt: 'Save this draft to get a shareable link.',
+  rcSaveLink: 'Save & get link',
+  rcSaving: 'Saving…',
+  rcLinkSaved: 'Saved — link',
 }
 
 const de = {
@@ -593,6 +617,30 @@ const de = {
   wsJoiningLockedBody: 'Die Moderation hat die Vorarbeit bereits abgeschlossen — diese Session nimmt keine neuen Teilnehmenden mehr auf.',
   wsPhaseElapsed: (mmss, budget) => `${mmss} vergangen · ~${budget} Min. geplant`,
   wsNotStartedAbbrev: '—',
+
+  // KI-Berichtscheck (Beta)
+  rcBrand: 'KI-BERICHTSCHECK · BETA',
+  rcWipNotice: 'Experimentelle Funktion: Eine KI erstellt aus Ihrem hochgeladenen Bericht einen Entwurf des TTCMM-Assessments. Nichts ist final — prüfen und korrigieren Sie jede Fähigkeit, bevor Sie dem Ergebnis vertrauen.',
+  rcHeroTitle: 'Assessment-Entwurf aus einem Bericht erstellen',
+  rcHeroIntro: 'Laden Sie einen Nachhaltigkeits-, Digitalstrategie- oder Geschäftsbericht hoch — eine KI erstellt daraus einen Assessment-Entwurf, mit einem Zitat als Beleg für jede Einschätzung, den Sie prüfen und korrigieren können, bevor er zählt.',
+  rcCompanyNameLabel: 'Unternehmen / Kunde (optional)',
+  rcCompanyNamePlaceholder: 'z. B. Northwind Logistics',
+  rcUploadLabel: 'Bericht (PDF)',
+  rcUploadHint: 'Nur textbasierte PDFs (kein gescanntes Bild). Die Datei bleibt in Ihrem Browser — nur der extrahierte Text wird zur Analyse gesendet.',
+  rcExtracting: 'PDF wird gelesen…',
+  rcAnalyzing: 'Assessment wird erstellt — das kann bis zu einer Minute dauern…',
+  rcInvalidCode: 'Diesen Berichtscheck gibt es nicht oder er wurde noch nicht geladen.',
+  rcReviewTitle: 'KI-Entwurf prüfen',
+  rcReviewIntro: 'Jede Fähigkeit zeigt die Einschätzung der KI und, wenn vorhanden, das gefundene Zitat als Beleg. Korrigieren Sie, was falsch aussieht — nur was Sie hier bestätigen, fließt ins Ergebnis ein.',
+  rcSourceLabel: 'Quelle',
+  rcTruncatedNote: 'Der Bericht war lang — nur der erste Teil wurde analysiert.',
+  rcConfirmButton: 'Entwurfsergebnis ansehen →',
+  rcStartOver: 'Neu starten',
+  rcDraftBadge: 'KI-Entwurf · von Ihnen geprüft',
+  rcSavePrompt: 'Entwurf speichern, um einen teilbaren Link zu erhalten.',
+  rcSaveLink: 'Speichern & Link erhalten',
+  rcSaving: 'Wird gespeichert…',
+  rcLinkSaved: 'Gespeichert — Link',
 }
 
 export const STRINGS = { en, de }
