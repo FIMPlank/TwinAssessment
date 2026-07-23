@@ -24,6 +24,20 @@
 <meta name="twitter:description" content="Verorten Sie Ihre Organisation auf dem Weg zur Twin Transformation — ein kostenloses, forschungsbasiertes Self-Assessment. Ohne Registrierung.">
 <meta name="twitter:image" content="https://fimplank.github.io/twinassessment/og-image.png">
 <meta name="theme-color" content="#0A1120">
+<script>
+  // Anti-flash: set data-theme before first paint so the CSS
+  // [data-theme="..."] rules (see :root tokens below) apply immediately,
+  // instead of the page flashing the dark default then repainting light.
+  (function(){
+    try{
+      var stored = localStorage.getItem('twinclimb_theme');
+      var theme = stored === 'light' || stored === 'dark' ? stored :
+        ((window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark');
+      document.documentElement.setAttribute('data-theme', theme);
+      document.documentElement.style.colorScheme = theme;
+    }catch(e){}
+  })();
+</script>
 <style>
   /* Self-hosted fonts (no third-party CDN) — same families the assessment
      app uses. Latin only: German umlauts/ß live in the Latin-1 range these
@@ -45,7 +59,18 @@
      sustainability transformation, gold reserved for the summit / premium
      highlights only. Six capability dimensions are NOT six rainbow hues:
      they sample one continuous gold→teal→cyan sweep, so the "compass"
-     reads as one coherent instrument, not a SaaS feature-icon grid. */
+     reads as one coherent instrument, not a SaaS feature-icon grid.
+
+     Theming: one token set, two value sets. Dark is the unconditional
+     default (:root) so nothing changes for existing visitors/browsers.
+     A plain `@media (prefers-color-scheme:light)` block gives light mode
+     to first-time visitors whose OS prefers it, entirely in CSS — so the
+     page still respects system preference even with JS disabled. Once
+     JS runs (inline anti-flash script in <head>, plus the toggle below),
+     an explicit `data-theme` attribute on <html> is used instead, and
+     [data-theme="dark"/"light"] wins over the media query in BOTH
+     directions because an attribute selector on :root is more specific
+     than a bare :root inside a media query — no !important needed. */
   :root{
     --navy-950:#060910; --navy-900:#0A0F1A; --navy-850:#0D1524; --navy-800:#111B2E; --navy-700:#17233A; --navy-600:#20304C;
     --line:rgba(232,224,204,.12); --line2:rgba(232,224,204,.20);
@@ -54,24 +79,144 @@
     --emerald:#3ED9A6; --emerald-dim:#1F6E58; --emerald-soft:rgba(62,217,166,.14);
     --gold:#E7C167; --gold-dim:#8A6B2E; --gold-soft:rgba(231,193,103,.16);
     --danger:#E28277;
+    --cyan-border:rgba(73,201,238,.18); --emerald-border:rgba(62,217,166,.18); --gold-border:rgba(231,193,103,.3); --gold-border-soft:rgba(231,193,103,.28); --gold-border-strong:rgba(231,193,103,.4); --danger-border:rgba(226,130,119,.35); --summit-node-glow:0 0 14px rgba(231,193,103,.55);
+    --chip-shadow-color:#000000; --chip-shadow-opacity:0.5;
+    --mist-op-1:0.06; --mist-op-2:0.05; --mist-op-3:0.04; --glass-sheen:linear-gradient(180deg,rgba(255,255,255,.05) 0%,rgba(255,255,255,0) 42%); --camp2-glow:drop-shadow(0 0 3px var(--cyan)) drop-shadow(0 0 9px var(--cyan));
     --d0:#E7C167; --d1:#D8BC86; --d2:#8FCBAE; --d3:#57D4B4; --d4:#4BCFC4; --d5:#49C9EE;
     --route-dt:var(--cyan); --route-st:var(--emerald); --route-new:#8A8577; --summit:var(--gold);
+    --shadow-color:rgba(0,0,0,.35);
+    --card-shadow:none;
+    --surface-wash-1:rgba(243,236,220,.035); --surface-wash-2:rgba(243,236,220,.06);
+    --surface-wash-3:rgba(243,236,220,.04); --surface-wash-4:rgba(243,236,220,.03); --surface-wash-5:rgba(243,236,220,.02);
+    --recessed-bg:rgba(6,9,16,.4); --header-solid-bg:rgba(10,15,26,.82); --btn-outline-border:rgba(243,236,220,.28);
+    --snow:#F3ECDC;
+    --sky-1:#060910; --sky-2:#0A0F1A; --sky-3:#0D1524; --camp-back:#0A0F1A;
+    --ridge-a-1:#141F34; --ridge-a-2:#111B2E; --ridge-b-1:#0F1B33; --ridge-b-2:#0D1728;
+    --massif-1:#152238; --massif-2:#101B2E; --massif-3:#0B1220;
+    --fore-1:#0A0F1A; --fore-2:#060910; --fore-line:#1A2A44;
+    --contour-color:#2C6E86; --contour-opacity:.35;
+    --glow-op-1:.20; --glow-op-2:.08;
+    --chip-bg:#101A2C; --chip-bg-summit:#141225; --chip-border:#2C3B54; --chip-label:#7C8AA0; --camp3:#7ED0B8;
+    --cta-bg-1:#060910; --cta-bg-2:#040609; --cta-glow:rgba(231,193,103,.16); --cta-peak-fill:#0D1524;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme:light){
+    :root{
+      --navy-950:#EEE3C7; --navy-900:#FAF6EC; --navy-850:#F3ECDA; --navy-800:#FFFFFF; --navy-700:#EDE6D3; --navy-600:#E7DEC7;
+      --line:rgba(20,33,61,.12); --line2:rgba(20,33,61,.20);
+      --ivory:#14213D; --sub:#3D4F68; --mut:#55677F; --faint:#4F6178; --card:#FFFFFF;
+      --cyan:#0A6E90; --cyan-dim:#2C6E86; --cyan-soft:rgba(73,201,238,.14);
+      --emerald:#0A7350; --emerald-dim:#1F6E58; --emerald-soft:rgba(62,217,166,.14);
+      --gold:#7D5A10; --gold-dim:#8A6B2E; --gold-soft:rgba(231,193,103,.16);
+      --danger:#A33F32;
+      --cyan-border:rgba(10,110,144,.22); --emerald-border:rgba(10,115,80,.22); --gold-border:rgba(125,90,16,.32); --gold-border-soft:rgba(125,90,16,.28); --gold-border-strong:rgba(125,90,16,.38); --danger-border:rgba(163,63,50,.38); --summit-node-glow:0 0 7px rgba(125,90,16,.4);
+      --chip-shadow-color:#14213D; --chip-shadow-opacity:0.12;
+      --mist-op-1:0.02; --mist-op-2:0.016; --mist-op-3:0.012; --glass-sheen:none; --camp2-glow:drop-shadow(0 0 1.5px var(--cyan));
+      --d0:#7D5A10; --d1:#8C7233; --d2:#3E8F6B; --d3:#12886E; --d4:#0F8983; --d5:#0A6E90;
+      --route-dt:var(--cyan); --route-st:var(--emerald); --route-new:#655D4C; --summit:var(--gold);
+      --shadow-color:rgba(20,33,61,.18);
+      --card-shadow:0 1px 2px rgba(20,33,61,.05), 0 10px 28px rgba(20,33,61,.08);
+      --surface-wash-1:rgba(255,255,255,.6); --surface-wash-2:rgba(255,255,255,.85);
+      --surface-wash-3:rgba(20,33,61,.05); --surface-wash-4:rgba(20,33,61,.035); --surface-wash-5:rgba(20,33,61,.02);
+      --recessed-bg:rgba(20,33,61,.05); --header-solid-bg:rgba(250,246,236,.86); --btn-outline-border:rgba(20,33,61,.22);
+      --snow:#FFFFFF;
+      --sky-1:#CFE7F1; --sky-2:#E9F2EE; --sky-3:#F7EFD9; --camp-back:#EDF1EA;
+      --ridge-a-1:#D7E6DC; --ridge-a-2:#CFE0D5; --ridge-b-1:#BFD6C7; --ridge-b-2:#B3CDBB;
+      --massif-1:#8FB39D; --massif-2:#6E9884; --massif-3:#547E6C;
+      --fore-1:#3E6B52; --fore-2:#2C5240; --fore-line:#4A7860;
+      --contour-color:#3D6E5C; --contour-opacity:.45;
+      --glow-op-1:.10; --glow-op-2:.04;
+      --chip-bg:#FFFFFF; --chip-bg-summit:#FFF8E8; --chip-border:#E4DCC8; --chip-label:#5F7288; --camp3:#127F68;
+      --cta-bg-1:#F7F1E0; --cta-bg-2:#FFFFFF; --cta-glow:rgba(154,122,16,.10); --cta-peak-fill:#D9E6DA;
+      color-scheme: light;
+    }
+  }
+  :root[data-theme="dark"]{
+    --navy-950:#060910; --navy-900:#0A0F1A; --navy-850:#0D1524; --navy-800:#111B2E; --navy-700:#17233A; --navy-600:#20304C;
+    --line:rgba(232,224,204,.12); --line2:rgba(232,224,204,.20);
+    --ivory:#F3ECDC; --sub:#BFB6A4; --mut:#8B8577; --faint:#857F6D; --card:#141F34;
+    --cyan:#49C9EE; --cyan-dim:#2C6E86; --cyan-soft:rgba(73,201,238,.14);
+    --emerald:#3ED9A6; --emerald-dim:#1F6E58; --emerald-soft:rgba(62,217,166,.14);
+    --gold:#E7C167; --gold-dim:#8A6B2E; --gold-soft:rgba(231,193,103,.16);
+    --danger:#E28277;
+    --cyan-border:rgba(73,201,238,.18); --emerald-border:rgba(62,217,166,.18); --gold-border:rgba(231,193,103,.3); --gold-border-soft:rgba(231,193,103,.28); --gold-border-strong:rgba(231,193,103,.4); --danger-border:rgba(226,130,119,.35); --summit-node-glow:0 0 14px rgba(231,193,103,.55);
+    --chip-shadow-color:#000000; --chip-shadow-opacity:0.5;
+    --mist-op-1:0.06; --mist-op-2:0.05; --mist-op-3:0.04; --glass-sheen:linear-gradient(180deg,rgba(255,255,255,.05) 0%,rgba(255,255,255,0) 42%); --camp2-glow:drop-shadow(0 0 3px var(--cyan)) drop-shadow(0 0 9px var(--cyan));
+    --d0:#E7C167; --d1:#D8BC86; --d2:#8FCBAE; --d3:#57D4B4; --d4:#4BCFC4; --d5:#49C9EE;
+    --route-dt:var(--cyan); --route-st:var(--emerald); --route-new:#8A8577; --summit:var(--gold);
+    --shadow-color:rgba(0,0,0,.35);
+    --card-shadow:none;
+    --surface-wash-1:rgba(243,236,220,.035); --surface-wash-2:rgba(243,236,220,.06);
+    --surface-wash-3:rgba(243,236,220,.04); --surface-wash-4:rgba(243,236,220,.03); --surface-wash-5:rgba(243,236,220,.02);
+    --recessed-bg:rgba(6,9,16,.4); --header-solid-bg:rgba(10,15,26,.82); --btn-outline-border:rgba(243,236,220,.28);
+    --snow:#F3ECDC;
+    --sky-1:#060910; --sky-2:#0A0F1A; --sky-3:#0D1524; --camp-back:#0A0F1A;
+    --ridge-a-1:#141F34; --ridge-a-2:#111B2E; --ridge-b-1:#0F1B33; --ridge-b-2:#0D1728;
+    --massif-1:#152238; --massif-2:#101B2E; --massif-3:#0B1220;
+    --fore-1:#0A0F1A; --fore-2:#060910; --fore-line:#1A2A44;
+    --contour-color:#2C6E86; --contour-opacity:.35;
+    --glow-op-1:.20; --glow-op-2:.08;
+    --chip-bg:#101A2C; --chip-bg-summit:#141225; --chip-border:#2C3B54; --chip-label:#7C8AA0; --camp3:#7ED0B8;
+    --cta-bg-1:#060910; --cta-bg-2:#040609; --cta-glow:rgba(231,193,103,.16); --cta-peak-fill:#0D1524;
+    color-scheme: dark;
+  }
+  :root[data-theme="light"]{
+    --navy-950:#EEE3C7; --navy-900:#FAF6EC; --navy-850:#F3ECDA; --navy-800:#FFFFFF; --navy-700:#EDE6D3; --navy-600:#E7DEC7;
+    --line:rgba(20,33,61,.12); --line2:rgba(20,33,61,.20);
+    --ivory:#14213D; --sub:#3D4F68; --mut:#55677F; --faint:#4F6178; --card:#FFFFFF;
+    --cyan:#0A6E90; --cyan-dim:#2C6E86; --cyan-soft:rgba(73,201,238,.14);
+    --emerald:#0A7350; --emerald-dim:#1F6E58; --emerald-soft:rgba(62,217,166,.14);
+    --gold:#7D5A10; --gold-dim:#8A6B2E; --gold-soft:rgba(231,193,103,.16);
+    --danger:#A33F32;
+      --cyan-border:rgba(10,110,144,.22); --emerald-border:rgba(10,115,80,.22); --gold-border:rgba(125,90,16,.32); --gold-border-soft:rgba(125,90,16,.28); --gold-border-strong:rgba(125,90,16,.38); --danger-border:rgba(163,63,50,.38); --summit-node-glow:0 0 7px rgba(125,90,16,.4);
+      --chip-shadow-color:#14213D; --chip-shadow-opacity:0.12;
+      --mist-op-1:0.02; --mist-op-2:0.016; --mist-op-3:0.012; --glass-sheen:none; --camp2-glow:drop-shadow(0 0 1.5px var(--cyan));
+    --d0:#7D5A10; --d1:#8C7233; --d2:#3E8F6B; --d3:#12886E; --d4:#0F8983; --d5:#0A6E90;
+    --route-dt:var(--cyan); --route-st:var(--emerald); --route-new:#655D4C; --summit:var(--gold);
+    --shadow-color:rgba(20,33,61,.18);
+    --card-shadow:0 1px 2px rgba(20,33,61,.05), 0 10px 28px rgba(20,33,61,.08);
+    --surface-wash-1:rgba(255,255,255,.6); --surface-wash-2:rgba(255,255,255,.85);
+    --surface-wash-3:rgba(20,33,61,.05); --surface-wash-4:rgba(20,33,61,.035); --surface-wash-5:rgba(20,33,61,.02);
+    --recessed-bg:rgba(20,33,61,.05); --header-solid-bg:rgba(250,246,236,.86); --btn-outline-border:rgba(20,33,61,.22);
+    --snow:#FFFFFF;
+    --sky-1:#CFE7F1; --sky-2:#E9F2EE; --sky-3:#F7EFD9; --camp-back:#EDF1EA;
+    --ridge-a-1:#D7E6DC; --ridge-a-2:#CFE0D5; --ridge-b-1:#BFD6C7; --ridge-b-2:#B3CDBB;
+    --massif-1:#8FB39D; --massif-2:#6E9884; --massif-3:#547E6C;
+    --fore-1:#3E6B52; --fore-2:#2C5240; --fore-line:#4A7860;
+    --contour-color:#3D6E5C; --contour-opacity:.45;
+    --glow-op-1:.10; --glow-op-2:.04;
+    --chip-bg:#FFFFFF; --chip-bg-summit:#FFF8E8; --chip-border:#E4DCC8; --chip-label:#5F7288; --camp3:#127F68;
+    --cta-bg-1:#F7F1E0; --cta-bg-2:#FFFFFF; --cta-glow:rgba(154,122,16,.10); --cta-peak-fill:#D9E6DA;
+    color-scheme: light;
+  }
+  :root{
     --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
     --sans:'IBM Plex Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
     --head:'Space Grotesk','IBM Plex Sans',system-ui,sans-serif;
     --display:'Iowan Old Style','Palatino Linotype','URW Palladio',ui-serif,Georgia,serif;
     --maxw:1200px; --maxw-hero:1360px; --r-lg:18px; --r-md:14px; --r-sm:10px;
   }
+  /* theme-color meta (mobile browser chrome) is kept in sync from JS since
+     a <meta> tag can't read a CSS custom property; see the toggle script. */
   *{box-sizing:border-box;margin:0;padding:0;}
   html{scroll-behavior:smooth;}
   @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto;} }
+  /* theme switch = environment change, not a hard cut: one centralized rule
+     cross-fades every token-driven color/surface (backgrounds, borders,
+     text, SVG fill/stroke/stops, shadows) over ~500ms whenever data-theme
+     flips — rather than hand-animating each component individually. Any
+     element that already declares its own (faster, hover-driven) transition
+     list simply keeps that instead, by ordinary cascade specificity. */
+  @media (prefers-reduced-motion:no-preference){
+    *,*::before,*::after{transition:background-color .5s ease,border-color .5s ease,color .5s ease,box-shadow .5s ease,fill .5s ease,stroke .5s ease,stop-color .5s ease,stop-opacity .5s ease,opacity .35s ease;}
+  }
   body{background:var(--navy-900);color:var(--ivory);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.6;}
   .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;}
   a{color:var(--cyan);}
   h1,h2,h3{font-family:var(--display);letter-spacing:-0.01em;line-height:1.12;font-weight:600;color:var(--ivory);}
   .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--cyan);}
   .btn{display:inline-flex;align-items:center;gap:9px;font-family:var(--head);font-weight:600;font-size:15px;text-decoration:none;border-radius:9px;padding:14px 26px;border:1px solid transparent;transition:transform .12s,box-shadow .12s,background .12s,color .12s,border-color .12s;cursor:pointer;}
-  .btn-primary{background:linear-gradient(120deg,var(--cyan) 0%,var(--emerald) 100%);color:#06251D;box-shadow:0 1px 2px rgba(0,0,0,.2);}
+  .btn-primary{background:linear-gradient(120deg,var(--cyan) 0%,var(--emerald) 100%);color:#06251D;box-shadow:0 1px 2px var(--shadow-color);}
   .btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(62,217,166,.28), 0 4px 10px rgba(73,201,238,.22);}
 
   /* hero CTA: a small light travels the border, drawing the eye to the one
@@ -91,7 +236,7 @@
   @media (prefers-reduced-motion:reduce){ .beam-wrap::before{animation:none !important;} }
   .btn-ghost{background:transparent;color:var(--ivory);border:1px solid var(--line2);}
   .btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);}
-  .btn-on-dark{background:transparent;color:var(--ivory);border:1px solid rgba(243,236,220,.28);}
+  .btn-on-dark{background:transparent;color:var(--ivory);border:1px solid var(--btn-outline-border);}
   .btn-on-dark:hover{color:var(--gold);border-color:var(--gold);}
   .link-sm{font-size:14px;color:var(--sub);text-decoration:none;border-bottom:1px solid var(--line2);padding-bottom:1px;transition:color .12s,border-color .12s;}
   .link-sm:hover{color:var(--ivory);border-color:var(--cyan);}
@@ -99,8 +244,8 @@
 
   /* header */
   header.nav{position:sticky;top:0;z-index:40;background:transparent;border-bottom:1px solid transparent;transition:background .2s ease,border-color .2s ease,backdrop-filter .2s ease;}
-  header.nav.solid{background:rgba(10,15,26,.82);backdrop-filter:saturate(160%) blur(14px);border-bottom-color:var(--line);}
-  .navbar{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 0;}
+  header.nav.solid{background:var(--header-solid-bg);backdrop-filter:saturate(160%) blur(14px);border-bottom-color:var(--line);}
+  .navbar{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-top:16px;padding-bottom:16px;}
   .brand{display:flex;align-items:baseline;gap:11px;text-decoration:none;color:var(--ivory);flex:none;}
   .brand b{font-family:var(--head);font-weight:700;font-size:18px;letter-spacing:0.14em;}
   .brand span{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--faint);text-transform:uppercase;}
@@ -116,6 +261,19 @@
   .nav-cta{font-size:14px;padding:10px 18px;}
   .menu-btn{display:flex;flex:none;width:38px;height:38px;border-radius:9px;border:1px solid var(--line2);background:var(--navy-800);align-items:center;justify-content:center;cursor:pointer;}
   .menu-btn svg{width:18px;height:18px;}
+  .theme-toggle{display:flex;flex:none;width:38px;height:38px;border-radius:9px;border:1px solid var(--line2);background:var(--navy-800);align-items:center;justify-content:center;cursor:pointer;color:var(--ivory);transition:border-color .12s,color .12s;}
+  .theme-toggle:hover{border-color:var(--gold);color:var(--gold);}
+  .theme-toggle svg{width:18px;height:18px;}
+  .theme-toggle .icon-moon{display:block;}
+  .theme-toggle .icon-sun{display:none;}
+  @media (prefers-color-scheme:light){
+    .theme-toggle .icon-moon{display:none;}
+    .theme-toggle .icon-sun{display:block;}
+  }
+  :root[data-theme="dark"] .theme-toggle .icon-moon{display:block;}
+  :root[data-theme="dark"] .theme-toggle .icon-sun{display:none;}
+  :root[data-theme="light"] .theme-toggle .icon-moon{display:none;}
+  :root[data-theme="light"] .theme-toggle .icon-sun{display:block;}
   .mobile-menu{display:none;}
   .mobile-menu.open{display:block;border-top:1px solid var(--line);background:var(--navy-950);}
   .mobile-menu .wrap{padding:16px 24px 22px;display:flex;flex-direction:column;gap:14px;}
@@ -139,10 +297,13 @@
   /* glass: translucent panels over the navy ground instead of white cards —
      degrades gracefully to a plain tinted panel where backdrop-filter isn't
      supported, so no browser sees a broken or invisible surface. */
-  .glass{background:rgba(243,236,220,.035);border:1px solid var(--line);border-radius:var(--r-md);
+  .glass{position:relative;background:var(--surface-wash-1);border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--card-shadow);
     backdrop-filter:blur(18px) saturate(140%); -webkit-backdrop-filter:blur(18px) saturate(140%);
-    transition:transform .18s ease,border-color .18s ease,background .18s ease;}
-  .glass.interactive:hover,.glass.interactive:focus-within{transform:translateY(-3px);border-color:var(--cyan-dim);background:rgba(243,236,220,.06);}
+    transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;}
+  .glass.interactive:hover,.glass.interactive:focus-within{transform:translateY(-3px);border-color:var(--cyan-dim);background:var(--surface-wash-2);}
+  /* dark: a faint top sheen reads as brushed metal; light: none — the soft
+     box-shadow (--card-shadow) already gives the panel a paper-like lift. */
+  .glass::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;background:var(--glass-sheen);}
 
   /* scroll reveal: content is visible by default (no JS / reduced-motion = no animation, no content loss) */
   body.reveal-ready [data-reveal]{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease;}
@@ -217,22 +378,47 @@
 
   /* ============================= results preview (dashboard mock) ============================= */
   .dash{padding:36px;border-radius:var(--r-lg);position:relative;overflow:hidden;}
-  .dash-tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);background:var(--gold-soft);border:1px solid rgba(231,193,103,.3);border-radius:20px;padding:6px 13px;}
-  .dash-grid{display:grid;grid-template-columns:1.1fr 1.3fr 1.1fr;gap:32px;margin-top:28px;align-items:start;}
-  .dash-badge{display:inline-flex;align-items:baseline;gap:8px;font-family:var(--display);font-weight:600;font-size:22px;color:var(--ivory);}
+  .dash-tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);background:var(--gold-soft);border:1px solid var(--gold-border);border-radius:20px;padding:6px 13px;}
+  .dash-grid2{display:grid;grid-template-columns:1.05fr .95fr;gap:40px;margin-top:26px;align-items:center;}
+  .dash-radar-col{min-width:0;}
+  .dash-radar{display:block;max-width:380px;margin:0 auto;}
+  .dash-insight-col{display:flex;flex-direction:column;gap:16px;min-width:0;}
+  .dash-stage-row{display:flex;flex-direction:column;}
+  .dash-badge{display:inline-flex;align-items:baseline;gap:8px;font-family:var(--display);font-weight:600;font-size:22px;color:var(--ivory);margin-top:8px;}
   .dash-badge .stagenum{color:var(--gold);font-size:30px;}
-  .dash-sub{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--faint);text-transform:uppercase;margin-top:10px;}
-  .dash-pw{display:inline-flex;align-items:center;gap:7px;margin-top:14px;font-family:var(--head);font-weight:600;font-size:13.5px;color:var(--cyan);}
+  .dash-sub{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--faint);text-transform:uppercase;}
+  .dash-pw{display:inline-flex;align-items:center;gap:7px;margin-top:12px;font-family:var(--head);font-weight:600;font-size:13.5px;color:var(--cyan);}
   .dash-pw i{width:8px;height:8px;border-radius:50%;background:var(--cyan);display:inline-block;}
-  .dash-mini{margin-top:22px;}
-  .dash-callout{padding:16px 18px;border-radius:var(--r-sm);margin-bottom:14px;border:1px solid var(--line);background:rgba(243,236,220,.03);}
+  .dash-route-mini{margin-top:10px;display:block;}
+  .camp2-dot{filter:var(--camp2-glow);}
+  .dash-callout{padding:16px 18px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--surface-wash-4);}
   .dash-callout .k{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);}
   .dash-callout .v{font-family:var(--head);font-weight:600;font-size:14.5px;color:var(--ivory);margin-top:7px;line-height:1.4;}
-  .dash-callout.bottleneck{border-color:rgba(226,130,119,.35);}
-  .dash-callout.bottleneck .v{color:var(--danger);}
-  .dash-callout.next .v{color:var(--emerald);}
-  .dash-foot{margin-top:8px;font-size:12px;color:var(--faint);border-top:1px solid var(--line);padding-top:16px;}
-  @media (max-width:960px){ .dash-grid{grid-template-columns:1fr;gap:26px;} }
+  .dash-callout.bottleneck{border-left-width:3px;border-left-color:var(--gold);}
+  .dash-callout.bottleneck .k{color:var(--gold);}
+  .dash-card.leverage{padding:16px 18px;border-radius:var(--r-sm);border:1px solid var(--gold-border);background:var(--gold-soft);}
+  .dash-card.leverage .lev-k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);}
+  .dash-card.leverage .lev-v{font-family:var(--display);font-weight:600;font-size:15.5px;color:var(--ivory);margin-top:8px;line-height:1.4;}
+
+  /* staged reveal: draw chart -> stage/pathway -> bottleneck -> leverage.
+     Hidden state only applies once JS confirms IntersectionObserver + no
+     reduced-motion (body.reveal-ready, same gate [data-reveal] uses above) —
+     so no-JS / reduced-motion visitors see the finished panel immediately. */
+  body.reveal-ready .dash .radar-grid-fade,body.reveal-ready .dash .radar-fill,body.reveal-ready .dash .radar-dots{opacity:0;}
+  body.reveal-ready .dash .radar-profile{stroke-dasharray:255;stroke-dashoffset:255;}
+  body.reveal-ready .dash .dash-stage-row,body.reveal-ready .dash .dash-callout.bottleneck,body.reveal-ready .dash .dash-card.leverage{opacity:0;transform:translateY(10px);}
+  .dash.is-visible .radar-grid-fade{animation:seqFade .5s ease forwards;animation-delay:.05s;}
+  .dash.is-visible .radar-profile{animation:radarDraw .8s ease forwards;animation-delay:.4s;}
+  .dash.is-visible .radar-fill{animation:seqFade .5s ease forwards;animation-delay:1.15s;}
+  .dash.is-visible .radar-dots{animation:seqFade .4s ease forwards;animation-delay:1.3s;}
+  .dash.is-visible .dash-stage-row{animation:seqUp .5s ease forwards;animation-delay:1.6s;}
+  .dash.is-visible .dash-callout.bottleneck{animation:seqUpGlow .6s ease forwards;animation-delay:2.1s;}
+  .dash.is-visible .dash-card.leverage{animation:seqUp .5s ease forwards;animation-delay:2.6s;}
+  @keyframes seqFade{from{opacity:0;}to{opacity:1;}}
+  @keyframes radarDraw{to{stroke-dashoffset:0;}}
+  @keyframes seqUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+  @keyframes seqUpGlow{0%{opacity:0;transform:translateY(10px);box-shadow:0 0 0 0 var(--gold-soft);}55%{opacity:1;transform:none;}70%{opacity:1;transform:none;box-shadow:0 0 0 6px var(--gold-soft);}100%{opacity:1;transform:none;box-shadow:0 0 0 0 rgba(0,0,0,0);}}
+  @media (max-width:900px){ .dash-grid2{grid-template-columns:1fr;gap:26px;} .dash-radar{max-width:320px;} }
 
   /* ============================= trust / credibility ============================= */
   .trust-row{display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap;margin-top:20px;}
@@ -261,7 +447,7 @@
   details.abstract[open] summary .chev{transform:rotate(90deg);}
   details.abstract summary .lang-tag{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.06em;}
   details.abstract p{font-size:14px;color:var(--sub);line-height:1.7;margin-top:14px;}
-  .cite{margin-top:22px;background:rgba(6,9,16,.4);border:1px solid var(--line);border-radius:11px;padding:16px 16px 14px;}
+  .cite{margin-top:22px;background:var(--recessed-bg);border:1px solid var(--line);border-radius:11px;padding:16px 16px 14px;}
   .cite .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--faint);text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;gap:10px;}
   .cite .txt{font-size:13px;color:var(--sub);line-height:1.6;margin-top:9px;font-family:var(--mono);}
   .copy{font-family:var(--head);font-weight:600;font-size:11.5px;color:var(--ivory);background:transparent;border:1px solid var(--line2);border-radius:6px;padding:5px 11px;cursor:pointer;transition:all .12s;}
@@ -292,12 +478,12 @@
   .astage:nth-child(1) .anode{border-color:var(--faint);}
   .astage:nth-child(2) .anode{border-color:var(--cyan);}
   .astage:nth-child(3) .anode{border-color:var(--emerald);}
-  .astage:nth-child(4) .anode{background:var(--gold);border-color:var(--gold);box-shadow:0 0 14px rgba(231,193,103,.55);}
+  .astage:nth-child(4) .anode{background:var(--gold);border-color:var(--gold);box-shadow:var(--summit-node-glow);}
   .acard{padding:22px 20px;display:flex;flex-direction:column;min-height:225px;transition:background .25s ease,border-color .25s ease;}
-  .astage:nth-child(1) .acard{background:rgba(243,236,220,.02);}
-  .astage:nth-child(2) .acard{background:var(--cyan-soft);border-color:rgba(73,201,238,.18);}
-  .astage:nth-child(3) .acard{background:var(--emerald-soft);border-color:rgba(62,217,166,.18);}
-  .astage:nth-child(4) .acard{background:var(--gold-soft);border-color:rgba(231,193,103,.3);}
+  .astage:nth-child(1) .acard{background:var(--surface-wash-5);}
+  .astage:nth-child(2) .acard{background:var(--cyan-soft);border-color:var(--cyan-border);}
+  .astage:nth-child(3) .acard{background:var(--emerald-soft);border-color:var(--emerald-border);}
+  .astage:nth-child(4) .acard{background:var(--gold-soft);border-color:var(--gold-border);}
   .acard:hover,.acard:focus-within{transform:translateY(-3px);}
   .astage .n{font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.1em;}
   .astage .t{font-family:var(--display);font-weight:600;margin-top:6px;font-size:19px;}
@@ -327,7 +513,7 @@
   .compass-node:focus-visible{outline:none;}
   .compass-list{display:flex;flex-direction:column;gap:2px;}
   .cdim{padding:16px 18px;border-radius:var(--r-sm);cursor:pointer;transition:background .15s;border:1px solid transparent;}
-  .cdim:hover,.cdim:focus-within,.cdim.active{background:rgba(243,236,220,.04);border-color:var(--line);}
+  .cdim:hover,.cdim:focus-within,.cdim.active{background:var(--surface-wash-3);border-color:var(--line);}
   .cdim .row{display:flex;align-items:center;gap:12px;}
   .cdim .sw{width:10px;height:10px;border-radius:50%;flex:none;}
   .cdim .nm{font-family:var(--head);font-weight:600;font-size:15px;}
@@ -344,7 +530,7 @@
   .pw .pattern{font-size:12px;color:var(--mut);margin-top:14px;padding-top:14px;border-top:1px solid var(--line);}
   .pw .pattern b{color:var(--sub);font-weight:600;}
   .pw-route{margin-top:16px;display:block;}
-  .pw-highlight{margin-top:20px;padding:20px 22px;background:var(--gold-soft);border:1px solid rgba(231,193,103,.28);border-radius:var(--r-sm);font-size:13.5px;color:var(--ivory);line-height:1.65;}
+  .pw-highlight{margin-top:20px;padding:20px 22px;background:var(--gold-soft);border:1px solid var(--gold-border-soft);border-radius:var(--r-sm);font-size:13.5px;color:var(--ivory);line-height:1.65;}
   .pw-highlight b{font-weight:700;color:var(--gold);}
   @media (max-width:820px){ .pathways{grid-template-columns:1fr;} }
 
@@ -353,7 +539,7 @@
   .steps-row{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;position:relative;}
   .steps-row::before{content:'';position:absolute;top:28px;left:5%;right:5%;height:1px;background:var(--line);z-index:0;}
   .step{position:relative;z-index:1;}
-  .step .num{font-family:var(--display);font-weight:600;font-size:clamp(30px,4vw,42px);color:var(--line2);line-height:1;background:var(--navy-900);display:inline-block;padding-right:8px;}
+  .step .num{font-family:var(--display);font-weight:600;font-size:clamp(30px,4vw,42px);color:var(--line2);line-height:1;background:var(--navy-850);display:inline-block;padding-right:8px;}
   .step.on .num{color:var(--cyan);}
   .step h3{font-size:15.5px;margin:14px 0 0;font-family:var(--head);font-weight:600;}
   .step p{font-size:13px;color:var(--mut);margin-top:8px;line-height:1.6;}
@@ -362,7 +548,7 @@
   @media (max-width:520px){ .steps-row{grid-template-columns:1fr;} }
 
   /* ============================= closing summit CTA ============================= */
-  .cta-summit{background:radial-gradient(120% 100% at 50% 120%,rgba(231,193,103,.16) 0%,rgba(231,193,103,0) 55%),linear-gradient(180deg,var(--navy-950) 0%,#040609 100%);text-align:center;overflow:hidden;position:relative;}
+  .cta-summit{background:radial-gradient(120% 100% at 50% 120%,var(--cta-glow) 0%,rgba(231,193,103,0) 55%),linear-gradient(180deg,var(--cta-bg-1) 0%,var(--cta-bg-2) 100%);text-align:center;overflow:hidden;position:relative;}
   .cta-summit .eyebrow{color:var(--gold);}
   .cta-summit h2{font-size:clamp(30px,4.4vw,48px);margin:18px auto 0;max-width:22ch;}
   .cta-summit p.lead{color:var(--sub);max-width:56ch;margin:18px auto 0;font-size:16.5px;line-height:1.65;}
@@ -429,12 +615,16 @@
       <a href="#research">Forschung</a>
     </nav>
     <div class="nav-right">
+      <button type="button" class="theme-toggle" id="themeToggle" aria-pressed="false" aria-label="Zu heller Darstellung wechseln">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4.3" stroke="currentColor" stroke-width="1.7"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.1 5.1l2.1 2.1M16.8 16.8l2.1 2.1M18.9 5.1l-2.1 2.1M7.2 16.8l-2.1 2.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 14.3A8.1 8.1 0 0 1 9.7 4 6.6 6.6 0 1 0 20 14.3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+      </button>
       <div class="lang" aria-label="Language / Sprache">
         <a href="index.html" data-setlang="en">EN</a><span class="sep">|</span><a class="active" aria-current="true">DE</a>
       </div>
       <a class="btn btn-primary nav-cta" href="assessment.de.html">Assessment starten&nbsp;→</a>
       <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mobileMenu" aria-label="Menü öffnen">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="#F3ECDC" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="var(--ivory)" stroke-width="1.8" stroke-linecap="round"/></svg>
       </button>
     </div>
   </div>
@@ -456,18 +646,18 @@
        role="img" aria-label="Illustration eines nächtlichen Bergaufstiegs: Vier Lager führen den Hang hinauf — Bewusstsein, Entwicklung, Umsetzung und der goldbeleuchtete Gipfel, True Twin Transformer. Drei Wege — ein cyanfarbener Weg für Experten der digitalen Transformation, ein smaragdgrüner Weg für Experten der Nachhaltigkeitstransformation und ein neutraler Weg für Neueinsteiger — starten im Talgrund und treffen sich bei Lager 2, von dort führt ein gemeinsamer Weg, der sich von Cyan und Smaragdgrün zu Gold erwärmt, zum Gipfel.">
     <defs>
       <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#060910"/><stop offset="0.55" stop-color="#0A0F1A"/><stop offset="1" stop-color="#0D1524"/>
+        <stop offset="0" stop-color="var(--sky-1)"/><stop offset="0.55" stop-color="var(--sky-2)"/><stop offset="1" stop-color="var(--sky-3)"/>
       </linearGradient>
       <radialGradient id="dawn" cx="0.5" cy="0.5" r="0.5">
-        <stop offset="0" stop-color="#E7C167" stop-opacity="0.20"/><stop offset="0.45" stop-color="#E7C167" stop-opacity="0.08"/><stop offset="1" stop-color="#E7C167" stop-opacity="0"/>
+        <stop offset="0" stop-color="var(--gold)" stop-opacity="var(--glow-op-1)"/><stop offset="0.45" stop-color="var(--gold)" stop-opacity="var(--glow-op-2)"/><stop offset="1" stop-color="var(--gold)" stop-opacity="0"/>
       </radialGradient>
-      <linearGradient id="ridgeA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#141F34"/><stop offset="1" stop-color="#111B2E"/></linearGradient>
-      <linearGradient id="ridgeB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0F1B33"/><stop offset="1" stop-color="#0D1728"/></linearGradient>
-      <linearGradient id="massif" x1="0.15" y1="0" x2="0.85" y2="1"><stop offset="0" stop-color="#152238"/><stop offset="0.5" stop-color="#101B2E"/><stop offset="1" stop-color="#0B1220"/></linearGradient>
-      <linearGradient id="massifLit" x1="0" y1="0" x2="1" y2="0.5"><stop offset="0" stop-color="#49C9EE" stop-opacity="0"/><stop offset="1" stop-color="#3ED9A6" stop-opacity="0.22"/></linearGradient>
-      <linearGradient id="foreSolid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0A0F1A"/><stop offset="1" stop-color="#060910"/></linearGradient>
-      <linearGradient id="sharedRoute" x1="0" y1="1" x2="0.4" y2="0"><stop offset="0" stop-color="#49C9EE"/><stop offset="0.55" stop-color="#3ED9A6"/><stop offset="1" stop-color="#E7C167"/></linearGradient>
-      <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.5"/></filter>
+      <linearGradient id="ridgeA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--ridge-a-1)"/><stop offset="1" stop-color="var(--ridge-a-2)"/></linearGradient>
+      <linearGradient id="ridgeB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--ridge-b-1)"/><stop offset="1" stop-color="var(--ridge-b-2)"/></linearGradient>
+      <linearGradient id="massif" x1="0.15" y1="0" x2="0.85" y2="1"><stop offset="0" stop-color="var(--massif-1)"/><stop offset="0.5" stop-color="var(--massif-2)"/><stop offset="1" stop-color="var(--massif-3)"/></linearGradient>
+      <linearGradient id="massifLit" x1="0" y1="0" x2="1" y2="0.5"><stop offset="0" stop-color="var(--cyan)" stop-opacity="0"/><stop offset="1" stop-color="var(--emerald)" stop-opacity="0.22"/></linearGradient>
+      <linearGradient id="foreSolid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--fore-1)"/><stop offset="1" stop-color="var(--fore-2)"/></linearGradient>
+      <linearGradient id="sharedRoute" x1="0" y1="1" x2="0.4" y2="0"><stop offset="0" stop-color="var(--cyan)"/><stop offset="0.55" stop-color="var(--emerald)"/><stop offset="1" stop-color="var(--gold)"/></linearGradient>
+      <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="var(--chip-shadow-color)" flood-opacity="var(--chip-shadow-opacity)"/></filter>
       <filter id="blur8" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="14"/></filter>
     </defs>
 
@@ -489,7 +679,7 @@
     </g>
 
     <!-- zurückhaltende topografische Höhenlinien, langsam driftend -->
-    <g class="contours parallax-layer" data-depth="6" opacity="0.35" stroke="#2C6E86" stroke-width="1" fill="none">
+    <g class="contours parallax-layer" data-depth="6" opacity="var(--contour-opacity)" stroke="var(--contour-color)" stroke-width="1" fill="none">
       <path d="M0,420 C 220,408 420,414 600,398 C 780,382 900,352 1200,340"/>
       <path d="M0,448 C 240,436 440,440 640,424 C 820,408 960,384 1200,372"/>
     </g>
@@ -501,20 +691,20 @@
 
     <!-- Nebel über den unteren Hängen -->
     <g class="mist" aria-hidden="true">
-      <ellipse class="mist-shape" style="--dx:60px;--dur:46s;--delay:0s" cx="260" cy="470" rx="220" ry="46" fill="#49C9EE" opacity="0.06" filter="url(#blur8)"/>
-      <ellipse class="mist-shape" style="--dx:-50px;--dur:54s;--delay:3s" cx="760" cy="520" rx="260" ry="52" fill="#3ED9A6" opacity="0.05" filter="url(#blur8)"/>
-      <ellipse class="mist-shape" style="--dx:40px;--dur:60s;--delay:6s" cx="1000" cy="440" rx="200" ry="40" fill="#F3ECDC" opacity="0.04" filter="url(#blur8)"/>
+      <ellipse class="mist-shape" style="--dx:60px;--dur:46s;--delay:0s" cx="260" cy="470" rx="220" ry="46" fill="var(--cyan)" opacity="var(--mist-op-1)" filter="url(#blur8)"/>
+      <ellipse class="mist-shape" style="--dx:-50px;--dur:54s;--delay:3s" cx="760" cy="520" rx="260" ry="52" fill="var(--emerald)" opacity="var(--mist-op-2)" filter="url(#blur8)"/>
+      <ellipse class="mist-shape" style="--dx:40px;--dur:60s;--delay:6s" cx="1000" cy="440" rx="200" ry="40" fill="var(--snow)" opacity="var(--mist-op-3)" filter="url(#blur8)"/>
     </g>
 
     <g class="parallax-layer" data-depth="14">
       <path d="M360,640 C 432,556 476,500 560,440 C 650,386 706,330 762,262 C 800,216 820,176 834,150 C 852,182 880,240 920,306 C 974,394 1046,438 1132,474 C 1164,488 1184,494 1200,500 L1200,640 L360,640 Z" fill="url(#massif)"/>
       <path d="M834,150 C 852,182 880,240 920,306 C 974,394 1046,438 1132,474 C 1164,488 1184,494 1200,500 L1200,640 L560,640 C 700,560 760,420 834,150 Z" fill="url(#massifLit)"/>
-      <path d="M806,208 C 816,190 826,168 834,150 C 844,172 856,196 866,220 C 856,214 848,224 838,220 C 828,226 818,216 806,208 Z" fill="#F3ECDC" opacity="0.85"/>
-      <path d="M792,236 C 800,232 808,240 816,236 C 812,248 802,250 794,246 Z" fill="#F3ECDC" opacity="0.5"/>
+      <path d="M806,208 C 816,190 826,168 834,150 C 844,172 856,196 866,220 C 856,214 848,224 838,220 C 828,226 818,216 806,208 Z" fill="var(--snow)" opacity="0.85"/>
+      <path d="M792,236 C 800,232 808,240 816,236 C 812,248 802,250 794,246 Z" fill="var(--snow)" opacity="0.5"/>
     </g>
 
     <path d="M0,616 C 180,610 340,614 500,606 C 660,598 800,566 960,560 C 1060,557 1140,560 1200,560 L1200,640 L0,640 Z" fill="url(#foreSolid)"/>
-    <path d="M0,630 C 220,624 440,632 660,626 C 860,621 1040,630 1200,626" stroke="#1A2A44" stroke-width="1" fill="none" opacity="0.6"/>
+    <path d="M0,630 C 220,624 440,632 660,626 C 860,621 1040,630 1200,626" stroke="var(--fore-line)" stroke-width="1" fill="none" opacity="0.6"/>
 
     <!-- drei Wege vom Talgrund, treffen sich bei Lager 2, dann ein gemeinsamer Weg, der sich zu Gold erwärmt -->
     <path class="route-draw" data-route="new" style="--len:230" d="M612,604 C 618,566 606,516 610,486 C 616,456 645,428 662,410" stroke="var(--route-new)" stroke-width="3.2" fill="none" stroke-linecap="round" opacity="0.85"/>
@@ -532,37 +722,37 @@
       <circle class="dim-tick" style="animation-delay:2.75s" cx="806" cy="215" r="3.2" fill="var(--d5)"/>
     </g>
 
-    <g class="camp" data-owner-routes="new" style="animation-delay:1.3s;--camp-color:var(--route-new)"><circle cx="612" cy="604" r="5" fill="#0A0F1A" filter="url(#soft)"/><circle cx="612" cy="604" r="2.9" fill="var(--route-new)"/></g>
-    <g class="camp" data-owner-routes="dt" style="animation-delay:1.3s;--camp-color:var(--cyan)"><circle cx="470" cy="600" r="5" fill="#0A0F1A" filter="url(#soft)"/><circle cx="470" cy="600" r="2.9" fill="var(--cyan)"/></g>
-    <g class="camp" data-owner-routes="st" style="animation-delay:1.3s;--camp-color:var(--emerald)"><circle cx="764" cy="566" r="5" fill="#0A0F1A" filter="url(#soft)"/><circle cx="764" cy="566" r="2.9" fill="var(--emerald)"/></g>
+    <g class="camp" data-owner-routes="new" style="animation-delay:1.3s;--camp-color:var(--route-new)"><circle cx="612" cy="604" r="5" fill="var(--camp-back)" filter="url(#soft)"/><circle cx="612" cy="604" r="2.9" fill="var(--route-new)"/></g>
+    <g class="camp" data-owner-routes="dt" style="animation-delay:1.3s;--camp-color:var(--cyan)"><circle cx="470" cy="600" r="5" fill="var(--camp-back)" filter="url(#soft)"/><circle cx="470" cy="600" r="2.9" fill="var(--cyan)"/></g>
+    <g class="camp" data-owner-routes="st" style="animation-delay:1.3s;--camp-color:var(--emerald)"><circle cx="764" cy="566" r="5" fill="var(--camp-back)" filter="url(#soft)"/><circle cx="764" cy="566" r="2.9" fill="var(--emerald)"/></g>
 
-    <g class="camp" data-camp-id="1" data-owner-routes="new" style="animation-delay:1.6s;--camp-color:var(--route-new)"><circle cx="610" cy="486" r="6.5" fill="#0A0F1A" filter="url(#soft)"/><circle cx="610" cy="486" r="4" fill="var(--route-new)"/></g>
-    <g class="camp" data-camp-id="2" data-owner-routes="new dt st" style="animation-delay:1.85s;--camp-color:var(--emerald)"><circle cx="662" cy="410" r="8.5" fill="#0A0F1A" filter="url(#soft)"/><circle cx="662" cy="410" r="5.4" fill="var(--emerald)"/><circle cx="662" cy="410" r="2.1" fill="#0A0F1A"/></g>
-    <g class="camp" data-camp-id="3" data-owner-routes="new dt st" style="animation-delay:2.1s;--camp-color:#7ED0B8"><circle cx="748" cy="300" r="6.5" fill="#0A0F1A" filter="url(#soft)"/><circle cx="748" cy="300" r="4" fill="#7ED0B8"/></g>
+    <g class="camp" data-camp-id="1" data-owner-routes="new" style="animation-delay:1.6s;--camp-color:var(--route-new)"><circle cx="610" cy="486" r="6.5" fill="var(--camp-back)" filter="url(#soft)"/><circle cx="610" cy="486" r="4" fill="var(--route-new)"/></g>
+    <g class="camp" data-camp-id="2" data-owner-routes="new dt st" style="animation-delay:1.85s;--camp-color:var(--emerald)"><circle cx="662" cy="410" r="8.5" fill="var(--camp-back)" filter="url(#soft)"/><circle cx="662" cy="410" r="5.4" fill="var(--emerald)"/><circle cx="662" cy="410" r="2.1" fill="var(--camp-back)"/></g>
+    <g class="camp" data-camp-id="3" data-owner-routes="new dt st" style="animation-delay:2.1s;--camp-color:var(--camp3)"><circle cx="748" cy="300" r="6.5" fill="var(--camp-back)" filter="url(#soft)"/><circle cx="748" cy="300" r="4" fill="var(--camp3)"/></g>
     <g class="camp summit-pulse" data-camp-id="4" data-owner-routes="new dt st" style="animation-delay:2.35s;--camp-color:var(--gold)">
-      <circle cx="836" cy="168" r="9" fill="#0A0F1A" filter="url(#soft)"/><circle cx="836" cy="168" r="5.6" fill="var(--gold)"/>
-      <path d="M836,160 L836,133" stroke="#F3ECDC" stroke-width="2.4"/><path d="M836,133 L864,141 L836,150 Z" fill="var(--gold)"/>
+      <circle cx="836" cy="168" r="9" fill="var(--camp-back)" filter="url(#soft)"/><circle cx="836" cy="168" r="5.6" fill="var(--gold)"/>
+      <path d="M836,160 L836,133" stroke="var(--snow)" stroke-width="2.4"/><path d="M836,133 L864,141 L836,150 Z" fill="var(--gold)"/>
     </g>
 
     <g class="camp-chip" data-camp-id="1" style="animation-delay:1.7s">
-      <rect x="622" y="470" width="118" height="34" rx="7" fill="#101A2C" fill-opacity="0.88" stroke="#2C3B54" stroke-width="1" filter="url(#soft)"/>
-      <text x="633" y="484" font-family="'IBM Plex Mono',monospace" font-size="9" letter-spacing="1.2" fill="#7C8AA0">LAGER 1</text>
-      <text x="633" y="498" font-family="'Space Grotesk',sans-serif" font-weight="600" font-size="13" fill="#F3ECDC">Bewusstsein</text>
+      <rect x="622" y="470" width="118" height="34" rx="7" fill="var(--chip-bg)" fill-opacity="0.88" stroke="var(--chip-border)" stroke-width="1" filter="url(#soft)"/>
+      <text x="633" y="484" font-family="'IBM Plex Mono',monospace" font-size="9" letter-spacing="1.2" fill="var(--chip-label)">LAGER 1</text>
+      <text x="633" y="498" font-family="'Space Grotesk',sans-serif" font-weight="600" font-size="13" fill="var(--ivory)">Bewusstsein</text>
     </g>
     <g class="camp-chip" data-camp-id="2" style="animation-delay:1.95s">
-      <rect x="674" y="378" width="192" height="34" rx="7" fill="#101A2C" fill-opacity="0.88" stroke="#2C3B54" stroke-width="1" filter="url(#soft)"/>
-      <text x="685" y="392" font-family="'IBM Plex Mono',monospace" font-size="9" letter-spacing="1.2" fill="#7C8AA0">LAGER 2 · WEGE TREFFEN SICH</text>
-      <text x="685" y="406" font-family="'Space Grotesk',sans-serif" font-weight="600" font-size="13" fill="#F3ECDC">Entwicklung</text>
+      <rect x="674" y="378" width="192" height="34" rx="7" fill="var(--chip-bg)" fill-opacity="0.88" stroke="var(--chip-border)" stroke-width="1" filter="url(#soft)"/>
+      <text x="685" y="392" font-family="'IBM Plex Mono',monospace" font-size="9" letter-spacing="1.2" fill="var(--chip-label)">LAGER 2 · WEGE TREFFEN SICH</text>
+      <text x="685" y="406" font-family="'Space Grotesk',sans-serif" font-weight="600" font-size="13" fill="var(--ivory)">Entwicklung</text>
     </g>
     <g class="camp-chip" data-camp-id="3" style="animation-delay:2.2s">
-      <rect x="760" y="268" width="150" height="34" rx="7" fill="#101A2C" fill-opacity="0.88" stroke="#2C3B54" stroke-width="1" filter="url(#soft)"/>
-      <text x="771" y="282" font-family="'IBM Plex Mono',monospace" font-size="9" letter-spacing="1.2" fill="#7C8AA0">LAGER 3</text>
-      <text x="771" y="296" font-family="'Space Grotesk',sans-serif" font-weight="600" font-size="13" fill="#F3ECDC">Umsetzung</text>
+      <rect x="760" y="268" width="150" height="34" rx="7" fill="var(--chip-bg)" fill-opacity="0.88" stroke="var(--chip-border)" stroke-width="1" filter="url(#soft)"/>
+      <text x="771" y="282" font-family="'IBM Plex Mono',monospace" font-size="9" letter-spacing="1.2" fill="var(--chip-label)">LAGER 3</text>
+      <text x="771" y="296" font-family="'Space Grotesk',sans-serif" font-weight="600" font-size="13" fill="var(--ivory)">Umsetzung</text>
     </g>
     <g class="camp-chip" data-camp-id="4" style="animation-delay:2.45s">
-      <rect x="852" y="150" width="196" height="34" rx="7" fill="#141225" fill-opacity="0.9" stroke="rgba(231,193,103,.4)" stroke-width="1" filter="url(#soft)"/>
-      <text x="863" y="164" font-family="'IBM Plex Mono',monospace" font-size="9" letter-spacing="1.2" fill="#E7C167">GIPFEL</text>
-      <text x="863" y="178" font-family="'Space Grotesk',sans-serif" font-weight="600" font-size="13" fill="#F3ECDC">True Twin Transformer</text>
+      <rect x="852" y="150" width="196" height="34" rx="7" fill="var(--chip-bg-summit)" fill-opacity="0.9" stroke="var(--gold-border-strong)" stroke-width="1" filter="url(#soft)"/>
+      <text x="863" y="164" font-family="'IBM Plex Mono',monospace" font-size="9" letter-spacing="1.2" fill="var(--gold)">GIPFEL</text>
+      <text x="863" y="178" font-family="'Space Grotesk',sans-serif" font-weight="600" font-size="13" fill="var(--ivory)">True Twin Transformer</text>
     </g>
   </svg>
 
@@ -591,59 +781,57 @@
     <div class="sec-head" data-reveal>
       <div class="eyebrow">In der Praxis</div>
       <h2>So sieht Ihr Ergebnis aus</h2>
-      <p class="lead">Jedes Ergebnis liefert Ihnen eine integrierte Reifegradstufe, Ihren Weg, ein Profil je Dimension und die eine Fähigkeit, die Sie als Nächstes entwickeln sollten.</p>
+      <p class="lead">Ihre Stufe, Ihr Engpass und die eine Fähigkeit, die als Nächstes zählt — auf einen Blick.</p>
     </div>
     <div class="dash glass" data-reveal>
       <span class="dash-tag">Beispielergebnis · illustrative Daten, keine echte Einreichung</span>
-      <div class="dash-grid">
-        <div class="dash-col">
-          <div class="dash-sub">Integrierter Reifegrad</div>
-          <div class="dash-badge"><span class="stagenum">2</span> Entwicklung</div>
-          <div class="dash-pw"><i aria-hidden="true"></i>Weg: Experte für digitale Transformation</div>
-          <div class="dash-mini">
-            <svg viewBox="0 0 200 90" width="100%" height="70" aria-hidden="true">
-              <path d="M6,80 C 40,70 70,40 100,30 C 130,20 150,14 194,10" stroke="var(--line2)" stroke-width="2" fill="none" stroke-linecap="round"/>
-              <path d="M6,80 C 40,70 70,40 100,30" stroke="var(--cyan)" stroke-width="3" fill="none" stroke-linecap="round"/>
-              <circle cx="100" cy="30" r="6" fill="var(--navy-900)" stroke="var(--cyan)" stroke-width="2.5"/>
-              <circle cx="194" cy="10" r="4" fill="var(--gold)"/>
-            </svg>
-            <div class="dash-foot">Position am Berg — Lager 2, kurz nachdem sich die Wege treffen.</div>
-          </div>
-        </div>
-        <div class="dash-col">
+      <div class="dash-grid2">
+        <div class="dash-radar-col">
           <div class="dash-sub">Profil über sechs Dimensionen</div>
-          <svg viewBox="0 0 220 220" width="100%" height="230" role="img" aria-label="Beispiel-Radarchart über sechs Fähigkeitsdimensionen: Strategie auf Stufe 3, Kultur auf Stufe 2, Ökosystem auf Stufe 2, Produkte auf Stufe 3, Betrieb auf Stufe 1, Technologie auf Stufe 2 — illustrative Daten.">
-            <polygon points="110,35 174.95,72.5 174.95,147.5 110,185 45.05,147.5 45.05,72.5" fill="none" stroke="var(--line2)" stroke-width="1"/>
-            <polygon points="110,72.5 142.475,91.25 142.475,128.75 110,147.5 77.525,128.75 77.525,91.25" fill="none" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 4"/>
-            <line x1="110" y1="110" x2="110" y2="35" stroke="var(--line)" stroke-width="1"/>
-            <line x1="110" y1="110" x2="174.95" y2="72.5" stroke="var(--line)" stroke-width="1"/>
-            <line x1="110" y1="110" x2="174.95" y2="147.5" stroke="var(--line)" stroke-width="1"/>
-            <line x1="110" y1="110" x2="110" y2="185" stroke="var(--line)" stroke-width="1"/>
-            <line x1="110" y1="110" x2="45.05" y2="147.5" stroke="var(--line)" stroke-width="1"/>
-            <line x1="110" y1="110" x2="45.05" y2="72.5" stroke="var(--line)" stroke-width="1"/>
-            <polygon points="110,53.75 142.48,91.25 142.48,128.75 110,166.25 93.76,119.38 93.76,100.63" fill="var(--emerald)" fill-opacity="0.16" stroke="var(--gold)" stroke-width="2"/>
-            <circle cx="110" cy="53.75" r="3" fill="var(--d0)"/><circle cx="142.48" cy="91.25" r="3" fill="var(--d1)"/><circle cx="142.48" cy="128.75" r="3" fill="var(--d2)"/><circle cx="110" cy="166.25" r="3" fill="var(--d3)"/><circle cx="93.76" cy="119.38" r="3" fill="var(--d4)"/><circle cx="93.76" cy="100.63" r="3" fill="var(--d5)"/>
-            <text x="110" y="20" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#8B8577">STRATEGIE</text>
-            <text x="196" y="66" text-anchor="start" font-family="IBM Plex Mono" font-size="9" fill="#8B8577">KULTUR</text>
-            <text x="196" y="154" text-anchor="start" font-family="IBM Plex Mono" font-size="9" fill="#8B8577">ÖKOSYSTEM</text>
-            <text x="110" y="203" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#8B8577">PRODUKTE</text>
-            <text x="24" y="154" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#8B8577">BETRIEB</text>
-            <text x="24" y="66" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="#8B8577">TECHNOLOGIE</text>
+          <svg class="dash-radar" viewBox="0 0 220 220" width="100%" height="260" role="img" aria-label="Beispiel-Radarchart über sechs Fähigkeitsdimensionen: Strategie auf Stufe 3, Kultur auf Stufe 2, Ökosystem auf Stufe 2, Produkte auf Stufe 3, Betrieb auf Stufe 1, Technologie auf Stufe 2 — illustrative Daten.">
+            <g class="radar-grid-fade">
+              <polygon points="110,35 174.95,72.5 174.95,147.5 110,185 45.05,147.5 45.05,72.5" fill="none" stroke="var(--line2)" stroke-width="1"/>
+              <polygon points="110,72.5 142.475,91.25 142.475,128.75 110,147.5 77.525,128.75 77.525,91.25" fill="none" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 4"/>
+              <line x1="110" y1="110" x2="110" y2="35" stroke="var(--line)" stroke-width="1"/>
+              <line x1="110" y1="110" x2="174.95" y2="72.5" stroke="var(--line)" stroke-width="1"/>
+              <line x1="110" y1="110" x2="174.95" y2="147.5" stroke="var(--line)" stroke-width="1"/>
+              <line x1="110" y1="110" x2="110" y2="185" stroke="var(--line)" stroke-width="1"/>
+              <line x1="110" y1="110" x2="45.05" y2="147.5" stroke="var(--line)" stroke-width="1"/>
+              <line x1="110" y1="110" x2="45.05" y2="72.5" stroke="var(--line)" stroke-width="1"/>
+              <text x="110" y="20" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="var(--mut)">STRATEGIE</text>
+              <text x="196" y="66" text-anchor="start" font-family="IBM Plex Mono" font-size="9" fill="var(--mut)">KULTUR</text>
+              <text x="196" y="154" text-anchor="start" font-family="IBM Plex Mono" font-size="9" fill="var(--mut)">ÖKOSYSTEM</text>
+              <text x="110" y="203" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="var(--mut)">PRODUKTE</text>
+              <text x="24" y="154" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="var(--mut)">BETRIEB</text>
+              <text x="24" y="66" text-anchor="end" font-family="IBM Plex Mono" font-size="9" fill="var(--mut)">TECHNOLOGIE</text>
+            </g>
+            <polygon class="radar-fill" points="110,53.75 142.48,91.25 142.48,128.75 110,166.25 93.76,119.38 93.76,100.63" fill="var(--emerald)" fill-opacity="0.16"/>
+            <polygon class="radar-profile" points="110,53.75 142.48,91.25 142.48,128.75 110,166.25 93.76,119.38 93.76,100.63" fill="none" stroke="var(--gold)" stroke-width="2"/>
+            <g class="radar-dots">
+              <circle cx="110" cy="53.75" r="3" fill="var(--d0)"/><circle cx="142.48" cy="91.25" r="3" fill="var(--d1)"/><circle cx="142.48" cy="128.75" r="3" fill="var(--d2)"/><circle cx="110" cy="166.25" r="3" fill="var(--d3)"/><circle cx="93.76" cy="119.38" r="3" fill="var(--d4)"/><circle cx="93.76" cy="100.63" r="3" fill="var(--d5)"/>
+            </g>
           </svg>
         </div>
-        <div class="dash-col">
-          <div class="dash-sub">Wo Sie ansetzen sollten</div>
-          <div class="dash-mini" style="margin-top:14px;">
-            <div class="dash-callout bottleneck">
-              <div class="k">Engpass-Dimension</div>
-              <div class="v">Betrieb — Stufe 1</div>
-            </div>
-            <div class="dash-callout next">
-              <div class="k">Empfohlene nächste Fähigkeit</div>
-              <div class="v">Datenbasiertes (Nachhaltigkeits-)Monitoring etablieren</div>
-            </div>
+        <div class="dash-insight-col">
+          <div class="dash-stage-row">
+            <div class="dash-sub">Integrierter Reifegrad</div>
+            <div class="dash-badge"><span class="stagenum">2</span> Entwicklung</div>
+            <div class="dash-pw"><i aria-hidden="true"></i>Weg: Experte für digitale Transformation</div>
+            <svg class="dash-route-mini" viewBox="0 0 200 90" width="100%" height="60" role="img" aria-label="Position am Berg — Lager 2, kurz nachdem sich die Wege treffen.">
+              <path d="M6,80 C 40,70 70,40 100,30 C 130,20 150,14 194,10" stroke="var(--line2)" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M6,80 C 40,70 70,40 100,30" stroke="var(--cyan)" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <circle class="camp2-dot" cx="100" cy="30" r="6" fill="var(--navy-900)" stroke="var(--cyan)" stroke-width="2.5"/>
+              <circle cx="194" cy="10" r="4" fill="var(--gold)"/>
+            </svg>
           </div>
-          <div class="dash-foot">Ihr eigenes Ergebnis basiert auf den tatsächlichen Antworten Ihrer Organisation — dieses Panel ist nur zur Veranschaulichung.</div>
+          <div class="dash-callout bottleneck">
+            <div class="k">Engpass-Dimension</div>
+            <div class="v">Betrieb — Stufe 1</div>
+          </div>
+          <div class="dash-card leverage">
+            <div class="lev-k">Fähigkeit mit dem größten Hebel</div>
+            <div class="lev-v">Datenbasiertes (Nachhaltigkeits-)Monitoring etablieren</div>
+          </div>
         </div>
       </div>
     </div>
@@ -812,9 +1000,9 @@
       <p style="font-size:14px;color:var(--mut);max-width:70ch;margin-top:8px;">Organisationen starten je nach ihrer bisherigen Digital- und Nachhaltigkeitserfahrung von unterschiedlichen Punkten — alle drei Wege treffen sich bei Stufe 2 und teilen sich dann einen gemeinsamen Aufstieg zum Gipfel.</p>
       <div class="pathways" data-reveal>
         <div class="pw glass interactive">
-          <span class="tag" style="background:#8C8A84;">Neueinsteiger</span>
+          <span class="tag" style="background:var(--route-new);">Neueinsteiger</span>
           <div class="nm">Twin-Transformation-Neueinsteiger</div>
-          <svg class="pw-route" viewBox="0 0 200 40" width="100%" height="32" aria-hidden="true"><path d="M6,32 C 60,30 120,20 194,8" stroke="#8C8A84" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="6" cy="32" r="3" fill="#8C8A84"/><circle cx="194" cy="8" r="3" fill="var(--gold)"/></svg>
+          <svg class="pw-route" viewBox="0 0 200 40" width="100%" height="32" aria-hidden="true"><path d="M6,32 C 60,30 120,20 194,8" stroke="var(--route-new)" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="6" cy="32" r="3" fill="var(--route-new)"/><circle cx="194" cy="8" r="3" fill="var(--gold)"/></svg>
           <div class="d">Begrenzte digitale und Nachhaltigkeitsfähigkeiten — integrieren Sie beide von Anfang an, um Zeit und Ressourcen zu sparen.</div>
           <div class="pattern"><b>Typisches Muster:</b> wenige bestehende Routinen zu verlernen, aber Fähigkeiten in beiden Bereichen müssen parallel aufgebaut werden.</div>
         </div>
@@ -865,7 +1053,7 @@
 <!-- ===================== ABSCHLUSS-GIPFEL-CTA ===================== -->
 <section class="cta-summit" id="consulting">
   <svg class="cta-peak" viewBox="0 0 400 160" aria-hidden="true">
-    <path d="M0,160 L120,40 L160,80 L220,10 L280,70 L400,160 Z" fill="#0D1524"/>
+    <path d="M0,160 L120,40 L160,80 L220,10 L280,70 L400,160 Z" fill="var(--cta-peak-fill)"/>
     <circle cx="220" cy="10" r="5" fill="var(--gold)" opacity="0.85"/>
   </svg>
   <div class="wrap" data-reveal>
@@ -942,6 +1130,36 @@
     function onScroll(){ nav.classList.toggle('solid', window.scrollY > 8); }
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
+  })();
+
+  // Theme-Umschalter: kippt data-theme, speichert die Wahl, hält Meta-
+  // theme-color und aria-pressed/label des Buttons synchron. Der initiale
+  // data-theme-Wert (aus dem Anti-Flash-Skript im <head>) bleibt unangetastet;
+  // dies behandelt nur nutzerausgelöste Änderungen ab hier.
+  (function(){
+    var btn = document.getElementById('themeToggle');
+    if(!btn) return;
+    var KEY = 'twinclimb_theme';
+    var meta = document.querySelector('meta[name="theme-color"]');
+    var DARK_COLOR = '#0A1120', LIGHT_COLOR = '#FAF6EC';
+
+    function current(){
+      var t = document.documentElement.getAttribute('data-theme');
+      if(t) return t;
+      return (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+    }
+    function reflect(theme){
+      btn.setAttribute('aria-pressed', theme === 'light' ? 'true' : 'false');
+      btn.setAttribute('aria-label', theme === 'light' ? 'Zu dunkler Darstellung wechseln' : 'Zu heller Darstellung wechseln');
+      if(meta) meta.setAttribute('content', theme === 'light' ? LIGHT_COLOR : DARK_COLOR);
+    }
+    reflect(current());
+    btn.addEventListener('click', function(){
+      var next = current() === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      try{ localStorage.setItem(KEY, next); }catch(e){}
+      reflect(next);
+    });
   })();
 
   // Mobiles Menü: barrierefreies Disclosure-Muster — Escape schließt, Fokus kehrt zum Button zurück
