@@ -21,7 +21,7 @@ export default function App({ lang }) {
   const clientSuffix = state.clientName ? `  ·  ${state.clientName}` : ''
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F2F4F3', color: '#17191C', fontFamily: "'IBM Plex Sans',sans-serif", WebkitFontSmoothing: 'antialiased' }}>
+    <div className="as-root" style={{ fontFamily: 'var(--as-sans)', WebkitFontSmoothing: 'antialiased' }}>
       <Header
         strings={strings} lang={lang} dims={DIMENSIONS} step={step} answers={state.answers}
         showStepper={!isIntro} onGoHome={() => go(0)} onGoStep={(s) => go(s)}

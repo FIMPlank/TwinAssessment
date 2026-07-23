@@ -160,6 +160,8 @@ const en = {
   panelTabLabel: 'Study ↑',
   adminLinkLabel: 'Study dashboard ↗',
   adminLinkTitle: 'Researcher area — sign-in required',
+  themeToLight: 'Switch to light theme',
+  themeToDark: 'Switch to dark theme',
 
   // workshop mode
   wsBrand: 'TWINCLIMB WORKSHOP',
@@ -491,6 +493,8 @@ const de = {
   panelTabLabel: 'Studie ↑',
   adminLinkLabel: 'Studien-Dashboard ↗',
   adminLinkTitle: 'Forschungsbereich — Anmeldung erforderlich',
+  themeToLight: 'Zu heller Darstellung wechseln',
+  themeToDark: 'Zu dunkler Darstellung wechseln',
 
   // Workshop-Modus
   wsBrand: 'TWINCLIMB WORKSHOP',
