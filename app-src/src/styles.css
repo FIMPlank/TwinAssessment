@@ -33,6 +33,167 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 /* ===================================================================
+   Self-assessment design tokens — scoped to .as-root, continuing the
+   landing page's navy/gold mountain-ascent identity (and its dark/light
+   theming) into the assessment flow itself rather than leaving it in a
+   separate flat gray/white shell. Same four-block pattern as the landing
+   page: a bare dark default, a prefers-color-scheme media query for
+   first-time light-preference visitors with no JS, and explicit
+   [data-theme] overrides (set pre-paint by an inline script in
+   assessment.html, toggled by ThemeToggle) that win in both directions
+   via plain CSS specificity. Six-dimension colors (ttcmm.PALETTE) are
+   deliberately left untouched here — they're shared with Workshop Studio
+   and the AI Report Check, whose own identities this task doesn't touch. */
+.as-root {
+  --as-bg: #0A0F1A;
+  --as-bg-deep: #060910;
+  --as-header-bg: #0D1524;
+  --as-surface: #141F34;
+  --as-surface-muted: rgba(243,236,220,.035);
+  --as-surface-hover: rgba(243,236,220,.06);
+  --as-ink: #F3ECDC;
+  --as-sub: #BFB6A4;
+  --as-mut: #8B8577;
+  --as-faint: #857F6D;
+  --as-line: rgba(232,224,204,.14);
+  --as-line-strong: rgba(232,224,204,.26);
+  --as-cyan: #49C9EE;
+  --as-cyan-soft: rgba(73,201,238,.14);
+  --as-emerald: #3ED9A6;
+  --as-emerald-soft: rgba(62,217,166,.14);
+  --as-gold: #E7C167;
+  --as-gold-soft: rgba(231,193,103,.16);
+  --as-danger: #E28277;
+  --as-danger-soft: rgba(226,130,119,.14);
+  --as-ink-on-accent: #06251D;
+  --as-shadow: 0 8px 30px rgba(0,0,0,.35);
+  --as-card-shadow: none;
+  --as-focus: #E7C167;
+  --as-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --as-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --as-head: 'Space Grotesk', 'IBM Plex Sans', sans-serif;
+  --as-display: 'Iowan Old Style', 'Palatino Linotype', 'URW Palladio', ui-serif, Georgia, serif;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  .as-root {
+    --as-bg: #FAF6EC;
+    --as-bg-deep: #EEE3C7;
+    --as-header-bg: #FFFFFF;
+    --as-surface: #FFFFFF;
+    --as-surface-muted: rgba(20,33,61,.035);
+    --as-surface-hover: rgba(20,33,61,.05);
+    --as-ink: #14213D;
+    --as-sub: #3D4F68;
+    --as-mut: #55677F;
+    --as-faint: #4F6178;
+    --as-line: rgba(20,33,61,.13);
+    --as-line-strong: rgba(20,33,61,.24);
+    --as-cyan: #0A6E90;
+    --as-cyan-soft: rgba(73,201,238,.14);
+    --as-emerald: #0A7350;
+    --as-emerald-soft: rgba(62,217,166,.14);
+    --as-gold: #7D5A10;
+    --as-gold-soft: rgba(231,193,103,.16);
+    --as-danger: #A33F32;
+    --as-danger-soft: rgba(163,63,50,.12);
+    --as-ink-on-accent: #ffffff;
+    --as-shadow: 0 1px 2px rgba(20,33,61,.05), 0 10px 28px rgba(20,33,61,.08);
+    --as-card-shadow: 0 1px 2px rgba(20,33,61,.04), 0 8px 22px rgba(20,33,61,.06);
+    --as-focus: #7D5A10;
+    color-scheme: light;
+  }
+}
+html[data-theme="dark"] .as-root {
+  --as-bg: #0A0F1A;
+  --as-bg-deep: #060910;
+  --as-header-bg: #0D1524;
+  --as-surface: #141F34;
+  --as-surface-muted: rgba(243,236,220,.035);
+  --as-surface-hover: rgba(243,236,220,.06);
+  --as-ink: #F3ECDC;
+  --as-sub: #BFB6A4;
+  --as-mut: #8B8577;
+  --as-faint: #857F6D;
+  --as-line: rgba(232,224,204,.14);
+  --as-line-strong: rgba(232,224,204,.26);
+  --as-cyan: #49C9EE;
+  --as-cyan-soft: rgba(73,201,238,.14);
+  --as-emerald: #3ED9A6;
+  --as-emerald-soft: rgba(62,217,166,.14);
+  --as-gold: #E7C167;
+  --as-gold-soft: rgba(231,193,103,.16);
+  --as-danger: #E28277;
+  --as-danger-soft: rgba(226,130,119,.14);
+  --as-ink-on-accent: #06251D;
+  --as-shadow: 0 8px 30px rgba(0,0,0,.35);
+  --as-card-shadow: none;
+  --as-focus: #E7C167;
+  color-scheme: dark;
+}
+html[data-theme="light"] .as-root {
+  --as-bg: #FAF6EC;
+  --as-bg-deep: #EEE3C7;
+  --as-header-bg: #FFFFFF;
+  --as-surface: #FFFFFF;
+  --as-surface-muted: rgba(20,33,61,.035);
+  --as-surface-hover: rgba(20,33,61,.05);
+  --as-ink: #14213D;
+  --as-sub: #3D4F68;
+  --as-mut: #55677F;
+  --as-faint: #4F6178;
+  --as-line: rgba(20,33,61,.13);
+  --as-line-strong: rgba(20,33,61,.24);
+  --as-cyan: #0A6E90;
+  --as-cyan-soft: rgba(73,201,238,.14);
+  --as-emerald: #0A7350;
+  --as-emerald-soft: rgba(62,217,166,.14);
+  --as-gold: #7D5A10;
+  --as-gold-soft: rgba(231,193,103,.16);
+  --as-danger: #A33F32;
+  --as-danger-soft: rgba(163,63,50,.12);
+  --as-ink-on-accent: #ffffff;
+  --as-shadow: 0 1px 2px rgba(20,33,61,.05), 0 10px 28px rgba(20,33,61,.08);
+  --as-card-shadow: 0 1px 2px rgba(20,33,61,.04), 0 8px 22px rgba(20,33,61,.06);
+  --as-focus: #7D5A10;
+  color-scheme: light;
+}
+
+.as-root {
+  background: var(--as-bg);
+  color: var(--as-ink);
+  min-height: 100vh;
+}
+.as-root *:focus-visible {
+  outline: 2.5px solid var(--as-focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .as-root, .as-root *, .as-root *::before, .as-root *::after {
+    transition: background-color .5s ease, border-color .5s ease, color .5s ease, box-shadow .5s ease, fill .5s ease, stroke .5s ease;
+  }
+}
+
+.as-theme-toggle {
+  display: flex; flex: none; width: 36px; height: 36px; border-radius: 9px; padding: 0;
+  border: 1px solid var(--as-line-strong); background: var(--as-surface);
+  align-items: center; justify-content: center; cursor: pointer; color: var(--as-ink);
+}
+.as-theme-toggle:hover { border-color: var(--as-gold); color: var(--as-gold); }
+.as-theme-toggle svg { width: 17px; height: 17px; }
+.as-theme-toggle .as-icon-moon { display: block; }
+.as-theme-toggle .as-icon-sun { display: none; }
+@media (prefers-color-scheme: light) {
+  .as-theme-toggle .as-icon-moon { display: none; }
+  .as-theme-toggle .as-icon-sun { display: block; }
+}
+html[data-theme="dark"] .as-theme-toggle .as-icon-moon { display: block; }
+html[data-theme="dark"] .as-theme-toggle .as-icon-sun { display: none; }
+html[data-theme="light"] .as-theme-toggle .as-icon-moon { display: none; }
+html[data-theme="light"] .as-theme-toggle .as-icon-sun { display: block; }
+
+/* ===================================================================
    Workshop Studio design tokens — scoped to .ws-root only, so none of
    this reaches the self-assessment app (which never uses classNames,
    only inline styles, so there is nothing to collide with anyway).

@@ -27,7 +27,7 @@ export default function SubmissionPanel({ strings, clientName, answers, caps, ef
   const [prefilled, setPrefilled] = useState(false)
   const [email, setEmail] = useState('')
   const [busy, setBusy] = useState(false)
-  const [msg, setMsg] = useState({ text: '', color: '#6B6B66' })
+  const [msg, setMsg] = useState({ text: '', color: 'var(--as-mut)' })
   const [collapsed, setCollapsed] = useState(() => {
     try { return localStorage.getItem(COLLAPSE_KEY) === '1' } catch (e) { return false }
   })
@@ -63,9 +63,9 @@ export default function SubmissionPanel({ strings, clientName, answers, caps, ef
 
   async function submit() {
     if (busy) return
-    if (!isComplete) { setMsg({ text: strings.panelErrIncomplete, color: '#9A2B2B' }); return }
+    if (!isComplete) { setMsg({ text: strings.panelErrIncomplete, color: 'var(--as-danger)' }); return }
     const companyTrimmed = (company || '').trim()
-    if (!companyTrimmed) { setMsg({ text: strings.panelErrNoCompany, color: '#9A2B2B' }); nameInputRef.current && nameInputRef.current.focus(); return }
+    if (!companyTrimmed) { setMsg({ text: strings.panelErrNoCompany, color: 'var(--as-danger)' }); nameInputRef.current && nameInputRef.current.focus(); return }
 
     const s = scoresFor(effByDim)
     const payload = {
@@ -80,7 +80,7 @@ export default function SubmissionPanel({ strings, clientName, answers, caps, ef
     }
 
     setBusy(true)
-    setMsg({ text: strings.panelSubmitting, color: '#6B6B66' })
+    setMsg({ text: strings.panelSubmitting, color: 'var(--as-mut)' })
     try {
       const r = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
         method: 'POST',
@@ -94,13 +94,13 @@ export default function SubmissionPanel({ strings, clientName, answers, caps, ef
       })
       if (r.ok) {
         setSubmittedSig(sig)
-        setMsg({ text: strings.panelSuccess, color: '#179C7D' })
+        setMsg({ text: strings.panelSuccess, color: 'var(--as-emerald)' })
       } else {
         const t = await r.text().catch(() => '')
-        setMsg({ text: strings.panelFailed(r.status, (t || '').slice(0, 160)), color: '#9A2B2B' })
+        setMsg({ text: strings.panelFailed(r.status, (t || '').slice(0, 160)), color: 'var(--as-danger)' })
       }
     } catch (e) {
-      setMsg({ text: strings.panelNetworkError, color: '#9A2B2B' })
+      setMsg({ text: strings.panelNetworkError, color: 'var(--as-danger)' })
     } finally {
       setBusy(false)
     }
@@ -110,17 +110,17 @@ export default function SubmissionPanel({ strings, clientName, answers, caps, ef
 
   const wrapStyle = {
     position: 'fixed', bottom: 20, right: 20, zIndex: 99998, width: 330, maxWidth: 'calc(100vw - 32px)',
-    background: '#fff', border: '1px solid #E3E7E5', borderRadius: 14, boxShadow: '0 8px 30px rgba(0,0,0,.14)',
-    fontFamily: "'IBM Plex Sans',-apple-system,BlinkMacSystemFont,sans-serif", color: '#17191C', overflow: 'hidden',
+    background: 'var(--as-surface)', border: '1px solid var(--as-line)', borderRadius: 14, boxShadow: 'var(--as-shadow)',
+    fontFamily: 'var(--as-sans)', color: 'var(--as-ink)', overflow: 'hidden',
     transition: 'transform .28s cubic-bezier(.4,0,.2,1), opacity .2s ease',
     transform: collapsed ? 'translateX(150%)' : 'translateX(0)',
     opacity: collapsed ? 0 : 1,
     pointerEvents: collapsed ? 'none' : 'auto',
   }
   const tabStyle = {
-    position: 'fixed', bottom: 20, right: 20, zIndex: 99998, border: '1px solid #E3E7E5', borderRadius: 999,
-    background: '#17191C', color: '#fff', fontFamily: "'IBM Plex Mono',ui-monospace,monospace", fontSize: 11,
-    letterSpacing: '0.06em', padding: '11px 18px', boxShadow: '0 6px 20px rgba(0,0,0,.16)', cursor: 'pointer',
+    position: 'fixed', bottom: 20, right: 20, zIndex: 99998, border: '1px solid var(--as-line-strong)', borderRadius: 999,
+    background: 'var(--as-ink)', color: 'var(--as-bg)', fontFamily: 'var(--as-mono)', fontSize: 11,
+    letterSpacing: '0.06em', padding: '11px 18px', boxShadow: 'var(--as-shadow)', cursor: 'pointer',
     transition: 'transform .28s cubic-bezier(.4,0,.2,1), opacity .2s ease',
     transform: collapsed ? 'translateX(0)' : 'translateX(150%)',
     opacity: collapsed ? 1 : 0,
@@ -133,39 +133,39 @@ export default function SubmissionPanel({ strings, clientName, answers, caps, ef
         <button
           id="__study_close"
           type="button" onClick={collapse} aria-label={strings.panelMinimize} title={strings.panelMinimize}
-          style={{ position: 'absolute', top: 8, right: 8, width: 24, height: 24, border: 'none', background: 'transparent', color: '#9A9A95', fontSize: 17, lineHeight: '24px', textAlign: 'center', cursor: 'pointer', padding: 0, borderRadius: 6 }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = '#F2F4F3'; e.currentTarget.style.color = '#17191C' }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#9A9A95' }}
+          style={{ position: 'absolute', top: 8, right: 8, width: 24, height: 24, border: 'none', background: 'transparent', color: 'var(--as-mut)', fontSize: 17, lineHeight: '24px', textAlign: 'center', cursor: 'pointer', padding: 0, borderRadius: 6 }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--as-surface-hover)'; e.currentTarget.style.color = 'var(--as-ink)' }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--as-mut)' }}
         >
           &times;
         </button>
         <div style={{ padding: '15px 17px 14px' }}>
-          <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 10, letterSpacing: '0.16em', color: '#179C7D', textTransform: 'uppercase' }}>
+          <div style={{ fontFamily: 'var(--as-mono)', fontSize: 10, letterSpacing: '0.16em', color: 'var(--as-cyan)', textTransform: 'uppercase' }}>
             {strings.panelKicker}
           </div>
-          <div style={{ fontSize: 13, lineHeight: 1.5, color: '#41413D', margin: '7px 0 12px' }}>{strings.panelIntro}</div>
-          <label style={{ display: 'block', fontFamily: "'IBM Plex Mono',monospace", fontSize: 9.5, letterSpacing: '0.14em', color: '#9A9A95', textTransform: 'uppercase', marginBottom: 5 }}>
+          <div style={{ fontSize: 13, lineHeight: 1.5, color: 'var(--as-sub)', margin: '7px 0 12px' }}>{strings.panelIntro}</div>
+          <label style={{ display: 'block', fontFamily: 'var(--as-mono)', fontSize: 9.5, letterSpacing: '0.14em', color: 'var(--as-mut)', textTransform: 'uppercase', marginBottom: 5 }}>
             {strings.panelCompanyLabel}
           </label>
           <input
             id="__study_name"
             ref={nameInputRef} value={company} onChange={(e) => setCompany(e.target.value)}
             placeholder={strings.panelCompanyPlaceholder}
-            style={{ width: '100%', padding: '10px 11px', border: '1px solid #C6CBC8', borderRadius: 7, fontFamily: 'inherit', fontSize: 14, color: '#17191C', marginBottom: 10 }}
+            style={{ width: '100%', padding: '10px 11px', border: '1px solid var(--as-line-strong)', borderRadius: 7, fontFamily: 'inherit', fontSize: 14, color: 'var(--as-ink)', background: 'var(--as-surface)', marginBottom: 10 }}
           />
-          <label style={{ display: 'block', fontFamily: "'IBM Plex Mono',monospace", fontSize: 9.5, letterSpacing: '0.14em', color: '#9A9A95', textTransform: 'uppercase', marginBottom: 5 }}>
+          <label style={{ display: 'block', fontFamily: 'var(--as-mono)', fontSize: 9.5, letterSpacing: '0.14em', color: 'var(--as-mut)', textTransform: 'uppercase', marginBottom: 5 }}>
             {strings.panelEmailLabel}
           </label>
           <input
             id="__study_email"
             type="email" value={email} onChange={(e) => setEmail(e.target.value)}
             placeholder={strings.panelEmailPlaceholder}
-            style={{ width: '100%', padding: '10px 11px', border: '1px solid #C6CBC8', borderRadius: 7, fontFamily: 'inherit', fontSize: 14, color: '#17191C', marginBottom: 13 }}
+            style={{ width: '100%', padding: '10px 11px', border: '1px solid var(--as-line-strong)', borderRadius: 7, fontFamily: 'inherit', fontSize: 14, color: 'var(--as-ink)', background: 'var(--as-surface)', marginBottom: 13 }}
           />
           <button
             id="__study_submit"
             onClick={submit} disabled={busy}
-            style={{ width: '100%', padding: '12px 16px', border: 'none', borderRadius: 7, background: '#17191C', color: '#fff', fontFamily: "'Space Grotesk','IBM Plex Sans',sans-serif", fontWeight: 600, fontSize: 14, opacity: busy ? 0.6 : 1 }}
+            style={{ width: '100%', padding: '12px 16px', border: 'none', borderRadius: 7, cursor: 'pointer', background: 'linear-gradient(120deg, var(--as-cyan) 0%, var(--as-emerald) 100%)', color: 'var(--as-ink-on-accent)', fontFamily: 'var(--as-head)', fontWeight: 600, fontSize: 14, opacity: busy ? 0.6 : 1 }}
           >
             {submitted ? strings.panelSubmitAgain : strings.panelSubmit}
           </button>
@@ -176,8 +176,8 @@ export default function SubmissionPanel({ strings, clientName, answers, caps, ef
         ref={tabRef} id="__study_tab" type="button" data-print-hide=""
         aria-label={strings.panelReopen} title={strings.panelReopen} onClick={expand}
         style={tabStyle}
-        onMouseEnter={(e) => { e.currentTarget.style.background = '#2A2D31' }}
-        onMouseLeave={(e) => { e.currentTarget.style.background = '#17191C' }}
+        onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--as-gold)' }}
+        onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--as-bg)' }}
       >
         {strings.panelTabLabel}
       </button>
