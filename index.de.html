@@ -63,6 +63,22 @@
   .btn{display:inline-flex;align-items:center;gap:9px;font-family:var(--head);font-weight:600;font-size:15px;text-decoration:none;border-radius:9px;padding:14px 26px;border:1px solid transparent;transition:transform .12s,box-shadow .12s,background .12s,color .12s,border-color .12s;cursor:pointer;}
   .btn-primary{background:var(--accent);color:#fff;box-shadow:0 1px 2px rgba(0,0,0,.08);}
   .btn-primary:hover{background:#12866B;transform:translateY(-1px);box-shadow:0 6px 18px rgba(23,156,125,.28);}
+
+  /* hero CTA: a small light travels the border, drawing the eye to the one
+     action that matters. Built from a conic-gradient behind the button —
+     its own opaque background masks everything but a thin ring. Animating
+     the gradient's own angle (not a transform:rotate on the box) matters
+     here: the button is a wide, short oblong, and rotating that whole box
+     swings its corners well outside its own footprint at 45°/135° — which
+     would expose raw gradient beyond the masking button. Un-rotated, only
+     the color's phase changes, so the light never leaves the ring. Falls
+     back to a static ring (no @property support) rather than breaking. */
+  @property --beam-angle{ syntax:'<angle>'; inherits:false; initial-value:0deg; }
+  .beam-wrap{position:relative;display:inline-block;border-radius:10px;}
+  .beam-wrap::before{content:'';position:absolute;inset:-3px;border-radius:12px;background:conic-gradient(from var(--beam-angle),transparent 0% 68%,var(--accent) 80%,#fff 87%,var(--accent) 94%,transparent 100%);z-index:0;animation:beam-spin 3.6s linear infinite;}
+  .beam-wrap .btn{position:relative;z-index:1;}
+  @keyframes beam-spin{to{--beam-angle:360deg;}}
+  @media (prefers-reduced-motion:reduce){ .beam-wrap::before{animation:none !important;} }
   .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line);}
   .btn-ghost:hover{border-color:#C6CBC8;background:var(--surface);}
   .btn-on-dark{background:transparent;color:var(--sage);border:1px solid rgba(159,184,172,.35);}
@@ -156,10 +172,21 @@
   @keyframes rise{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:translateY(0);}}
   .glow{opacity:0;animation:fade 1.4s ease .3s forwards;}
   @keyframes fade{to{opacity:1;}}
+
+  /* hero sky: a handful of slow-drifting marks in the open sky above the
+     ridgeline — atmosphere/altitude, not confetti, so kept sparse, small
+     and low-opacity. Each dot gets its own drift distance/speed via
+     inline custom properties for an organic (non-grid) feel. */
+  .sky-dots{opacity:0;animation:fade 1.6s ease .4s forwards;}
+  .sky-dot{fill:var(--accent);animation:sky-drift var(--dur,24s) ease-in-out var(--delay,0s) infinite;transform-box:fill-box;transform-origin:center;}
+  @keyframes sky-drift{0%,100%{transform:translate(0,0);opacity:.16;}50%{transform:translate(var(--dx,10px),var(--dy,-8px));opacity:.38;}}
+
   @media (prefers-reduced-motion:reduce){
     .route-draw{animation:none !important;stroke-dashoffset:0 !important;}
     .camp,.camp-chip,.dim-tick{animation:none !important;opacity:1 !important;transform:none !important;}
     .glow{animation:none !important;opacity:1 !important;}
+    .sky-dots{animation:none !important;opacity:1 !important;}
+    .sky-dot{animation:none !important;opacity:.22 !important;transform:none !important;}
   }
 
   /* hero mountain: cursor-reactive routes + camp proximity — JS only computes
@@ -409,6 +436,18 @@
     <rect x="0" y="0" width="1200" height="640" fill="url(#sky)"/>
     <ellipse class="glow" cx="835" cy="150" rx="360" ry="300" fill="url(#dawn)"/>
 
+    <!-- open-sky drift: a few slow, low-opacity marks — atmosphere, not confetti -->
+    <g class="sky-dots" aria-hidden="true">
+      <circle class="sky-dot" style="--dx:16px;--dy:-10px;--dur:23s;--delay:0s" cx="95" cy="88" r="2.1"/>
+      <circle class="sky-dot" style="--dx:-12px;--dy:10px;--dur:27s;--delay:2.4s" cx="240" cy="58" r="1.6"/>
+      <circle class="sky-dot" style="--dx:14px;--dy:12px;--dur:31s;--delay:1.1s" cx="150" cy="180" r="1.8"/>
+      <circle class="sky-dot" style="--dx:-16px;--dy:-8px;--dur:25s;--delay:3.6s" cx="340" cy="130" r="1.4"/>
+      <circle class="sky-dot" style="--dx:10px;--dy:-14px;--dur:29s;--delay:0.8s" cx="55" cy="220" r="1.7"/>
+      <circle class="sky-dot" style="--dx:-10px;--dy:14px;--dur:22s;--delay:4.2s" cx="450" cy="80" r="1.5"/>
+      <circle class="sky-dot" style="--dx:13px;--dy:9px;--dur:26s;--delay:1.9s" cx="290" cy="230" r="1.9"/>
+      <circle class="sky-dot" style="--dx:-14px;--dy:-11px;--dur:33s;--delay:2.9s" cx="510" cy="170" r="1.4"/>
+    </g>
+
     <!-- restrained topographic contour lines across the lower ridge -->
     <g opacity="0.35" stroke="#7C948E" stroke-width="1" fill="none">
       <path d="M0,420 C 220,408 420,414 600,398 C 780,382 900,352 1200,340"/>
@@ -482,7 +521,7 @@
       <h1>Finden Sie Ihren Weg zur Twin&nbsp;Transformation.</h1>
       <p class="vp">Das Assessment zeigt, wie wirksam Digitalisierung und Nachhaltigkeit in Ihrer Organisation zusammenwirken — und welchen nächsten Entwicklungsschritt Sie angehen sollten.</p>
       <div class="hero-cta">
-        <a class="btn btn-primary" href="assessment.de.html">Assessment starten&nbsp;→</a>
+        <span class="beam-wrap"><a class="btn btn-primary" href="assessment.de.html">Assessment starten&nbsp;→</a></span>
         <a class="link-sm" href="#what">Modell entdecken</a>
       </div>
     </div>
