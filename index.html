@@ -275,9 +275,22 @@
   .ascent{position:relative;margin-top:44px;}
   .arow{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;position:relative;}
   .astage{display:flex;flex-direction:column;position:relative;}
-  .aline{position:absolute;top:14px;left:7%;right:7%;height:2px;background:linear-gradient(90deg,var(--faint) 0%,var(--cyan) 35%,var(--emerald) 68%,var(--gold) 100%);opacity:.4;z-index:0;}
-  .anode{width:15px;height:15px;border-radius:50%;background:var(--navy-900);border:2.5px solid var(--line2);margin-bottom:18px;position:relative;z-index:1;transition:border-color .15s,transform .15s,box-shadow .15s;}
-  .astage:nth-child(4) .anode{background:var(--gold);border-color:var(--gold);width:19px;height:19px;box-shadow:0 0 16px rgba(231,193,103,.5);}
+  /* line endpoints land exactly on node 1's and node 4's centers. Nodes are
+     flex/flex-start (flush with the card text below, not centered in their
+     grid column), so node 1's center is a fixed 7.5px (half its own width)
+     from the left — not a %, which previously left a visible gap. Node 4's
+     center scales with the column width, so its inset is 25% (one column)
+     minus the constant part of that same 7.5px math. */
+  .aline{position:absolute;top:6.5px;left:7.5px;right:calc(25% - 21px);height:2px;background:linear-gradient(90deg,var(--faint) 0%,var(--cyan) 35%,var(--emerald) 68%,var(--gold) 100%);opacity:.5;z-index:0;}
+  /* every node is the same 15px box so the line's vertical center (6.5px
+     top + 1px half-thickness = 7.5px, matching 15px/2) lines up with all
+     four — the reached/summit node is distinguished by fill and glow, not
+     by a bigger box that would throw the line off-center again. */
+  .anode{width:15px;height:15px;border-radius:50%;background:var(--navy-900);border:2.5px solid var(--line2);margin-bottom:18px;position:relative;z-index:1;transition:border-color .15s,background .15s,transform .15s,box-shadow .15s;}
+  .astage:nth-child(1) .anode{border-color:var(--faint);}
+  .astage:nth-child(2) .anode{border-color:var(--cyan);}
+  .astage:nth-child(3) .anode{border-color:var(--emerald);}
+  .astage:nth-child(4) .anode{background:var(--gold);border-color:var(--gold);box-shadow:0 0 14px rgba(231,193,103,.55);}
   .acard{padding:22px 20px;display:flex;flex-direction:column;min-height:225px;transition:background .25s ease,border-color .25s ease;}
   .astage:nth-child(1) .acard{background:rgba(243,236,220,.02);}
   .astage:nth-child(2) .acard{background:var(--cyan-soft);border-color:rgba(73,201,238,.18);}
