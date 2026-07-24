@@ -6,7 +6,7 @@ import { layoutOrgTree } from '../orgLayout'
 // glance rather than inferred from indentation. Box content is fully
 // supplied by the caller (the builder needs forms and links, the rollup
 // view needs a radar) -- this only owns the layout and the connector lines.
-export default function OrgCanvas({ units, boxWidth = 220, boxHeight = 120, renderNode }) {
+export default function OrgCanvas({ units, boxWidth = 220, boxHeight = 120, renderNode, extraConnectors = [] }) {
   const { positions, connectors, totalWidth, totalHeight } = layoutOrgTree(units, { boxWidth, boxHeight })
   const pad = 16
 
@@ -26,6 +26,25 @@ export default function OrgCanvas({ units, boxWidth = 220, boxHeight = 120, rend
                 key={`${parentId}-${childId}`}
                 d={`M${x1},${y1} V${midY} H${x2} V${y2}`}
                 fill="none" stroke="var(--ws-border-soft)" strokeWidth="1.5"
+              />
+            )
+          })}
+          {/* Extra-parent links (a unit shared by more than one parent) can
+              connect boxes anywhere on the canvas, not just a row directly
+              above/below -- a plain curved line, visually distinct (dashed,
+              brand color) from the tree's solid elbow connectors. */}
+          {extraConnectors.map(({ parentId, childId }) => {
+            const p = positions[parentId]
+            const c = positions[childId]
+            if (!p || !c) return null
+            const x1 = c.cx + pad, y1 = c.cy + pad
+            const x2 = p.cx + pad, y2 = p.cy + pad
+            const bendY = Math.min(y1, y2) - 26
+            return (
+              <path
+                key={`extra-${parentId}-${childId}`}
+                d={`M${x1},${y1} Q${(x1 + x2) / 2},${bendY} ${x2},${y2}`}
+                fill="none" stroke="var(--ws-brand)" strokeWidth="1.5" strokeDasharray="5 4" opacity="0.65"
               />
             )
           })}
