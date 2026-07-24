@@ -24,8 +24,16 @@ export async function fetchOrgChart(orgId) {
   return data
 }
 
-export async function createOrgUnit(org, parentUnitId, name) {
-  const session = await createSession(org.facilitator_name, org.lang, { mode: 'async', companyName: name })
+// opts carries the exact same session-customization fields the standalone
+// FacilitatorHome form offers (mode, contextNote, phaseMinutes) -- a unit's
+// session is created through the very same createSession() that flow uses,
+// so nothing about it is a cut-down version of a "real" workshop session.
+export async function createOrgUnit(org, parentUnitId, name, opts = {}) {
+  const mode = opts.mode === 'live' ? 'live' : 'async'
+  const sessionOpts = { mode, companyName: name }
+  if (opts.contextNote) sessionOpts.contextNote = opts.contextNote
+  if (mode === 'live' && opts.phaseMinutes) sessionOpts.phaseMinutes = opts.phaseMinutes
+  const session = await createSession(org.facilitator_name, org.lang, sessionOpts)
   const { data, error } = await supabase
     .from('org_units')
     .insert({ org_id: org.id, parent_unit_id: parentUnitId ?? null, session_id: session.id, name })

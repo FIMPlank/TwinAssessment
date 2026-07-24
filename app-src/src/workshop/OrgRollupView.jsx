@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { DIMENSIONS } from '../ttcmm'
+import { DIMENSIONS, dimName } from '../ttcmm'
 import { SHORT_LABEL } from '../i18n'
 import { fetchOrgChart, fetchOrgRollupData } from './orgApi'
-import { rollupOrg, integratedStage } from './orgRollup'
+import { rollupOrg, integratedStage, weakestDimension } from './orgRollup'
 import UnitRadar from './components/UnitRadar'
 import OrgCanvas from './components/OrgCanvas'
 
@@ -16,12 +16,27 @@ function flattenRollup(nodes, map = {}) {
   return map
 }
 
+function ManagementSummary({ strings, lang, node }) {
+  const stage = integratedStage(node.stages, DIMENSIONS)
+  if (stage === null) return <p style={{ fontSize: 14, color: 'var(--ws-text-muted)', fontStyle: 'italic', margin: 0 }}>{strings.wsOrgNoDataYet}</p>
+  const SHORT = SHORT_LABEL[lang]
+  const weakId = weakestDimension(node.stages, DIMENSIONS)
+  const weakDim = DIMENSIONS.find((d) => d.id === weakId)
+  const bottleneckName = weakDim ? dimName(weakDim, lang) : ''
+  return (
+    <p style={{ fontSize: 14.5, lineHeight: 1.6, color: 'var(--ws-text-primary)', margin: 0 }}>
+      {strings.wsOrgSummaryText(strings.wsOrgParticipants(node.participantCount), SHORT[stage], bottleneckName)}
+    </p>
+  )
+}
+
 export default function OrgRollupView({ strings, lang, orgId }) {
   const [org, setOrg] = useState(null)
   const [units, setUnits] = useState([])
   const [rollup, setRollup] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [selectedId, setSelectedId] = useState(null)
   const verifiedKey = `twinclimb_org_verified_${orgId}`
   const [verified, setVerified] = useState(() => { try { return localStorage.getItem(verifiedKey) === '1' } catch (e) { return false } })
   const [pin, setPin] = useState('')
@@ -75,6 +90,8 @@ export default function OrgRollupView({ strings, lang, orgId }) {
   const root = rollup[0]
   const rootStage = root ? integratedStage(root.stages, DIMENSIONS) : null
   const rollupById = flattenRollup(rollup)
+  const selectedUnit = selectedId ? units.find((u) => u.id === selectedId) : null
+  const selectedNode = selectedId ? rollupById[selectedId] : null
 
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto', padding: '36px 28px 100px' }}>
@@ -108,9 +125,19 @@ export default function OrgRollupView({ strings, lang, orgId }) {
             renderNode={(unit) => {
               const node = rollupById[unit.id]
               const isRoot = unit.id === root?.unit.id
+              const isSelected = unit.id === selectedId
               const stage = node ? integratedStage(node.stages, DIMENSIONS) : null
               return (
-                <div style={{ border: `1px solid ${isRoot ? 'var(--ws-brand)' : 'var(--ws-border-soft)'}`, borderRadius: 'var(--ws-radius-md)', padding: '10px 10px 8px', background: '#fff', height: '100%', boxSizing: 'border-box', boxShadow: 'var(--ws-shadow-soft)', textAlign: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => setSelectedId((cur) => (cur === unit.id ? null : unit.id))}
+                  style={{
+                    border: `1.5px solid ${isSelected ? 'var(--ws-brand)' : (isRoot ? 'var(--ws-brand)' : 'var(--ws-border-soft)')}`,
+                    borderRadius: 'var(--ws-radius-md)', padding: '10px 10px 8px', background: isSelected ? 'var(--ws-bg-soft)' : '#fff',
+                    height: '100%', width: '100%', boxSizing: 'border-box', boxShadow: isSelected ? 'var(--ws-shadow-deep)' : 'var(--ws-shadow-soft)',
+                    textAlign: 'center', cursor: 'pointer', fontFamily: 'inherit',
+                  }}
+                >
                   <div style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 700, fontSize: 12.5, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                     {unit.name}
                   </div>
@@ -118,10 +145,31 @@ export default function OrgRollupView({ strings, lang, orgId }) {
                   <div style={{ fontFamily: 'var(--ws-font-mono)', fontSize: 10.5, marginTop: 2, color: stage === null ? 'var(--ws-text-muted)' : 'var(--ws-brand-deep)', fontWeight: stage === null ? 400 : 600 }}>
                     {stage === null ? strings.wsOrgNoDataYet : `${strings.wsOrgStageLabel} ${stage}`}
                   </div>
-                </div>
+                </button>
               )
             }}
           />
+
+          {selectedUnit && selectedNode && (
+            <div className="ws-animate-in" style={{ ...cardStyle, marginTop: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
+                <div>
+                  <div style={{ fontFamily: 'var(--ws-font-mono)', fontSize: 10.5, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--ws-brand-deep)' }}>{strings.wsOrgSummaryHeading}</div>
+                  <h4 style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 700, fontSize: 17, margin: '4px 0 0' }}>{selectedUnit.name}</h4>
+                </div>
+                <button type="button" onClick={() => setSelectedId(null)} aria-label={strings.wsOrgCollapse} title={strings.wsOrgCollapse} style={{ width: 28, height: 28, border: 'none', background: 'transparent', fontSize: 16, cursor: 'pointer', color: 'var(--ws-text-muted)' }}>×</button>
+              </div>
+              <div style={{ marginTop: 12 }}>
+                <ManagementSummary strings={strings} lang={lang} node={selectedNode} />
+              </div>
+              <a
+                href={`?facilitate=${selectedUnit.session_id}`}
+                style={{ display: 'inline-block', marginTop: 16, fontFamily: 'var(--ws-font-head)', fontWeight: 600, fontSize: 14, color: 'var(--ws-brand-deep)', textDecoration: 'none' }}
+              >
+                {strings.wsOrgViewDetailed}
+              </a>
+            </div>
+          )}
         </div>
       )}
     </div>

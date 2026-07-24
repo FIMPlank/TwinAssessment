@@ -75,3 +75,16 @@ export function integratedStage(stages, dims) {
   const vals = dims.map((d) => stages[d.id]).filter((v) => v !== null && v !== undefined)
   return vals.length ? Math.min(...vals) : null
 }
+
+// The dimension holding the integrated stage back -- the same dimension
+// that determines integratedStage above, surfaced by id so a management
+// summary can name it. Returns null if nothing has been answered yet.
+export function weakestDimension(stages, dims) {
+  let weakId = null
+  let weak = Infinity
+  dims.forEach((d) => {
+    const v = stages[d.id]
+    if (v !== null && v !== undefined && v < weak) { weak = v; weakId = d.id }
+  })
+  return weakId
+}

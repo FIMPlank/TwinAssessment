@@ -5,7 +5,16 @@ import OrgCanvas from './components/OrgCanvas'
 const cardStyle = { background: '#fff', border: '1px solid var(--ws-border-soft)', borderRadius: 'var(--ws-radius-lg)', boxShadow: 'var(--ws-shadow-soft)', padding: 24 }
 const h2Style = { fontFamily: 'var(--ws-font-head)', fontWeight: 700, fontSize: 'clamp(22px,2.8vw,28px)', margin: '8px 0 6px', letterSpacing: '-0.01em' }
 const bodyMuted = { fontSize: 14.5, lineHeight: 1.6, color: 'var(--ws-text-muted)', maxWidth: '68ch' }
-const iconBtn = { width: 30, height: 30, border: '1px solid var(--ws-border-soft)', borderRadius: 7, background: '#fff', fontSize: 13.5, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }
+const iconBtn = { width: 30, height: 30, border: '1px solid var(--ws-border-soft)', borderRadius: 7, background: '#fff', fontSize: 13.5, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, textDecoration: 'none', color: 'inherit' }
+const labelStyle = {
+  display: 'block', fontFamily: 'var(--ws-font-mono)', fontSize: 10.5, letterSpacing: '0.1em', color: 'var(--ws-text-muted)',
+  textTransform: 'uppercase', marginBottom: 6, marginTop: 16,
+}
+const inputStyle = {
+  width: '100%', boxSizing: 'border-box', padding: '10px 12px', borderRadius: 'var(--ws-radius-sm)',
+  border: '1.5px solid var(--ws-border-soft)', fontSize: 14, fontFamily: 'inherit', background: '#fff', color: 'var(--ws-text-primary)',
+}
+const DEFAULT_MINUTES = { opening: 10, calibration: 15, deepdive: 40, prioritization: 25 }
 
 function statusPill(strings, unit, participantsBySession) {
   const list = participantsBySession[unit.session_id] || []
@@ -20,6 +29,87 @@ function joinUrlFor(lang, session) {
   return `${window.location.origin}${window.location.pathname.replace(/workshop(\.de)?\.html$/, `workshop${lang === 'de' ? '.de' : ''}.html`)}?code=${session.code}`
 }
 
+// Same fields FacilitatorHome offers a standalone session -- a unit's
+// session is never a cut-down version of "real" workshop mode.
+function NewUnitModal({ strings, onSubmit, onClose }) {
+  const [name, setName] = useState('')
+  const [mode, setMode] = useState('async')
+  const [contextNote, setContextNote] = useState('')
+  const [minutes, setMinutes] = useState(DEFAULT_MINUTES)
+  const [busy, setBusy] = useState(false)
+
+  async function submit(e) {
+    e.preventDefault()
+    if (!name.trim() || busy) return
+    setBusy(true)
+    try {
+      await onSubmit({ name: name.trim(), mode, contextNote: contextNote.trim(), phaseMinutes: minutes })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div
+      style={{ position: 'fixed', inset: 0, background: 'rgba(13,23,20,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 20 }}
+      onClick={onClose}
+    >
+      <form onSubmit={submit} onClick={(e) => e.stopPropagation()} style={{ background: '#fff', borderRadius: 'var(--ws-radius-lg)', padding: 26, maxWidth: 440, width: '100%', boxShadow: 'var(--ws-shadow-deep)', maxHeight: '85vh', overflowY: 'auto' }}>
+        <h3 style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 700, fontSize: 19, margin: 0 }}>{strings.wsOrgUnitFormTitle}</h3>
+
+        <label style={{ ...labelStyle, marginTop: 18 }}>{strings.wsOrgUnitNameLabel}</label>
+        <input value={name} onChange={(e) => setName(e.target.value)} placeholder={strings.wsOrgUnitNamePlaceholder} autoFocus style={inputStyle} />
+
+        <label style={labelStyle}>{strings.wsModeGroupLabel}</label>
+        <div role="group" aria-label={strings.wsModeGroupLabel} style={{ display: 'flex', gap: 8 }}>
+          {['live', 'async'].map((m) => (
+            <button
+              key={m} type="button" onClick={() => setMode(m)} aria-pressed={mode === m}
+              style={{
+                padding: '8px 16px', borderRadius: 20, fontSize: 13, fontFamily: 'var(--ws-font-head)', fontWeight: 600, cursor: 'pointer',
+                border: `1.5px solid ${mode === m ? 'var(--ws-brand)' : 'var(--ws-border-soft)'}`,
+                background: mode === m ? 'var(--ws-brand)' : '#fff', color: mode === m ? '#fff' : 'var(--ws-text-muted)',
+              }}
+            >
+              {m === 'live' ? strings.wsModeLive : strings.wsModeAsync}
+            </button>
+          ))}
+        </div>
+
+        <label style={labelStyle}>{strings.wsContextNoteLabel}</label>
+        <textarea value={contextNote} onChange={(e) => setContextNote(e.target.value)} placeholder={strings.wsContextNotePlaceholder} rows={2} style={{ ...inputStyle, resize: 'vertical' }} />
+
+        {mode === 'live' && (
+          <>
+            <label style={labelStyle}>{strings.wsPhaseMinutesLabel}</label>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {['opening', 'calibration', 'deepdive', 'prioritization'].map((phase) => (
+                <div key={phase} style={{ flex: '1 1 90px' }}>
+                  <div style={{ fontSize: 10.5, color: 'var(--ws-text-muted)', marginBottom: 3 }}>{strings[`wsPhase${phase[0].toUpperCase()}${phase.slice(1)}`]}</div>
+                  <input
+                    type="number" min={1} max={180} value={minutes[phase]}
+                    onChange={(e) => setMinutes((m) => ({ ...m, [phase]: Math.max(1, Number(e.target.value) || 1) }))}
+                    style={{ ...inputStyle, padding: '8px 9px' }}
+                  />
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        <div style={{ display: 'flex', gap: 10, marginTop: 22 }}>
+          <button type="submit" disabled={busy || !name.trim()} style={{ flex: 1, padding: '12px 18px', border: 'none', borderRadius: 'var(--ws-radius-sm)', background: 'var(--ws-brand)', color: '#fff', fontFamily: 'var(--ws-font-head)', fontWeight: 600, fontSize: 14, cursor: 'pointer', opacity: busy ? 0.6 : 1 }}>
+            {busy ? strings.wsCreating : strings.wsOrgUnitFormCreate}
+          </button>
+          <button type="button" onClick={onClose} style={{ padding: '12px 18px', border: '1px solid var(--ws-border-soft)', borderRadius: 'var(--ws-radius-sm)', background: '#fff', fontFamily: 'var(--ws-font-head)', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>
+            {strings.wsOrgCancel}
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}
+
 export default function OrgChartBuilder({ strings, lang, orgId }) {
   const [org, setOrg] = useState(null)
   const [units, setUnits] = useState([])
@@ -29,6 +119,7 @@ export default function OrgChartBuilder({ strings, lang, orgId }) {
   const [error, setError] = useState(null)
   const [busyId, setBusyId] = useState(null)
   const [copiedId, setCopiedId] = useState(null)
+  const [addingUnder, setAddingUnder] = useState(null) // unit or null
   const verifiedKey = `twinclimb_org_verified_${orgId}`
   const [verified, setVerified] = useState(() => { try { return localStorage.getItem(verifiedKey) === '1' } catch (e) { return false } })
   const [pin, setPin] = useState('')
@@ -57,16 +148,10 @@ export default function OrgChartBuilder({ strings, lang, orgId }) {
     return () => clearInterval(t)
   }, [orgId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  async function handleAddChild(parentUnit) {
-    const name = window.prompt(strings.wsOrgUnitNamePlaceholder)
-    if (!name || !name.trim()) return
-    setBusyId(parentUnit.id)
-    try {
-      await createOrgUnit(org, parentUnit.id, name.trim())
-      await load()
-    } finally {
-      setBusyId(null)
-    }
+  async function handleAddUnit({ name, mode, contextNote, phaseMinutes }) {
+    await createOrgUnit(org, addingUnder ? addingUnder.id : null, name, { mode, contextNote, phaseMinutes })
+    setAddingUnder(null)
+    await load()
   }
 
   async function handleRename(unit) {
@@ -140,26 +225,36 @@ export default function OrgChartBuilder({ strings, lang, orgId }) {
         <OrgCanvas
           units={units}
           boxWidth={220}
-          boxHeight={142}
+          boxHeight={152}
           renderNode={(unit) => {
             const session = sessionsById[unit.session_id]
             const pill = statusPill(strings, unit, participantsBySession)
             const isRoot = unit.id === root?.id
             const busy = busyId === unit.id
             return (
-              <div style={{ border: `1px solid ${isRoot ? 'var(--ws-brand)' : 'var(--ws-border-soft)'}`, borderRadius: 'var(--ws-radius-md)', padding: '12px 13px', background: isRoot ? 'var(--ws-brand-tint,#eef7f4)' : '#fff', height: '100%', boxSizing: 'border-box', boxShadow: 'var(--ws-shadow-soft)' }}>
+              <div style={{ border: `1px solid ${isRoot ? 'var(--ws-brand)' : 'var(--ws-border-soft)'}`, borderRadius: 'var(--ws-radius-md)', padding: '12px 13px', background: isRoot ? '#eef7f4' : '#fff', height: '100%', boxSizing: 'border-box', boxShadow: 'var(--ws-shadow-soft)' }}>
                 <div style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 700, fontSize: 14, lineHeight: 1.25, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                   {unit.name}
                 </div>
-                {isRoot && <div style={{ fontFamily: 'var(--ws-font-mono)', fontSize: 9, letterSpacing: '0.1em', color: 'var(--ws-brand-deep)', textTransform: 'uppercase', marginTop: 3 }}>{strings.wsOrgWholeOrgTag}</div>}
-                <div style={{ fontSize: 11.5, marginTop: 6, color: pill.tone === 'active' ? 'var(--ws-brand-deep)' : 'var(--ws-text-muted)', fontWeight: pill.tone === 'active' ? 600 : 400 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
+                  {isRoot && <span style={{ fontFamily: 'var(--ws-font-mono)', fontSize: 9, letterSpacing: '0.1em', color: 'var(--ws-brand-deep)', textTransform: 'uppercase' }}>{strings.wsOrgWholeOrgTag}</span>}
+                  {session && (
+                    <span style={{ fontFamily: 'var(--ws-font-mono)', fontSize: 9, letterSpacing: '0.08em', color: 'var(--ws-text-muted)', textTransform: 'uppercase' }}>
+                      {session.mode === 'live' ? strings.wsModeLive : strings.wsModeAsync}
+                    </span>
+                  )}
+                </div>
+                <div style={{ fontSize: 11.5, marginTop: 5, color: pill.tone === 'active' ? 'var(--ws-brand-deep)' : 'var(--ws-text-muted)', fontWeight: pill.tone === 'active' ? 600 : 400 }}>
                   {pill.text}
                 </div>
-                <div style={{ display: 'flex', gap: 6, marginTop: 10 }}>
+                <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
                   <button type="button" onClick={() => handleCopy(unit, session)} disabled={!session} title={strings.wsOrgCopyLink} aria-label={strings.wsOrgCopyLink} style={iconBtn}>
                     {copiedId === unit.id ? '✓' : '⧉'}
                   </button>
-                  <button type="button" onClick={() => handleAddChild(unit)} disabled={busy} title={strings.wsOrgAddUnit} aria-label={strings.wsOrgAddUnit} style={iconBtn}>+</button>
+                  {session && (
+                    <a href={`?facilitate=${session.id}`} title={strings.wsOrgFacilitate} aria-label={strings.wsOrgFacilitate} style={iconBtn}>▶</a>
+                  )}
+                  <button type="button" onClick={() => setAddingUnder(unit)} disabled={busy} title={strings.wsOrgAddUnit} aria-label={strings.wsOrgAddUnit} style={iconBtn}>+</button>
                   <button type="button" onClick={() => handleRename(unit)} disabled={busy} title={strings.wsOrgRename} aria-label={strings.wsOrgRename} style={iconBtn}>✎</button>
                   {!isRoot && (
                     <button type="button" onClick={() => handleDelete(unit)} disabled={busy} title={strings.wsOrgDelete} aria-label={strings.wsOrgDelete} style={{ ...iconBtn, color: '#B3432F' }}>×</button>
@@ -180,6 +275,10 @@ export default function OrgChartBuilder({ strings, lang, orgId }) {
         </a>
         <span style={{ fontFamily: 'var(--ws-font-mono)', fontSize: 11.5, color: 'var(--ws-text-muted)' }}>{strings.wsPinDisplay(org.facilitator_pin)}</span>
       </div>
+
+      {addingUnder !== null && (
+        <NewUnitModal strings={strings} onSubmit={handleAddUnit} onClose={() => setAddingUnder(null)} />
+      )}
     </div>
   )
 }
