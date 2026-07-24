@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { fetchOrgChart, fetchOrgRollupData, createOrgUnit, renameOrgUnit, deleteOrgUnit } from './orgApi'
+import { fetchOrgChart, fetchOrgRollupData, createOrgUnit, renameOrgUnit, deleteOrgUnit, addOrgUnitLink, removeOrgUnitLink } from './orgApi'
+import { canLinkAsExtraParent } from './orgRollup'
 import OrgCanvas from './components/OrgCanvas'
 
 const cardStyle = { background: '#fff', border: '1px solid var(--ws-border-soft)', borderRadius: 'var(--ws-radius-lg)', boxShadow: 'var(--ws-shadow-soft)', padding: 24 }
@@ -110,16 +111,104 @@ function NewUnitModal({ strings, onSubmit, onClose }) {
   )
 }
 
+// Lets a unit's rolled-up stage also count toward a parent OTHER than its
+// one primary slot in the tree -- e.g. a shared "IT" unit that should feed
+// both Operations and Finance. canLinkAsExtraParent already filters out
+// anything that would be redundant (the current primary parent) or would
+// close a loop, so every option offered here is always safe to add.
+function LinkUnitModal({ strings, unit, units, links, onAdd, onRemove, onClose }) {
+  const [selected, setSelected] = useState('')
+  const [busy, setBusy] = useState(false)
+  const nameById = {}
+  units.forEach((u) => { nameById[u.id] = u.name })
+  const existingParentIds = links.filter((l) => l.unit_id === unit.id).map((l) => l.parent_unit_id)
+  const candidates = units.filter((u) => !existingParentIds.includes(u.id) && canLinkAsExtraParent(unit.id, u.id, units, links))
+
+  async function add() {
+    if (!selected || busy) return
+    setBusy(true)
+    try {
+      await onAdd(selected)
+      setSelected('')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function remove(parentUnitId) {
+    setBusy(true)
+    try {
+      await onRemove(parentUnitId)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div
+      style={{ position: 'fixed', inset: 0, background: 'rgba(13,23,20,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 20 }}
+      onClick={onClose}
+    >
+      <div onClick={(e) => e.stopPropagation()} style={{ background: '#fff', borderRadius: 'var(--ws-radius-lg)', padding: 26, maxWidth: 420, width: '100%', boxShadow: 'var(--ws-shadow-deep)', maxHeight: '85vh', overflowY: 'auto' }}>
+        <h3 style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 700, fontSize: 19, margin: 0 }}>{strings.wsOrgLinkModalTitle(unit.name)}</h3>
+        <p style={{ fontSize: 13.5, lineHeight: 1.55, color: 'var(--ws-text-muted)', marginTop: 10 }}>{strings.wsOrgLinkIntro}</p>
+
+        <label style={labelStyle}>{strings.wsOrgLinkExistingHeading}</label>
+        {existingParentIds.length === 0 ? (
+          <p style={{ fontSize: 13.5, color: 'var(--ws-text-muted)', margin: 0 }}>{strings.wsOrgLinkNone}</p>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {existingParentIds.map((id) => (
+              <div key={id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 10px', border: '1px solid var(--ws-border-soft)', borderRadius: 'var(--ws-radius-sm)', fontSize: 13.5 }}>
+                <span>{nameById[id] || '—'}</span>
+                <button type="button" onClick={() => remove(id)} disabled={busy} style={{ border: 'none', background: 'transparent', color: '#B3432F', fontSize: 12.5, cursor: 'pointer', fontFamily: 'var(--ws-font-head)', fontWeight: 600 }}>
+                  {strings.wsOrgLinkRemove}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <label style={labelStyle}>{strings.wsOrgLinkUnit}</label>
+        {candidates.length === 0 ? (
+          <p style={{ fontSize: 13, color: 'var(--ws-text-muted)', margin: 0 }}>{strings.wsOrgLinkNoCandidates}</p>
+        ) : (
+          <div style={{ display: 'flex', gap: 8 }}>
+            <select value={selected} onChange={(e) => setSelected(e.target.value)} style={{ ...inputStyle, flex: 1 }}>
+              <option value="">{strings.wsOrgLinkPickPlaceholder}</option>
+              {candidates.map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
+            </select>
+            <button
+              type="button" onClick={add} disabled={!selected || busy}
+              style={{ padding: '10px 16px', border: 'none', borderRadius: 'var(--ws-radius-sm)', background: 'var(--ws-brand)', color: '#fff', fontFamily: 'var(--ws-font-head)', fontWeight: 600, fontSize: 13.5, cursor: 'pointer', opacity: (!selected || busy) ? 0.5 : 1 }}
+            >
+              {strings.wsOrgLinkAdd}
+            </button>
+          </div>
+        )}
+
+        <div style={{ marginTop: 22 }}>
+          <button type="button" onClick={onClose} style={{ padding: '11px 18px', border: '1px solid var(--ws-border-soft)', borderRadius: 'var(--ws-radius-sm)', background: '#fff', fontFamily: 'var(--ws-font-head)', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>
+            {strings.wsOrgLinkDone}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function OrgChartBuilder({ strings, lang, orgId }) {
   const [org, setOrg] = useState(null)
   const [units, setUnits] = useState([])
   const [sessionsById, setSessionsById] = useState({})
   const [participantsBySession, setParticipantsBySession] = useState({})
+  const [links, setLinks] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [busyId, setBusyId] = useState(null)
   const [copiedId, setCopiedId] = useState(null)
   const [addingUnder, setAddingUnder] = useState(null) // unit or null
+  const [linkingUnit, setLinkingUnit] = useState(null) // unit or null
   const verifiedKey = `twinclimb_org_verified_${orgId}`
   const [verified, setVerified] = useState(() => { try { return localStorage.getItem(verifiedKey) === '1' } catch (e) { return false } })
   const [pin, setPin] = useState('')
@@ -132,6 +221,7 @@ export default function OrgChartBuilder({ strings, lang, orgId }) {
       setUnits(rollup.units)
       setSessionsById(rollup.sessionsById)
       setParticipantsBySession(rollup.participantsBySession)
+      setLinks(rollup.links)
     } catch (e) {
       setError(e)
     } finally {
@@ -183,6 +273,16 @@ export default function OrgChartBuilder({ strings, lang, orgId }) {
     navigator.clipboard?.writeText(url).then(() => { setCopiedId(unit.id); setTimeout(() => setCopiedId(null), 1800) })
   }
 
+  async function handleAddLink(parentUnitId) {
+    await addOrgUnitLink(linkingUnit.id, parentUnitId)
+    await load()
+  }
+
+  async function handleRemoveLink(parentUnitId) {
+    await removeOrgUnitLink(linkingUnit.id, parentUnitId)
+    await load()
+  }
+
   if (loading) return <p style={{ padding: 60, color: 'var(--ws-text-muted)', textAlign: 'center' }}>…</p>
   if (error || !org) return <p style={{ padding: 60, color: '#B3432F', textAlign: 'center' }}>{strings.wsNoSession}</p>
 
@@ -226,21 +326,28 @@ export default function OrgChartBuilder({ strings, lang, orgId }) {
           units={units}
           boxWidth={220}
           boxHeight={152}
+          extraConnectors={links.map((l) => ({ parentId: l.parent_unit_id, childId: l.unit_id }))}
           renderNode={(unit) => {
             const session = sessionsById[unit.session_id]
             const pill = statusPill(strings, unit, participantsBySession)
             const isRoot = unit.id === root?.id
             const busy = busyId === unit.id
+            const linkCount = links.filter((l) => l.unit_id === unit.id || l.parent_unit_id === unit.id).length
             return (
               <div style={{ border: `1px solid ${isRoot ? 'var(--ws-brand)' : 'var(--ws-border-soft)'}`, borderRadius: 'var(--ws-radius-md)', padding: '12px 13px', background: isRoot ? '#eef7f4' : '#fff', height: '100%', boxSizing: 'border-box', boxShadow: 'var(--ws-shadow-soft)' }}>
                 <div style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 700, fontSize: 14, lineHeight: 1.25, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                   {unit.name}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3, flexWrap: 'wrap' }}>
                   {isRoot && <span style={{ fontFamily: 'var(--ws-font-mono)', fontSize: 9, letterSpacing: '0.1em', color: 'var(--ws-brand-deep)', textTransform: 'uppercase' }}>{strings.wsOrgWholeOrgTag}</span>}
                   {session && (
                     <span style={{ fontFamily: 'var(--ws-font-mono)', fontSize: 9, letterSpacing: '0.08em', color: 'var(--ws-text-muted)', textTransform: 'uppercase' }}>
                       {session.mode === 'live' ? strings.wsModeLive : strings.wsModeAsync}
+                    </span>
+                  )}
+                  {linkCount > 0 && (
+                    <span title={strings.wsOrgLinkBadge(linkCount)} style={{ fontFamily: 'var(--ws-font-mono)', fontSize: 9, letterSpacing: '0.04em', color: 'var(--ws-brand)', border: '1px solid var(--ws-brand)', borderRadius: 8, padding: '0 5px' }}>
+                      🔗{linkCount}
                     </span>
                   )}
                 </div>
@@ -252,9 +359,10 @@ export default function OrgChartBuilder({ strings, lang, orgId }) {
                     {copiedId === unit.id ? '✓' : '⧉'}
                   </button>
                   {session && (
-                    <a href={`?facilitate=${session.id}`} title={strings.wsOrgFacilitate} aria-label={strings.wsOrgFacilitate} style={iconBtn}>▶</a>
+                    <a href={`?facilitate=${session.id}&pin=${session.facilitator_pin}`} title={strings.wsOrgFacilitate} aria-label={strings.wsOrgFacilitate} style={iconBtn}>▶</a>
                   )}
                   <button type="button" onClick={() => setAddingUnder(unit)} disabled={busy} title={strings.wsOrgAddUnit} aria-label={strings.wsOrgAddUnit} style={iconBtn}>+</button>
+                  <button type="button" onClick={() => setLinkingUnit(unit)} disabled={busy} title={strings.wsOrgLinkUnit} aria-label={strings.wsOrgLinkUnit} style={iconBtn}>🔗</button>
                   <button type="button" onClick={() => handleRename(unit)} disabled={busy} title={strings.wsOrgRename} aria-label={strings.wsOrgRename} style={iconBtn}>✎</button>
                   {!isRoot && (
                     <button type="button" onClick={() => handleDelete(unit)} disabled={busy} title={strings.wsOrgDelete} aria-label={strings.wsOrgDelete} style={{ ...iconBtn, color: '#B3432F' }}>×</button>
@@ -278,6 +386,13 @@ export default function OrgChartBuilder({ strings, lang, orgId }) {
 
       {addingUnder !== null && (
         <NewUnitModal strings={strings} onSubmit={handleAddUnit} onClose={() => setAddingUnder(null)} />
+      )}
+
+      {linkingUnit !== null && (
+        <LinkUnitModal
+          strings={strings} unit={linkingUnit} units={units} links={links}
+          onAdd={handleAddLink} onRemove={handleRemoveLink} onClose={() => setLinkingUnit(null)}
+        />
       )}
     </div>
   )

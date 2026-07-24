@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { DIMENSIONS, dimName, PALETTE } from '../ttcmm'
 import { useWorkshopSession } from './useWorkshopSession'
 import { usePrefersReducedMotion, useElapsedSeconds } from './hooks'
@@ -30,6 +30,20 @@ export default function FacilitatorRoom({ strings, lang, sessionId }) {
   const [pin, setPin] = useState('')
   const [pinError, setPinError] = useState(false)
   const elapsedSeconds = useElapsedSeconds(session?.phase)
+
+  // A link into this session (e.g. an org unit's "open control room" button)
+  // can carry its own PIN as ?pin=... -- the person clicking it already
+  // authenticated one level up (the org's facilitator PIN), which is never
+  // the same PIN as this session's own, so re-prompting them for a PIN they
+  // were never shown would just fail every time.
+  useEffect(() => {
+    if (verified || !session) return
+    const urlPin = new URLSearchParams(window.location.search).get('pin')
+    if (urlPin && urlPin === session.facilitator_pin) {
+      try { localStorage.setItem(verifiedKey, '1') } catch (err) {}
+      setVerified(true)
+    }
+  }, [session, verified, verifiedKey])
 
   if (loading) return <p style={{ padding: 60, color: 'var(--ws-text-muted)', textAlign: 'center' }}>…</p>
   if (error || !session) return <p style={{ padding: 60, color: '#B3432F', textAlign: 'center' }}>{strings.wsNoSession}</p>
