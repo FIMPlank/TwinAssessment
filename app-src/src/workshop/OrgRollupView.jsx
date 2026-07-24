@@ -4,35 +4,21 @@ import { SHORT_LABEL } from '../i18n'
 import { fetchOrgChart, fetchOrgRollupData } from './orgApi'
 import { rollupOrg, integratedStage } from './orgRollup'
 import UnitRadar from './components/UnitRadar'
+import OrgCanvas from './components/OrgCanvas'
 
 const cardStyle = { background: '#fff', border: '1px solid var(--ws-border-soft)', borderRadius: 'var(--ws-radius-lg)', boxShadow: 'var(--ws-shadow-soft)', padding: 24 }
 
-function DeptNode({ strings, lang, node, depth }) {
-  const SHORT = SHORT_LABEL[lang]
-  const stage = integratedStage(node.stages, DIMENSIONS)
-  return (
-    <div style={{ marginLeft: depth ? 20 : 0, marginTop: 14 }}>
-      <div style={{ border: '1px solid var(--ws-border-soft)', borderRadius: 'var(--ws-radius-md)', padding: 18, background: depth ? 'var(--ws-bg-soft)' : '#fff', display: 'grid', gridTemplateColumns: '1fr 160px', gap: 16, alignItems: 'center' }}>
-        <div>
-          <div style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 700, fontSize: 15.5 }}>{node.unit.name}</div>
-          <div style={{ fontFamily: 'var(--ws-font-mono)', fontSize: 11.5, color: 'var(--ws-text-muted)', marginTop: 4 }}>
-            {node.participantCount === 0 ? strings.wsOrgStatusEmpty : strings.wsOrgParticipants(node.participantCount)}
-          </div>
-          <div style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 600, fontSize: 14.5, marginTop: 8, color: stage === null ? 'var(--ws-text-muted)' : 'var(--ws-brand-deep)' }}>
-            {stage === null ? strings.wsOrgNoDataYet : `${strings.wsOrgStageLabel} ${stage} · ${SHORT[stage]}`}
-          </div>
-        </div>
-        <UnitRadar lang={lang} dims={DIMENSIONS} stages={node.stages} size={140} showLabels={false} emptyLabel={strings.wsNoPreworkYet} />
-      </div>
-      {node.children.map((child) => (
-        <DeptNode key={child.unit.id} strings={strings} lang={lang} node={child} depth={depth + 1} />
-      ))}
-    </div>
-  )
+function flattenRollup(nodes, map = {}) {
+  nodes.forEach((n) => {
+    map[n.unit.id] = n
+    flattenRollup(n.children, map)
+  })
+  return map
 }
 
 export default function OrgRollupView({ strings, lang, orgId }) {
   const [org, setOrg] = useState(null)
+  const [units, setUnits] = useState([])
   const [rollup, setRollup] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -47,6 +33,7 @@ export default function OrgRollupView({ strings, lang, orgId }) {
       .then(([o, data]) => {
         if (cancelled) return
         setOrg(o)
+        setUnits(data.units)
         setRollup(rollupOrg(data.units, data.participantsBySession, DIMENSIONS))
       })
       .catch((e) => { if (!cancelled) setError(e) })
@@ -87,9 +74,10 @@ export default function OrgRollupView({ strings, lang, orgId }) {
   const SHORT = SHORT_LABEL[lang]
   const root = rollup[0]
   const rootStage = root ? integratedStage(root.stages, DIMENSIONS) : null
+  const rollupById = flattenRollup(rollup)
 
   return (
-    <div style={{ maxWidth: 940, margin: '0 auto', padding: '36px 28px 100px' }}>
+    <div style={{ maxWidth: 1100, margin: '0 auto', padding: '36px 28px 100px' }}>
       <div style={{ fontFamily: 'var(--ws-font-mono)', fontSize: 11.5, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--ws-text-muted)' }}>{strings.wsOrgRollupKicker}</div>
       <h2 style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 700, fontSize: 'clamp(26px,3.4vw,36px)', margin: '8px 0 6px', letterSpacing: '-0.01em' }}>{org.name}</h2>
       <p style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ws-text-muted)', maxWidth: '68ch' }}>{strings.wsOrgRollupIntro}</p>
@@ -110,12 +98,30 @@ export default function OrgRollupView({ strings, lang, orgId }) {
         </div>
       )}
 
-      {root && root.children.length > 0 && (
+      {units.length > 0 && (
         <div style={{ marginTop: 30 }}>
           <h3 style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 600, fontSize: 18, margin: '0 0 4px' }}>{strings.wsOrgByDepartment}</h3>
-          {root.children.map((child) => (
-            <DeptNode key={child.unit.id} strings={strings} lang={lang} node={child} depth={0} />
-          ))}
+          <OrgCanvas
+            units={units}
+            boxWidth={168}
+            boxHeight={188}
+            renderNode={(unit) => {
+              const node = rollupById[unit.id]
+              const isRoot = unit.id === root?.unit.id
+              const stage = node ? integratedStage(node.stages, DIMENSIONS) : null
+              return (
+                <div style={{ border: `1px solid ${isRoot ? 'var(--ws-brand)' : 'var(--ws-border-soft)'}`, borderRadius: 'var(--ws-radius-md)', padding: '10px 10px 8px', background: '#fff', height: '100%', boxSizing: 'border-box', boxShadow: 'var(--ws-shadow-soft)', textAlign: 'center' }}>
+                  <div style={{ fontFamily: 'var(--ws-font-head)', fontWeight: 700, fontSize: 12.5, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                    {unit.name}
+                  </div>
+                  <UnitRadar lang={lang} dims={DIMENSIONS} stages={node ? node.stages : {}} size={92} showLabels={false} emptyLabel="" />
+                  <div style={{ fontFamily: 'var(--ws-font-mono)', fontSize: 10.5, marginTop: 2, color: stage === null ? 'var(--ws-text-muted)' : 'var(--ws-brand-deep)', fontWeight: stage === null ? 400 : 600 }}>
+                    {stage === null ? strings.wsOrgNoDataYet : `${strings.wsOrgStageLabel} ${stage}`}
+                  </div>
+                </div>
+              )
+            }}
+          />
         </div>
       )}
     </div>
