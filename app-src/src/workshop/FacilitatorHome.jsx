@@ -135,10 +135,15 @@ export default function FacilitatorHome({ strings, lang, onCreated }) {
             </button>
           </form>
 
-          <div className="ws-animate-fade" style={{ marginTop: 22, display: 'flex', alignItems: 'baseline', gap: 10, fontSize: 13.5, color: 'var(--ws-text-muted-on-dark)' }}>
+          <div className="ws-animate-fade" style={{ marginTop: 22, display: 'flex', alignItems: 'baseline', gap: 10, fontSize: 13.5, color: 'var(--ws-text-muted-on-dark)', flexWrap: 'wrap' }}>
             <span>{strings.wsHaveCodeAlready}</span>
             <a href="#" onClick={handleJoinPrompt} style={{ color: 'var(--ws-brand-bright)', fontWeight: 600, textDecoration: 'none' }}>
               {strings.wsGoJoin}
+            </a>
+          </div>
+          <div className="ws-animate-fade" style={{ marginTop: 10, fontSize: 13.5, color: 'var(--ws-text-muted-on-dark)' }}>
+            <a href="?neworg=1" style={{ color: 'var(--ws-brand-bright)', fontWeight: 600, textDecoration: 'none' }}>
+              {strings.wsGoOrgChart}
             </a>
           </div>
         </div>

@@ -1,1 +1,0 @@
-import{b as e,r as t,y as n}from"./radar-C9jo6PZI.js";import{t as r}from"./WorkshopApp-DcEOPed9.js";var i=e(),a=n(),o=t();(0,a.createRoot)(document.getElementById(`root`)).render((0,o.jsx)(i.StrictMode,{children:(0,o.jsx)(r,{lang:`de`})}));
