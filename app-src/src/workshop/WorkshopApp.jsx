@@ -5,6 +5,9 @@ import FacilitatorHome from './FacilitatorHome'
 import FacilitatorRoom from './FacilitatorRoom'
 import ParticipantJoin from './ParticipantJoin'
 import ParticipantRoom from './ParticipantRoom'
+import OrgChartHome from './OrgChartHome'
+import OrgChartBuilder from './OrgChartBuilder'
+import OrgRollupView from './OrgRollupView'
 
 function useQueryParam(name) {
   const [value, setValue] = useState(() => new URLSearchParams(window.location.search).get(name))
@@ -27,9 +30,13 @@ export default function WorkshopApp({ lang }) {
   const strings = STRINGS[lang]
   const code = useQueryParam('code')
   const facilitateId = useQueryParam('facilitate')
+  const orgViewId = useQueryParam('orgview')
+  const newOrg = useQueryParam('neworg')
+  const orgIdParam = useQueryParam('org')
 
   const [participant, setParticipant] = useState(null) // { id, name, sessionId } once joined
   const [facilitatorSessionId, setFacilitatorSessionId] = useState(facilitateId)
+  const [orgId, setOrgId] = useState(orgIdParam)
 
   // Resume a participant identity for this join code from a prior visit
   // (page refresh mid-workshop), so re-joining never creates a duplicate.
@@ -56,11 +63,24 @@ export default function WorkshopApp({ lang }) {
     try { localStorage.setItem(`twinclimb_ws_participant_${code}`, JSON.stringify(record)) } catch (e) {}
   }
 
+  function onOrgCreated(org) {
+    setOrgId(org.id)
+    setQueryParam('neworg', null)
+    setQueryParam('org', org.id)
+    try { localStorage.setItem(`twinclimb_org_verified_${org.id}`, '1') } catch (e) {}
+  }
+
   let body
   if (code) {
     body = participant
       ? <ParticipantRoom strings={strings} lang={lang} code={code} participant={participant} />
       : <ParticipantJoin strings={strings} lang={lang} code={code} onJoined={onJoined} />
+  } else if (orgViewId) {
+    body = <OrgRollupView strings={strings} lang={lang} orgId={orgViewId} />
+  } else if (orgId) {
+    body = <OrgChartBuilder strings={strings} lang={lang} orgId={orgId} />
+  } else if (newOrg) {
+    body = <OrgChartHome strings={strings} lang={lang} onCreated={onOrgCreated} />
   } else if (facilitatorSessionId) {
     body = <FacilitatorRoom strings={strings} lang={lang} sessionId={facilitatorSessionId} />
   } else {
